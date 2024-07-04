@@ -1,10 +1,12 @@
+import {Home, Logout, MyAccount} from '../../components/Layout/Header'
+
 export default function Header() {
   //
   return (
-    <div>
-      <p>Home</p>
-      <p>My Page</p>
-      <p>Logout</p>
+    <div className="flex flex-row">
+      <Home />
+      <MyAccount />
+      <Logout />
     </div>
-  );
+  )
 }

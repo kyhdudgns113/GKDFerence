@@ -1,12 +1,16 @@
-import { Routes, Route } from "react-router-dom";
-import Layout from "./Layout";
-import RootPage from "../pages/RootPage";
+import {Routes, Route} from 'react-router-dom'
+import Layout from './Layout'
+import RootPage from '../pages/RootPage'
+import NullPage from '../pages/NullPage'
+import SignUpPage from '../pages/SignUpPage'
 
 export default function RoutesSetup() {
   return (
     <Routes>
       <Route path="/" element={<RootPage />}></Route>
       <Route path="/main" element={<Layout />}></Route>
+      <Route path="/signup" element={<SignUpPage />}></Route>
+      <Route path="/*" element={<NullPage />}></Route>
     </Routes>
     // <Routes>
     //   <Route path="/" element={<Layout />}>
@@ -33,5 +37,5 @@ export default function RoutesSetup() {
     //   />
     //   <Route path="*" element={<NoMatch />} />
     // </Routes>
-  );
+  )
 }

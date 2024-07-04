@@ -1,7 +1,7 @@
 import {FC} from 'react'
 import {TextProps} from './props'
 
-export const _2XL: FC<TextProps> = ({className: _className, ...props}) => {
+export const Text_2xl: FC<TextProps> = ({className: _className, ...props}) => {
   const className = [
     'text-gkd-sakura-text', //
     'text-2xl', //

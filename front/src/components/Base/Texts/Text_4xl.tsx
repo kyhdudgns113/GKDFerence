@@ -1,10 +1,10 @@
 import {FC} from 'react'
 import {TextProps} from './props'
 
-export const _SM: FC<TextProps> = ({className: _className, ...props}) => {
+export const Text_4xl: FC<TextProps> = ({className: _className, ...props}) => {
   const className = [
     'text-gkd-sakura-text', //
-    'text-sm', //
+    'text-4xl', //
     _className
   ].join(' ')
 
