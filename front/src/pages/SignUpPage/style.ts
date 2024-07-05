@@ -1,5 +1,5 @@
 const style_centerElemet = {
-  width: '400px',
+  width: '500px',
   minHeight: '400px'
 }
 

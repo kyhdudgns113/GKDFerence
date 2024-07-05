@@ -9,6 +9,8 @@ export type RowInputProps = InputProps & {
   placeholder?: string
   inputType: string
   setVal: Dispatch<SetStateAction<string>>
+
+  classNameText?: string
 }
 
 export const RowInput: FC<PropsWithChildren<RowInputProps>> = ({
@@ -17,6 +19,7 @@ export const RowInput: FC<PropsWithChildren<RowInputProps>> = ({
   inputType,
   setVal,
   className: _className,
+  classNameText: _classNameText,
   children,
   ...props
 }) => {
@@ -26,10 +29,9 @@ export const RowInput: FC<PropsWithChildren<RowInputProps>> = ({
     _className
   ].join(' ')
   const className_text = [
-    //
-    'w-12',
-    'flex justify-center',
-    'font-bold' //
+    'flex justify-center', //
+    'font-bold', //
+    _classNameText
   ].join(' ')
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {

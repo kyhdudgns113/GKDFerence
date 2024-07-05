@@ -13,10 +13,12 @@ export const IDElement: FC<IDElementProps> = ({
   ...props
 }) => {
   const classNameToDiv = [_className].join(' ')
+  const classNameText = 'w-12'
 
   return (
     <RowInput
       className={classNameToDiv}
+      classNameText={classNameText}
       inputType="text"
       placeholder="id or email"
       setVal={setIdVal}
