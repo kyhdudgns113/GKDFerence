@@ -17,6 +17,8 @@ import {
   useStateRow
 } from './hooks'
 import {MouseEvent, useCallback, useEffect} from 'react' //eslint-disable-line
+import {useAuth} from '../../contexts/AuthContext'
+import {useNavigate} from 'react-router-dom'
 
 export default function SignUpPage() {
   const {className_main, className_centerElement} = classNameSignUpPage
@@ -27,11 +29,37 @@ export default function SignUpPage() {
   const [pwVal, setPwVal, pwErr, setPwErr] = useStateRow()
   const [pw2Val, setPw2Val, pw2Err, setPw2Err] = useStateRow()
 
+  const {signup} = useAuth()
+
+  const navigate = useNavigate()
+
   //  추후 Submit 버튼 적용해야됨
   useCheckIdError(idVal, setIdErr)
   useCheckEmailError(email, setEmailErr)
   useCheckPWError(pwVal, setPwErr)
   useCheckPW2Error(pwVal, pw2Val, setPw2Err)
+
+  const onClickSubmit = useCallback(
+    (e: MouseEvent) => {
+      if (idErr) {
+        alert(idErr)
+      } else if (emailErr) {
+        alert(emailErr)
+      } else if (pwErr) {
+        alert(pwErr)
+      } else if (pw2Err) {
+        alert(pw2Err)
+      } else {
+        signup(idVal, email, pwVal, () => navigate('/'))
+      }
+    },
+    // prettier-ignore
+    [
+      idVal, idErr, email, emailErr,
+      pwVal, pwErr, pw2Err,
+      signup, navigate
+    ]
+  )
 
   const onClickTest = useCallback((e: MouseEvent) => {
     //
@@ -46,7 +74,7 @@ export default function SignUpPage() {
         <PWElement {...{pwVal, setPwVal, pwErr}} />
         <PWCheckElement {...{pw2Val, setPw2Val, pw2Err}} />
         <div className="flex flex-row justify-center mt-4">
-          <SubmitButton />
+          <SubmitButton onClick={onClickSubmit} />
           <button
             className="btn w-1/4 ml-2 mr-2 border-2 border-gkd-sakura-border"
             onClick={onClickTest}>

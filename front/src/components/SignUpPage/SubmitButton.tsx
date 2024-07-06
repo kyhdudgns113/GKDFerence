@@ -1,9 +1,12 @@
-import {FC} from 'react'
+import {FC, MouseEvent} from 'react'
 import {Button, ButtonCommonProps} from '../Base'
 
-export type SubmitButtonProps = ButtonCommonProps & {}
+export type SubmitButtonProps = ButtonCommonProps & {
+  onClick?: (e: MouseEvent) => void
+}
 
 export const SubmitButton: FC<SubmitButtonProps> = ({
+  onClick,
   className: _className, //
   ...props
 }) => {
@@ -13,7 +16,7 @@ export const SubmitButton: FC<SubmitButtonProps> = ({
   ].join(' ')
 
   return (
-    <Button className={className} {...props}>
+    <Button className={className} {...props} onClick={onClick}>
       Submit
     </Button>
   )
