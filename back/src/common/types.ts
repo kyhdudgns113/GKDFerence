@@ -5,4 +5,3 @@ export type AuthBodyType = {
   email?: string
   _id?: string
 }
-export type ErrorsType = {[key: string]: string}

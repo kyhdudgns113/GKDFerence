@@ -4,14 +4,13 @@ import * as U from '../../utils'
 import {post} from '../../server'
 import {useNavigate} from 'react-router-dom'
 import {get} from '../../server'
-import {BodyType, Callback} from './types'
+import {AuthBodyType, Callback, ErrorsType} from './types'
 import {writeBodyObject} from './writeBodyObject'
 
 type ContextType = {
-  jwt?: string
   alertMsg?: string
 
-  signup: (id: string, email: string, password: string, callback?: Callback) => void
+  signup: (id: string, email: string, password: string) => Promise<ErrorsType>
   login: (id: string, password: string, callback?: Callback) => void
   logout: (callback?: Callback) => void
   checkToken: (callback?: Callback) => void
@@ -19,7 +18,7 @@ type ContextType = {
 }
 
 export const AuthContext = createContext<ContextType>({
-  signup: (id: string, email: string, password: string, callback?: Callback) => {},
+  signup: async (id: string, email: string, password: string) => ({}),
   login: (id: string, password: string, callback?: Callback) => {},
   logout: (callback?: Callback) => {},
   checkToken: (callback?: Callback) => {},
@@ -33,25 +32,29 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
 
   const navigate = useNavigate()
 
-  const signup = useCallback((id: string, email: string, password: string, callback?: Callback) => {
+  const signup = useCallback((id: string, email: string, password: string) => {
     const user = {id, email, password}
-    post('/auth/signup', user)
-      .then(res => res.json())
-      .then((result: {ok: boolean; body?: BodyType; errors?: string}) => {
-        const {ok, body, errors} = result
-        if (ok) {
-          writeBodyObject(body, callback)
-        } else {
-          setAlertMsg(errors ?? '')
-        }
-      })
-      .catch((e: Error) => setAlertMsg(e.message))
+    const ret = new Promise<ErrorsType>((resolve, reject) => {
+      post('/auth/signup', user)
+        .then(res => res.json())
+        .then((result: {ok: boolean; body?: AuthBodyType; errors: ErrorsType}) => {
+          const {ok, body, errors} = result
+          if (ok) {
+            writeBodyObject(body)
+            resolve({})
+          } else {
+            reject(errors)
+          }
+        })
+        .catch((e: Error) => setAlertMsg(e.message))
+    })
+    return ret
   }, [])
   const login = useCallback((id: string, password: string, callback?: Callback) => {
     const user = {id, password}
     post('/auth/login', user)
       .then(res => res.json())
-      .then((result: {ok: boolean; body?: BodyType; errors?: string}) => {
+      .then((result: {ok: boolean; body?: AuthBodyType; errors?: string}) => {
         const {ok, body, errors} = result
         if (ok) {
           writeBodyObject(body, callback)

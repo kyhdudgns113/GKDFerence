@@ -50,14 +50,23 @@ export default function SignUpPage() {
       } else if (pw2Err) {
         alert(pw2Err)
       } else {
-        signup(idVal, email, pwVal, () => navigate('/'))
+        // TODO: Set errors with reveiced 'errors'
+        // TODO: It will be need to use 'Promise'
+        signup(idVal, email, pwVal)
+          .then(() => navigate('/'))
+          .catch(errors => {
+            const keys = Object.keys(errors)
+
+            keys.includes('id') && setIdErr(errors['id'])
+            keys.includes('email') && setEmailErr(errors['email'])
+          })
       }
     },
     // prettier-ignore
     [
       idVal, idErr, email, emailErr,
       pwVal, pwErr, pw2Err,
-      signup, navigate
+      signup, navigate, setIdErr, setEmailErr
     ]
   )
 
