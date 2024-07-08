@@ -3,6 +3,8 @@ import {Document} from 'mongoose'
 
 @Schema()
 export class User extends Document {
+  /** Object Id is in extended class Document */
+
   /** User ID */
   @Prop()
   id: string

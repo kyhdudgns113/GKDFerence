@@ -2,10 +2,11 @@ import {Module} from '@nestjs/common'
 import {JwtModule} from '@nestjs/jwt'
 import {PassportModule} from '@nestjs/passport'
 
-import {AuthController, AuthService} from '../auth'
-import {UserModule} from '../user'
 import {gkdJwtSecret, gkdJwtSignOption} from '../server_secret'
 import {JwtStrategy} from '../jwt'
+import {UserModule} from 'src/user/user.module'
+import {AuthController} from './auth.controller'
+import {AuthService} from './auth.service'
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
 const style_centerElemet = {
-  width: '400px',
-  height: '300px'
+  width: '500px',
+  minHeight: '400px'
 }
 
 export const styleRootPage = {

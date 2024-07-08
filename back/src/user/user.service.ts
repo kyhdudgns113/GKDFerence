@@ -1,8 +1,8 @@
 import {Injectable} from '@nestjs/common'
 import {InjectModel} from '@nestjs/mongoose'
 import {Model, ObjectId} from 'mongoose'
-
-import {CreateUserDto, UpdateUserDto, User} from '../user'
+import {User} from './entities'
+import {CreateUserDto, UpdateUserDto} from './dto'
 
 @Injectable()
 export class UserService {
@@ -33,11 +33,7 @@ export class UserService {
     return result
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`
+  blankLineFunction() {
+    //
   }
 }

@@ -1,8 +1,9 @@
-import {useState} from 'react'
+import {MouseEvent, useCallback, useEffect, useState} from 'react' // eslint-disable-line
 
 import {classNameRootPage} from './className'
 import {styleRootPage} from './style'
 import {
+  ArgLoginButtonProps,
   IDElement,
   LoginButton,
   PWElement,
@@ -10,21 +11,43 @@ import {
   Title
 } from '../../components/RootPage'
 
+import * as U from '../../utils' // eslint-disable-line
+import {useNavigate} from 'react-router-dom'
+import {useAuth} from '../../contexts/AuthContext'
+import {useGoToMain} from './hooks'
+
 export default function RootPage() {
   const {className_main, className_centerElement} = classNameRootPage
   const {style_centerElemet} = styleRootPage
 
+  /* eslint-disable */
   const [idVal, setIdVal] = useState<string>('')
   const [pwVal, setPwVal] = useState<string>('')
+  const [idErr, setIdErr] = useState<string>('')
+  const [pwErr, setPwErr] = useState<string>('')
+  /* eslint-enable */
 
+  const navigate = useNavigate() // eslint-disable-line
+
+  const {login, logout, checkToken} = useAuth() // eslint-disable-line
+
+  useGoToMain()
+
+  const argLoginButton: ArgLoginButtonProps = {
+    idVal,
+    pwVal,
+    setIdErr,
+    setPwErr
+  }
+  // TODO: Server_Login First
   return (
     <div className={className_main}>
       <div className={className_centerElement} style={style_centerElemet}>
         <Title />
-        <IDElement idVal={idVal} setIdVal={setIdVal} />
-        <PWElement pwVal={pwVal} setPwVal={setPwVal} />
+        <IDElement idVal={idVal} setIdVal={setIdVal} idErr={idErr} />
+        <PWElement pwVal={pwVal} setPwVal={setPwVal} pwErr={pwErr} />
         <div className="flex flex-row justify-center mt-4">
-          <LoginButton />
+          <LoginButton arg={argLoginButton} />
           <div className="w-1/4"> </div>
           <SignUpButton />
         </div>

@@ -50,8 +50,6 @@ export default function SignUpPage() {
       } else if (pw2Err) {
         alert(pw2Err)
       } else {
-        // TODO: Set errors with reveiced 'errors'
-        // TODO: It will be need to use 'Promise'
         signup(idVal, email, pwVal)
           .then(() => navigate('/'))
           .catch(errors => {
@@ -70,9 +68,7 @@ export default function SignUpPage() {
     ]
   )
 
-  const onClickTest = useCallback((e: MouseEvent) => {
-    //
-  }, [])
+  // TODO: if jwt token validate, navigate to /main
 
   return (
     <div className={className_main}>
@@ -84,12 +80,7 @@ export default function SignUpPage() {
         <PWCheckElement {...{pw2Val, setPw2Val, pw2Err}} />
         <div className="flex flex-row justify-center mt-4">
           <SubmitButton onClick={onClickSubmit} />
-          <button
-            className="btn w-1/4 ml-2 mr-2 border-2 border-gkd-sakura-border"
-            onClick={onClickTest}>
-            Test
-          </button>
-          {/* <div className="w-1/4"></div> */}
+          <div className="w-1/4"></div>
           <CancelButton />
         </div>
       </div>

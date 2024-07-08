@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common'
-import {ObjectId} from 'mongoose'
 import * as bcrypt from 'bcrypt'
 import {JwtService} from '@nestjs/jwt'
 
-import {CreateUserDto, UserService} from '../user'
-import {gkdSaltOrRounds} from '../server_secret'
+import {gkdJwtSecret, gkdSaltOrRounds} from '../server_secret'
 import {JwtPayload} from '../jwt'
-import {AuthBodyType} from '../common'
+import {AuthBodyType, AuthObjectType} from '../common'
+import {UserService} from 'src/user/user.service'
+import {CreateUserDto} from 'src/user/dto'
 
 @Injectable()
 export class AuthService {
@@ -15,14 +15,13 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  // TODO: 그냥 나머지 다 구현하면 됨.
-  async signup(userDto: CreateUserDto) {
+  async signup(authBody: AuthBodyType) {
     const errors: {[key: string]: string} = {}
     let ok: boolean = true
     let body: AuthBodyType = {}
 
-    const userById = await this.userService.findOneById(userDto.id)
-    const userByEmail = await this.userService.findOneByEmail(userDto.email)
+    const userById = await this.userService.findOneById(authBody.id)
+    const userByEmail = await this.userService.findOneByEmail(authBody.email)
 
     if (userById) {
       errors['id'] = 'ID가 중복입니다.'
@@ -32,22 +31,27 @@ export class AuthService {
       errors['email'] = 'EMAIL이 중복입니다.'
       ok = false
     }
-    const hashedPassword = bcrypt.hashSync(userDto.password, gkdSaltOrRounds)
+    const hashedPassword = bcrypt.hashSync(authBody.password, gkdSaltOrRounds)
 
     if (ok) {
       try {
+        const userDto: CreateUserDto = {
+          id: authBody.id,
+          email: authBody.email,
+          password: hashedPassword
+        }
         const user = await this.userService.create({
           ...userDto,
           password: hashedPassword
         })
 
-        const jwtPayload: JwtPayload = {id: user.id, email: user.email}
+        const jwtPayload: JwtPayload = {_id: user._id.toString(), email: user.email}
         const jwt = this.jwtService.sign(jwtPayload)
 
         ok = true
         body.id = user.id
         body.email = user.email
-        body._id = user._id as string
+        body._id = user._id.toString()
         body.jwt = jwt
       } catch (error) {
         ok = false
@@ -56,26 +60,111 @@ export class AuthService {
       }
     }
 
-    return {ok, body, errors}
+    const sendObject: AuthObjectType = {ok, body, errors}
+
+    return sendObject
   }
 
-  findOneById(id: string) {
-    return id
+  async login(authBody: AuthBodyType) {
+    const authObject: AuthObjectType = {
+      ok: true,
+      body: {},
+      errors: {}
+    }
+    const {id, password} = authBody
+
+    if (!id || !password) {
+      authObject.ok = false
+      authObject.errors['id'] = id ? '' : 'ID 가 공란입니다.'
+      authObject.errors['password'] = password ? '' : 'PW 가 공란입니다.'
+      return authObject
+    }
+
+    let user = await this.userService.findOneById(id)
+    if (!user) {
+      user = await this.userService.findOneByEmail(id)
+      if (!user) {
+        authObject.ok = false
+        authObject.errors['id'] = '존재하지 않는 ID 입니다.'
+        return authObject
+      }
+      const isPwSame = bcrypt.compare(authBody.password, user.hashedPassword)
+
+      if (!isPwSame) {
+        authObject.ok = false
+        authObject.errors['password'] = '비밀번호가 틀립니다.'
+        return authObject
+      }
+    }
+
+    const jwtPayload: JwtPayload = {
+      _id: user._id.toString(),
+      email: user.email
+    }
+    const jwt = this.jwtService.sign(jwtPayload)
+
+    authObject.body.id = authBody.id
+    authObject.body._id = user._id.toString()
+    authObject.body.jwt = jwt
+
+    return authObject
   }
 
-  findOneByObjectId(_id: ObjectId) {
-    return 'yes'
+  async checkToken(jwt: string) {
+    if (!jwt) {
+      const sendObject: AuthObjectType = {
+        ok: false,
+        body: {},
+        errors: {jwt: 'No jwt is sended'}
+      }
+      return sendObject
+    }
+
+    const isJwt = this.jwtService.verify(jwt)
+    const sendObject: AuthObjectType = {
+      ok: Boolean(isJwt),
+      body: isJwt ? {jwt: jwt} : {},
+      errors: isJwt ? {} : {jwt: 'JWT Invalid'}
+    }
+
+    return sendObject
   }
 
-  findOneByEmail(email: string) {
-    return email
+  async refreshToken(jwt: string) {
+    if (!jwt) {
+      const sendObject: AuthObjectType = {
+        ok: false,
+        body: {},
+        errors: {jwt: 'No jwt is sended'}
+      }
+      return sendObject
+    }
+
+    const isJwt = this.jwtService.verify(jwt)
+    if (!Boolean(isJwt)) {
+      const sendObject: AuthObjectType = {
+        ok: false,
+        body: {},
+        errors: {jwt: 'JWT Invalid'}
+      }
+      return sendObject
+    }
+
+    const jwtPayload: JwtPayload = {
+      _id: isJwt._id,
+      email: isJwt.email
+    }
+
+    const newJwt = this.jwtService.sign(jwtPayload)
+    const sendObject: AuthObjectType = {
+      ok: Boolean(newJwt),
+      body: {jwt: newJwt},
+      errors: newJwt ? {} : {jwt: 'jwt regenerate error'}
+    }
+    return sendObject
   }
 
-  // update(id: number, updateAuthDto: UpdateAuthDto) {
-  //   return `This action updates a #${id} auth`;
-  // }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`
+  emptyFunction() {
+    // this function is for blank line
   }
 }
