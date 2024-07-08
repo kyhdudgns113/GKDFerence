@@ -29,7 +29,7 @@ export default function SignUpPage() {
   const [pwVal, setPwVal, pwErr, setPwErr] = useStateRow()
   const [pw2Val, setPw2Val, pw2Err, setPw2Err] = useStateRow()
 
-  const {signup} = useAuth()
+  const {signup, checkToken} = useAuth()
 
   const navigate = useNavigate()
 
@@ -38,6 +38,13 @@ export default function SignUpPage() {
   useCheckEmailError(email, setEmailErr)
   useCheckPWError(pwVal, setPwErr)
   useCheckPW2Error(pwVal, pw2Val, setPw2Err)
+
+  useEffect(() => {
+    checkToken(
+      () => navigate('/main'),
+      () => {}
+    )
+  }, [checkToken, navigate])
 
   const onClickSubmit = useCallback(
     (e: MouseEvent) => {

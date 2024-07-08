@@ -38,11 +38,11 @@ export class AuthService {
         const userDto: CreateUserDto = {
           id: authBody.id,
           email: authBody.email,
-          password: hashedPassword
+          hashedPassword: hashedPassword
         }
         const user = await this.userService.create({
           ...userDto,
-          password: hashedPassword
+          hashedPassword: hashedPassword
         })
 
         const jwtPayload: JwtPayload = {_id: user._id.toString(), email: user.email}
@@ -88,13 +88,14 @@ export class AuthService {
         authObject.errors['id'] = '존재하지 않는 ID 입니다.'
         return authObject
       }
-      const isPwSame = bcrypt.compare(authBody.password, user.hashedPassword)
+    }
 
-      if (!isPwSame) {
-        authObject.ok = false
-        authObject.errors['password'] = '비밀번호가 틀립니다.'
-        return authObject
-      }
+    const isPwSame = await bcrypt.compare(password, user.hashedPassword)
+
+    if (!isPwSame) {
+      authObject.ok = false
+      authObject.errors['password'] = '비밀번호가 틀립니다.'
+      return authObject
     }
 
     const jwtPayload: JwtPayload = {

@@ -33,13 +33,16 @@ export default function RootPage() {
 
   useGoToMain()
 
+  const onClickTest = useCallback((e: MouseEvent) => {
+    // For now, this is blank function
+  }, [])
+
   const argLoginButton: ArgLoginButtonProps = {
     idVal,
     pwVal,
     setIdErr,
     setPwErr
   }
-  // TODO: Server_Login First
   return (
     <div className={className_main}>
       <div className={className_centerElement} style={style_centerElemet}>
@@ -48,7 +51,9 @@ export default function RootPage() {
         <PWElement pwVal={pwVal} setPwVal={setPwVal} pwErr={pwErr} />
         <div className="flex flex-row justify-center mt-4">
           <LoginButton arg={argLoginButton} />
-          <div className="w-1/4"> </div>
+          <div className="btn w-1/4 border-2" onClick={onClickTest}>
+            {' '}
+          </div>
           <SignUpButton />
         </div>
       </div>

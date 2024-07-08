@@ -12,7 +12,6 @@ export class AuthController {
     const {ok, body, errors} = await this.authService.signup(authBody)
     return {ok, body, errors} as AuthObjectType
   }
-
   @Post('/login')
   async login(@Body() authBody: AuthBodyType) {
     const ret = await this.authService.login(authBody)
@@ -31,7 +30,6 @@ export class AuthController {
     const ret = await this.authService.checkToken(jwt)
     return ret
   }
-
   @Get('/refreshToken')
   async refreshToken(@Headers() headers) {
     if (!headers || !headers.authorization) {

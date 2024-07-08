@@ -3,7 +3,7 @@ import {createContext, useContext, useState, useCallback, useEffect} from 'react
 import * as U from '../../utils'
 import {post, get} from '../../server'
 import {useNavigate} from 'react-router-dom'
-import {AuthBodyType, AuthObjectType, Callback, ErrorsType} from './types'
+import {AuthObjectType, Callback, ErrorsType} from './types'
 import {writeBodyObject} from './writeBodyObject'
 
 type ContextType = {
@@ -75,7 +75,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     (successCallBack?: Callback, failCallBack?: Callback) => {
       U.readStringP('jwt').then(jwt => {
         if (!jwt) {
-          navigate('/') // jwt 토큰이 없으므로 로그인 화면으로 이동
+          failCallBack && failCallBack()
         } else {
           get('/auth/checkToken', jwt)
             .then(res => res.json())
