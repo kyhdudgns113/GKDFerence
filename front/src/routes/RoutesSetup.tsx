@@ -4,11 +4,12 @@ import NullPage from '../pages/NullPage'
 import {LayoutProvider} from '../contexts/LayoutContext'
 import MainPage from '../pages/MainPage'
 import {SignUpProvider} from '../contexts/SignUpContext'
+import {RootPageProvider} from '../contexts/RootPageContext'
 
 export default function RoutesSetup() {
   return (
     <Routes>
-      <Route path="/" element={<RootPage />}></Route>
+      <Route path="/" element={<RootPageProvider />}></Route>
 
       {/* // TODO: ADD RequireAuth
        */}
