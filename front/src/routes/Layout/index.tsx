@@ -6,7 +6,7 @@ import Sidebar from './Sidebar'
 export default function Layout() {
   return (
     <div className="flex flex-col">
-      <div className="p-4 border-2">
+      <div className="p-4">
         <Header />
       </div>
       <div className="flex flex-row">

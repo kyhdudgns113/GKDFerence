@@ -71,8 +71,9 @@ export class AuthService {
       body: {},
       errors: {}
     }
-    const {id, password} = authBody
 
+    //  Check is input validate
+    const {id, password} = authBody
     if (!id || !password) {
       authObject.ok = false
       authObject.errors['id'] = id ? '' : 'ID 가 공란입니다.'
@@ -80,6 +81,7 @@ export class AuthService {
       return authObject
     }
 
+    // Check is user exist
     let user = await this.userService.findOneById(id)
     if (!user) {
       user = await this.userService.findOneByEmail(id)
@@ -90,20 +92,20 @@ export class AuthService {
       }
     }
 
+    // Check password
     const isPwSame = await bcrypt.compare(password, user.hashedPassword)
-
     if (!isPwSame) {
       authObject.ok = false
       authObject.errors['password'] = '비밀번호가 틀립니다.'
       return authObject
     }
 
+    /** For forcing type, jwtPayload should be declared as const variable */
     const jwtPayload: JwtPayload = {
       _id: user._id.toString(),
       email: user.email
     }
     const jwt = this.jwtService.sign(jwtPayload)
-
     authObject.body.id = authBody.id
     authObject.body._id = user._id.toString()
     authObject.body.jwt = jwt
@@ -116,7 +118,7 @@ export class AuthService {
       const sendObject: AuthObjectType = {
         ok: false,
         body: {},
-        errors: {jwt: 'No jwt is sended'}
+        errors: {jwt: 'No header is sended'}
       }
       return sendObject
     }
@@ -136,13 +138,13 @@ export class AuthService {
       const sendObject: AuthObjectType = {
         ok: false,
         body: {},
-        errors: {jwt: 'No jwt is sended'}
+        errors: {jwt: 'No header is sended'}
       }
       return sendObject
     }
 
     const isJwt = this.jwtService.verify(jwt)
-    if (!Boolean(isJwt)) {
+    if (!isJwt) {
       const sendObject: AuthObjectType = {
         ok: false,
         body: {},
@@ -151,11 +153,11 @@ export class AuthService {
       return sendObject
     }
 
+    /** For forcing type, jwtPayload should be declared as const variable */
     const jwtPayload: JwtPayload = {
       _id: isJwt._id,
       email: isJwt.email
     }
-
     const newJwt = this.jwtService.sign(jwtPayload)
     const sendObject: AuthObjectType = {
       ok: Boolean(newJwt),

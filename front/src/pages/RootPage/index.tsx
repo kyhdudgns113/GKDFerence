@@ -1,4 +1,4 @@
-import {MouseEvent, useCallback, useEffect, useState} from 'react' // eslint-disable-line
+import {KeyboardEvent, MouseEvent, useCallback, useEffect, useState} from 'react' // eslint-disable-line
 
 import {classNameRootPage} from './className'
 import {styleRootPage} from './style'
@@ -33,6 +33,20 @@ export default function RootPage() {
 
   useGoToMain()
 
+  const onKeyDownDivEnter = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter') {
+        login(idVal, pwVal)
+          .then(_ => navigate('/main'))
+          .catch(errors => {
+            setIdErr(errors['id'])
+            setPwErr(errors['password'])
+          })
+      }
+    },
+    [idVal, pwVal, setIdErr, setPwErr, login, navigate]
+  )
+
   const onClickTest = useCallback((e: MouseEvent) => {
     // For now, this is blank function
   }, [])
@@ -45,7 +59,11 @@ export default function RootPage() {
   }
   return (
     <div className={className_main}>
-      <div className={className_centerElement} style={style_centerElemet}>
+      <div
+        className={className_centerElement}
+        onKeyDown={onKeyDownDivEnter}
+        style={style_centerElemet}
+        tabIndex={0}>
         <Title />
         <IDElement idVal={idVal} setIdVal={setIdVal} idErr={idErr} />
         <PWElement pwVal={pwVal} setPwVal={setPwVal} pwErr={pwErr} />

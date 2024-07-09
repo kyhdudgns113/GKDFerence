@@ -3,12 +3,19 @@ import Layout from './Layout'
 import RootPage from '../pages/RootPage'
 import NullPage from '../pages/NullPage'
 import SignUpPage from '../pages/SignUpPage'
+import {LayoutProvider} from '../contexts/LayoutContext'
 
 export default function RoutesSetup() {
   return (
     <Routes>
       <Route path="/" element={<RootPage />}></Route>
-      <Route path="/main" element={<Layout />}></Route>
+      <Route
+        path="/main"
+        element={
+          <LayoutProvider>
+            <Layout />
+          </LayoutProvider>
+        }></Route>
       <Route path="/signup" element={<SignUpPage />}></Route>
       <Route path="/*" element={<NullPage />}></Route>
     </Routes>
