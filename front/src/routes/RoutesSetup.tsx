@@ -1,10 +1,9 @@
 import {Routes, Route} from 'react-router-dom'
-import Layout from './Layout'
 import RootPage from '../pages/RootPage'
 import NullPage from '../pages/NullPage'
-import SignUpPage from '../pages/SignUpPage'
 import {LayoutProvider} from '../contexts/LayoutContext'
 import MainPage from '../pages/MainPage'
+import {SignUpProvider} from '../contexts/SignUpContext'
 
 export default function RoutesSetup() {
   return (
@@ -13,16 +12,10 @@ export default function RoutesSetup() {
 
       {/* // TODO: ADD RequireAuth
        */}
-      <Route
-        path="/main"
-        element={
-          <LayoutProvider>
-            <Layout />
-          </LayoutProvider>
-        }>
+      <Route path="/main" element={<LayoutProvider />}>
         <Route index element={<MainPage />} />
       </Route>
-      <Route path="/signup" element={<SignUpPage />}></Route>
+      <Route path="/signup" element={<SignUpProvider />}></Route>
       <Route path="/*" element={<NullPage />}></Route>
     </Routes>
     // <Routes>

@@ -1,6 +1,3 @@
-import {DetailedHTMLProps, HTMLAttributes} from 'react'
+import {ParagraphCommonProps} from '../Props'
 
-export type TextProps = DetailedHTMLProps<
-  HTMLAttributes<HTMLParagraphElement>,
-  HTMLParagraphElement
->
+export type TextProps = ParagraphCommonProps & {}

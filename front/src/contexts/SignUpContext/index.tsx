@@ -3,6 +3,7 @@ import {createContext, useCallback, useContext, useState} from 'react'
 import {useStateRow} from '../../pages/SignUpPage/hooks'
 import {useAuth} from '../AuthContext'
 import {useNavigate} from 'react-router-dom'
+import SignUpPage from '../../pages/SignUpPage'
 
 // prettier-ignore
 type ContextType = {
@@ -34,6 +35,10 @@ export const SignUpContext = createContext<ContextType>({
 
 type SignUpProviderProps = {}
 
+/**
+ * @param param0: Unused children
+ * @returns Provider with "SignUpPage" elements
+ */
 export const SignUpProvider: FC<PropsWithChildren<SignUpProviderProps>> = ({children}) => {
   const [idVal, setIdVal, idErr, setIdErr] = useStateRow()
   const [email, setEmail, emailErr, setEmailErr] = useStateRow()
@@ -86,7 +91,7 @@ export const SignUpProvider: FC<PropsWithChildren<SignUpProviderProps>> = ({chil
     submitLock, setSubmitLock,
     submitFunction
   }
-  return <SignUpContext.Provider value={value} children={children} />
+  return <SignUpContext.Provider value={value} children={<SignUpPage />} />
 }
 
 export const useSignUpContext = () => {

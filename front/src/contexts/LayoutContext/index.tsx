@@ -8,6 +8,7 @@ import {
   useState
 } from 'react'
 import {useToggle} from '../../hooks'
+import Layout from '../../routes/Layout'
 
 type ContextType = {
   testCnt?: number
@@ -30,6 +31,10 @@ export const LayoutContext = createContext<ContextType>({
 
 type LayoutProviderProps = {}
 
+/**
+ * @param param0: Unused children
+ * @returns Provider with "Layout" elements
+ */
 export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({children}) => {
   const [testCnt, setTestCnt] = useState<number>(0)
   const [showConf, setShowConf] = useToggle()
@@ -47,7 +52,7 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
     showDoc,
     setShowDoc
   }
-  return <LayoutContext.Provider value={value} children={children} />
+  return <LayoutContext.Provider value={value} children={<Layout />} />
 }
 
 export const useLayoutContext = () => {

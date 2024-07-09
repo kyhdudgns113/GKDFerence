@@ -7,5 +7,5 @@ export const Title: FC<T.TextProps> = ({className: _className, ...props}) => {
     _className
   ].join(' ')
 
-  return <T.Text_5xl className={className} {...props} />
+  return <T.Text5XL className={className} {...props} />
 }

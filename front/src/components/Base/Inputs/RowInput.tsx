@@ -40,7 +40,7 @@ export const RowInput: FC<PropsWithChildren<RowInputProps>> = ({
 
   return (
     <div className={className_div}>
-      <T.Text_2xl className={className_text}>{children}</T.Text_2xl>
+      <T.Text2XL className={className_text}>{children}</T.Text2XL>
       <Input
         type={inputType}
         value={val}
