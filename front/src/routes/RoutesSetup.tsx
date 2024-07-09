@@ -1,5 +1,4 @@
 import {Routes, Route} from 'react-router-dom'
-import RootPage from '../pages/RootPage'
 import NullPage from '../pages/NullPage'
 import {LayoutProvider} from '../contexts/LayoutContext'
 import MainPage from '../pages/MainPage'
@@ -10,9 +9,6 @@ export default function RoutesSetup() {
   return (
     <Routes>
       <Route path="/" element={<RootPageProvider />}></Route>
-
-      {/* // TODO: ADD RequireAuth
-       */}
       <Route path="/main" element={<LayoutProvider />}>
         <Route index element={<MainPage />} />
       </Route>

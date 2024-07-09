@@ -1,29 +1,24 @@
 import {MouseEvent, useCallback} from 'react'
 import {Button} from '../../components'
-import {Text} from '../../components/Layout/Header'
 import {useLayoutContext} from '../../contexts/LayoutContext'
+import * as C from '../../components/Layout/Sidebar'
+import * as CN from './className'
 
 export default function Sidebar() {
-  const {setTestCnt} = useLayoutContext() // eslint-disable-line
+  const {setTestCnt} = useLayoutContext()
 
   const onClickSocketButtontConst = useCallback((e: MouseEvent) => {
     //
   }, [])
 
   return (
-    <div className="w-24" style={{minWidth: '200px'}}>
-      <div className="GKD_LISTs">
-        <div>
-          <Text>&nbsp;&nbsp;Conference List</Text>
-        </div>
-        <div>
-          <Text>&nbsp;&nbsp;Chatting List</Text>
-        </div>
-        <div>
-          <Text>&nbsp;&nbsp;Document List</Text>
-        </div>
+    <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>
+      <div className="GKD_LIST_AREA">
+        <C.ConferenceList />
+        <C.ChattingList />
+        <C.DocumentList />
       </div>
-      <div className="flex flex-col items-center justify-center mt-4">
+      <div className={CN.classNameTestButton}>
         <Button
           onClick={e => {
             setTestCnt(prev => prev + 1)
@@ -31,7 +26,7 @@ export default function Sidebar() {
           Just Increase
         </Button>
       </div>
-      <div className="flex flex-col items-center justify-center mt-4">
+      <div className={CN.classNameTestButton}>
         <Button onClick={onClickSocketButtontConst}>Socket Increase</Button>
       </div>
     </div>
