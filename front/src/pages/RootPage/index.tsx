@@ -1,4 +1,4 @@
-import {KeyboardEvent, MouseEvent, useCallback, useEffect, useState} from 'react' // eslint-disable-line
+import {KeyboardEvent, MouseEvent, useCallback, useState} from 'react' // eslint-disable-line
 
 import {classNameRootPage} from './className'
 import {styleRootPage} from './style'

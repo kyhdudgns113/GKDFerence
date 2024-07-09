@@ -1,23 +1,18 @@
-import {Dispatch, FC, SetStateAction} from 'react'
+import {FC} from 'react'
 import {InputProps, RowInput} from '../Base/Inputs'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
+import {useSignUpContext} from '../../contexts/SignUpContext'
 
 export type PWElementProps = InputProps & {
-  pwVal: string
-  setPwVal: Dispatch<SetStateAction<string>>
-  pwErr: string
+  //
 }
 
-export const PWElement: FC<PWElementProps> = ({
-  pwVal,
-  setPwVal,
-  pwErr,
-  className: _className,
-  ...props
-}) => {
+export const PWElement: FC<PWElementProps> = ({className: _className, ...props}) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
+
+  const {pwVal, setPwVal, pwErr} = useSignUpContext()
 
   return (
     <div className="flex flex-col">

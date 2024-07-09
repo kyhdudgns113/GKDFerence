@@ -4,18 +4,24 @@ import RootPage from '../pages/RootPage'
 import NullPage from '../pages/NullPage'
 import SignUpPage from '../pages/SignUpPage'
 import {LayoutProvider} from '../contexts/LayoutContext'
+import MainPage from '../pages/MainPage'
 
 export default function RoutesSetup() {
   return (
     <Routes>
       <Route path="/" element={<RootPage />}></Route>
+
+      {/* // TODO: ADD RequireAuth
+       */}
       <Route
         path="/main"
         element={
           <LayoutProvider>
             <Layout />
           </LayoutProvider>
-        }></Route>
+        }>
+        <Route index element={<MainPage />} />
+      </Route>
       <Route path="/signup" element={<SignUpPage />}></Route>
       <Route path="/*" element={<NullPage />}></Route>
     </Routes>

@@ -10,6 +10,7 @@ export class AuthController {
   // AREA2 : Post
   @Post('/signup')
   async signUp(@Body() authBody: AuthBodyType) {
+    console.log('/auth/signup called with ', authBody.id)
     return await this.authService.signup(authBody)
   }
   @Post('/login')

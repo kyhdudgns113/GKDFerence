@@ -1,23 +1,16 @@
-import {Dispatch, FC, SetStateAction} from 'react'
+import {FC} from 'react'
 import {InputProps, RowInput} from '../Base/Inputs'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
+import {useSignUpContext} from '../../contexts/SignUpContext'
 
-export type EmailElementProps = InputProps & {
-  email: string
-  setEmail: Dispatch<SetStateAction<string>>
-  emailErr: string
-}
+export type EmailElementProps = InputProps & {}
 
-export const EmailElement: FC<EmailElementProps> = ({
-  email,
-  setEmail,
-  emailErr,
-  className: _className,
-  ...props
-}) => {
+export const EmailElement: FC<EmailElementProps> = ({className: _className, ...props}) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
+
+  const {email, setEmail, emailErr} = useSignUpContext()
 
   return (
     <div className="flex flex-col">

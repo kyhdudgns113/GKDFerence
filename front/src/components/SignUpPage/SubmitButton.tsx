@@ -1,12 +1,14 @@
-import {FC, MouseEvent} from 'react'
+import {FC, MouseEvent, useCallback} from 'react'
 import {Button, ButtonCommonProps} from '../Base'
+import {useAuth} from '../../contexts/AuthContext'
+import {useSignUpContext} from '../../contexts/SignUpContext'
+import {useNavigate} from 'react-router-dom'
 
 export type SubmitButtonProps = ButtonCommonProps & {
-  onClick?: (e: MouseEvent) => void
+  //
 }
 
 export const SubmitButton: FC<SubmitButtonProps> = ({
-  onClick,
   className: _className, //
   ...props
 }) => {
@@ -14,6 +16,21 @@ export const SubmitButton: FC<SubmitButtonProps> = ({
     'w-1/3 text-xl', //
     _className
   ].join(' ')
+
+  const {checkToken} = useAuth()
+  const {submitFunction} = useSignUpContext()
+  const navigate = useNavigate()
+
+  /** Block submit if already logged */
+  const onClick = useCallback(
+    (e: MouseEvent) => {
+      checkToken(
+        () => navigate('/main'),
+        () => submitFunction()
+      )
+    },
+    [navigate, submitFunction, checkToken]
+  )
 
   return (
     <Button className={className} {...props} onClick={onClick}>

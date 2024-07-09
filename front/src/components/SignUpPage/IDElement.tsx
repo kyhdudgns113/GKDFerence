@@ -1,23 +1,18 @@
-import {Dispatch, FC, SetStateAction} from 'react'
+import {FC} from 'react'
 import {InputProps, RowInput} from '../Base/Inputs'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
+import {useSignUpContext} from '../../contexts/SignUpContext'
 
 export type IDElementProps = InputProps & {
-  idVal: string
-  setIdVal: Dispatch<SetStateAction<string>>
-  idErr: string
+  //
 }
 
-export const IDElement: FC<IDElementProps> = ({
-  idVal,
-  setIdVal,
-  idErr,
-  className: _className,
-  ...props
-}) => {
+export const IDElement: FC<IDElementProps> = ({className: _className, ...props}) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
+
+  const {idVal, setIdVal, idErr} = useSignUpContext()
 
   return (
     <div className="flex flex-col">
