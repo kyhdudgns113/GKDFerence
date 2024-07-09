@@ -1,35 +1,22 @@
-import {KeyboardEvent, MouseEvent, useCallback, useState} from 'react' // eslint-disable-line
-
+import {KeyboardEvent, MouseEvent, useCallback} from 'react' // eslint-disable-line
 import {classNameRootPage} from './className'
 import {styleRootPage} from './style'
-import {
-  ArgLoginButtonProps,
-  IDElement,
-  LoginButton,
-  PWElement,
-  SignUpButton,
-  Title
-} from '../../components/RootPage'
+import {IDElement, LoginButton, PWElement, SignUpButton, Title} from '../../components/RootPage'
 
-import * as U from '../../utils' // eslint-disable-line
 import {useNavigate} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
 import {useGoToMain} from './hooks'
+import {useRootPageContext} from '../../contexts/RootPageContext'
 
 export default function RootPage() {
   const {className_main, className_centerElement} = classNameRootPage
   const {style_centerElemet} = styleRootPage
 
-  /* eslint-disable */
-  const [idVal, setIdVal] = useState<string>('')
-  const [pwVal, setPwVal] = useState<string>('')
-  const [idErr, setIdErr] = useState<string>('')
-  const [pwErr, setPwErr] = useState<string>('')
-  /* eslint-enable */
+  const {idVal, pwVal, setIdErr, setPwErr} = useRootPageContext()
 
   const navigate = useNavigate() // eslint-disable-line
 
-  const {login, logout, checkToken} = useAuth() // eslint-disable-line
+  const {login} = useAuth() // eslint-disable-line
 
   useGoToMain()
 
@@ -51,12 +38,6 @@ export default function RootPage() {
     // For now, this is blank function
   }, [])
 
-  const argLoginButton: ArgLoginButtonProps = {
-    idVal,
-    pwVal,
-    setIdErr,
-    setPwErr
-  }
   return (
     <div className={className_main}>
       <div
@@ -65,10 +46,10 @@ export default function RootPage() {
         style={style_centerElemet}
         tabIndex={0}>
         <Title />
-        <IDElement idVal={idVal} setIdVal={setIdVal} idErr={idErr} />
-        <PWElement pwVal={pwVal} setPwVal={setPwVal} pwErr={pwErr} />
+        <IDElement />
+        <PWElement />
         <div className="flex flex-row justify-center mt-4">
-          <LoginButton arg={argLoginButton} />
+          <LoginButton />
           <div className="btn w-1/4 border-2" onClick={onClickTest}>
             {' '}
           </div>

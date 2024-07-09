@@ -1,24 +1,22 @@
-import {Dispatch, FC, SetStateAction} from 'react'
+import {FC} from 'react'
 import {InputProps, RowInput} from '../Base/Inputs'
 import {ErrorLine} from './ErrorLine'
 import {classNames} from './className'
+import {useRootPageContext} from '../../contexts/RootPageContext'
 
 export type IDElementProps = InputProps & {
-  idVal: string
-  setIdVal: Dispatch<SetStateAction<string>>
-
-  idErr: string
+  //
 }
 
 export const IDElement: FC<IDElementProps> = ({
-  idVal,
-  setIdVal,
-  idErr,
+  //
   className: _className,
   ...props
 }) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
+
+  const {idVal, setIdVal, idErr} = useRootPageContext()
 
   return (
     <div className="flex flex-col">

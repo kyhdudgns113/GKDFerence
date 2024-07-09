@@ -1,29 +1,41 @@
-import type {FC, PropsWithChildren} from 'react'
-import {createContext, useContext} from 'react'
+import type {Dispatch, FC, PropsWithChildren, SetStateAction} from 'react'
+import {createContext, useContext, useState} from 'react'
+import RootPage from '../../pages/RootPage'
 
+// prettier-ignore
 type ContextType = {
-  testValue?: string
-  testFunction: () => void
+  idVal: string, setIdVal: Dispatch<SetStateAction<string>>,
+  pwVal: string, setPwVal: Dispatch<SetStateAction<string>>,
+  idErr: string, setIdErr: Dispatch<SetStateAction<string>>,
+  pwErr: string, setPwErr: Dispatch<SetStateAction<string>>,
 }
 
-export const CopyMeContext = createContext<ContextType>({
-  testFunction: () => {}
-  //
+// prettier-ignore
+export const RootPageContext = createContext<ContextType>({
+  idVal: '', setIdVal: () => {},
+  pwVal: '', setPwVal: () => {},
+  idErr: '', setIdErr: () => {},
+  pwErr: '', setPwErr: () => {},
 })
 
-type CopyMeProviderProps = {}
+type RootPageProviderProps = {}
 
-export const CopyMeProvider: FC<PropsWithChildren<CopyMeProviderProps>> = ({children}) => {
-  const testValue = 'test'
-  const testFunction = () => console.log('test function')
+export const RootPageProvider: FC<PropsWithChildren<RootPageProviderProps>> = ({children}) => {
+  const [idVal, setIdVal] = useState<string>('')
+  const [pwVal, setPwVal] = useState<string>('')
+  const [idErr, setIdErr] = useState<string>('')
+  const [pwErr, setPwErr] = useState<string>('')
 
+  // prettier-ignore
   const value = {
-    testValue,
-    testFunction
+    idVal, setIdVal,
+    pwVal, setPwVal,
+    idErr, setIdErr,
+    pwErr, setPwErr,
   }
-  return <CopyMeContext.Provider value={value} children={children} />
+  return <RootPageContext.Provider value={value} children={<RootPage />} />
 }
 
-export const useCopyMeContext = () => {
-  return useContext(CopyMeContext)
+export const useRootPageContext = () => {
+  return useContext(RootPageContext)
 }

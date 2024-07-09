@@ -1,21 +1,14 @@
-import {Dispatch, FC, MouseEvent, PropsWithChildren, SetStateAction, useCallback} from 'react'
+import {FC, MouseEvent, PropsWithChildren, useCallback} from 'react'
 import {Button, ButtonProps} from '../Base/Buttons'
 import {useNavigate} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
-
-export type ArgLoginButtonProps = {
-  idVal: string
-  setIdErr: Dispatch<SetStateAction<string>>
-  pwVal: string
-  setPwErr: Dispatch<SetStateAction<string>>
-}
+import {useRootPageContext} from '../../contexts/RootPageContext'
 
 export type LoginButtonProps = ButtonProps & {
-  arg: ArgLoginButtonProps
+  //
 }
 
 export const LoginButton: FC<PropsWithChildren<LoginButtonProps>> = ({
-  arg,
   className: _className,
   ...props
 }) => {
@@ -25,11 +18,9 @@ export const LoginButton: FC<PropsWithChildren<LoginButtonProps>> = ({
     _className
   ].join(' ')
 
-  /* eslint-disable */
   const navigate = useNavigate()
   const {login} = useAuth()
-  const {idVal, pwVal, setIdErr, setPwErr} = arg
-  /* eslint-enable */
+  const {idVal, pwVal, setIdErr, setPwErr} = useRootPageContext()
 
   const onClick = useCallback(
     (e: MouseEvent) => {
