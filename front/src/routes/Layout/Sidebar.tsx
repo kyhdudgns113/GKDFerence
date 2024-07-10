@@ -1,5 +1,5 @@
 import {MouseEvent, useCallback} from 'react'
-import {Button} from '../../components'
+import {TestButton} from '../../components'
 import {useLayoutContext} from '../../contexts/LayoutContext'
 import * as C from '../../components/Layout/Sidebar'
 import * as CN from './className'
@@ -33,15 +33,15 @@ export default function Sidebar() {
         <C.DocumentList />
       </div>
       <div className={CN.classNameTestButton}>
-        <Button
+        <TestButton
           onClick={e => {
             setTestCnt(prev => prev + 1)
           }}>
           Just Increase
-        </Button>
+        </TestButton>
       </div>
       <div className={CN.classNameTestButton}>
-        <Button onClick={onClickSocketButtontConst}>Socket Increase</Button>
+        <TestButton onClick={onClickSocketButtontConst}>Socket Increase</TestButton>
       </div>
     </div>
   )

@@ -36,7 +36,7 @@ export class SocketGateway
   }
   @SubscribeMessage('test count')
   testCount(client: Socket, payload: SocketTestCountType): void {
-    this.logger.log('Test Cnt ')
+    this.logger.log('Test Cnt from ' + payload.id)
     payload.cnt++
     client.emit('test count', payload)
   }

@@ -72,6 +72,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         })
         .catch((e: Error) => setAlertMsg(e.message))
     })
+    console.log('🚀 ~ ret ~ user:', user)
+    console.log('🚀 ~ ret ~ user:', user)
     return ret
   }, [])
   const logout = useCallback((callback?: Callback) => {

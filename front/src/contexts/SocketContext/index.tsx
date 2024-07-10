@@ -11,10 +11,12 @@ import {SocketUserConnectedType} from './types'
 type ContextType = {
   socketP?: Socket<DefaultEventsMap, DefaultEventsMap> | null
   socketPInit: () => void
+  socketPReset: () => void
 }
 
 export const SocketContext = createContext<ContextType>({
-  socketPInit: () => {}
+  socketPInit: () => {},
+  socketPReset: () => {}
 })
 
 type SocketProviderProps = {}
@@ -43,6 +45,12 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     }
   }
 
+  const socketPReset = () => {
+    if (socketP) {
+      setSocketP(null)
+    }
+  }
+
   useEffect(() => {
     return () => {
       if (socketP && socketP.connected) {
@@ -54,7 +62,8 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
   const value = {
     /** socket: Before use it, you should call useSocket() */
     socketP,
-    socketPInit
+    socketPInit,
+    socketPReset
   }
   return <SocketContext.Provider value={value} children={children} />
 }
