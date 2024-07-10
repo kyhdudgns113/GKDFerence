@@ -5,10 +5,13 @@ import {
   PropsWithChildren,
   SetStateAction,
   useContext,
+  useEffect,
   useState
 } from 'react'
 import {useToggle} from '../../hooks'
 import Layout from '../../routes/Layout'
+import {useSocketContext} from '../SocketContext'
+import {SocketTestCountType} from '../SocketContext/types'
 
 type ContextType = {
   testCnt?: number
@@ -40,6 +43,23 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
   const [showConf, setShowConf] = useToggle()
   const [showChat, setShowChat] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
+
+  const {socketP: socket, socketPInit: socketInit} = useSocketContext()
+
+  useEffect(() => {
+    socketInit()
+    if (socket) {
+      socket.on('test count', (payload: SocketTestCountType) => {
+        setTestCnt(payload.cnt)
+      })
+    } else {
+      console.log('Why not socket in LayoutContext?')
+    }
+
+    return () => {
+      socket?.disconnect()
+    }
+  }, [socket, socketInit])
 
   const value = {
     testCnt,

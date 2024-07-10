@@ -8,6 +8,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 # GKD Secret
+**/client_secret.ts
 **/server_secret.ts
 
 # package-lock.json

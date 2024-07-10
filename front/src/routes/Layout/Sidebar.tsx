@@ -3,13 +3,27 @@ import {Button} from '../../components'
 import {useLayoutContext} from '../../contexts/LayoutContext'
 import * as C from '../../components/Layout/Sidebar'
 import * as CN from './className'
+import {useSocketContext} from '../../contexts/SocketContext'
+import {SocketTestCountType} from '../../contexts/SocketContext/types'
 
 export default function Sidebar() {
-  const {setTestCnt} = useLayoutContext()
+  const {testCnt, setTestCnt} = useLayoutContext()
+  const {socketP: socket} = useSocketContext()
 
-  const onClickSocketButtontConst = useCallback((e: MouseEvent) => {
-    //
-  }, [])
+  const onClickSocketButtontConst = useCallback(
+    (e: MouseEvent) => {
+      if (socket) {
+        const sendObj: SocketTestCountType = {
+          id: 'yes',
+          cnt: testCnt || 0
+        }
+        socket.emit('test count', sendObj)
+      } else {
+        console.log('Why not socket')
+      }
+    },
+    [socket, testCnt]
+  )
 
   return (
     <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>

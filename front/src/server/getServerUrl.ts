@@ -1,4 +1,6 @@
+import {serverUrl} from '../client_secret'
+
 export const getServerUrl = (path: string) => {
-  const host = 'http://127.0.0.1:4000'
+  const host = serverUrl
   return [host, path].join('')
 }
