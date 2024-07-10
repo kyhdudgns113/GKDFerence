@@ -1,4 +1,3 @@
-import {MouseEvent, useCallback} from 'react'
 import {TestButton} from '../../components'
 import {useLayoutContext} from '../../contexts/LayoutContext'
 import * as C from '../../components/Layout/Sidebar'
@@ -6,48 +5,16 @@ import * as CN from './className'
 import {useSocketContext} from '../../contexts/SocketContext'
 import {SocketTestCountType} from '../../contexts/SocketContext/types'
 import {useAuth} from '../../contexts/AuthContext'
+import {useState} from 'react'
+import {useLayoutModalContext} from '../../contexts/LayoutModalContext'
 
 export default function Sidebar() {
   const {testCnt, setTestCnt} = useLayoutContext()
-  const {socketP: socket} = useSocketContext()
+  const {socketP} = useSocketContext()
 
   const {id, checkToken, refreshToken} = useAuth()
 
-  const onClickInc = useCallback(
-    (e: MouseEvent) => {
-      setTestCnt(prev => prev + 1)
-    },
-    [setTestCnt]
-  )
-
-  const onClickSockInc = useCallback(
-    (e: MouseEvent) => {
-      if (socket) {
-        const sendObj: SocketTestCountType = {
-          id: id || '',
-          cnt: testCnt || 0
-        }
-        socket.emit('test count', sendObj)
-      } else {
-        console.log('Why not socket')
-      }
-    },
-    [socket, testCnt, id]
-  )
-
-  const onClickCheck = useCallback(
-    (e: MouseEvent) => {
-      checkToken()
-    },
-    [checkToken]
-  )
-
-  const onClickRefresh = useCallback(
-    (e: MouseEvent) => {
-      refreshToken()
-    },
-    [refreshToken]
-  )
+  const {onOpen} = useLayoutModalContext()
 
   return (
     <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>
@@ -56,11 +23,25 @@ export default function Sidebar() {
         <C.ChattingList />
         <C.DocumentList />
       </div>
-      <div className="flex flex-col items-center justify-center mt-2">
-        <TestButton onClick={onClickInc}>Inc</TestButton>
-        <TestButton onClick={onClickSockInc}>Sock Inc</TestButton>
-        <TestButton onClick={onClickCheck}>Token C</TestButton>
-        <TestButton onClick={onClickRefresh}>Token R</TestButton>
+      <div className="GKD_TestBtn_Area flex flex-col items-center justify-center mt-2">
+        <TestButton onClick={e => setTestCnt(prev => prev + 1)}>Inc</TestButton>
+        <TestButton
+          onClick={e => {
+            if (socketP) {
+              const sendObj: SocketTestCountType = {
+                id: id || '',
+                cnt: testCnt || 0
+              }
+              socketP.emit('test count', sendObj)
+            } else {
+              console.log('Why not socket in Sidebar')
+            }
+          }}>
+          Sock Inc
+        </TestButton>
+        <TestButton onClick={e => checkToken()}>Token C</TestButton>
+        <TestButton onClick={e => refreshToken()}>Token R</TestButton>
+        <TestButton onClick={e => onOpen()}>Open Modal</TestButton>
       </div>
     </div>
   )

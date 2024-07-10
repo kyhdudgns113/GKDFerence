@@ -22,5 +22,5 @@ export const TestButton: FC<PropsWithChildren<TestButtonProps>> = ({
     _className
   ].join(' ')
 
-  return <button type={type} {...props} className={className} style={{minWidth: '100px'}} />
+  return <button type={type} {...props} className={className} style={{minWidth: '150px'}} />
 }

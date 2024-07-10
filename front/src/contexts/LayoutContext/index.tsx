@@ -9,9 +9,9 @@ import {
   useState
 } from 'react'
 import {useToggle} from '../../hooks'
-import Layout from '../../routes/Layout'
 import {useSocketContext} from '../SocketContext'
 import {SocketTestCountType} from '../SocketContext/types'
+import {LayoutModalProvider} from '../LayoutModalContext'
 
 type ContextType = {
   testCnt?: number
@@ -70,7 +70,7 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
     showDoc,
     setShowDoc
   }
-  return <LayoutContext.Provider value={value} children={<Layout />} />
+  return <LayoutContext.Provider value={value} children={<LayoutModalProvider />} />
 }
 
 export const useLayoutContext = () => {
