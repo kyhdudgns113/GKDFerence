@@ -31,7 +31,7 @@ export class SocketGateway
 
   @SubscribeMessage('user connected')
   userConnect(client: Socket, payload: SocketUserConnectedType): void {
-    this.logger.log('USER CONNECTED : ', payload.id)
+    this.logger.log('USER CONNECTED : ' + payload.id)
     client.emit('message', payload)
   }
   @SubscribeMessage('test count')

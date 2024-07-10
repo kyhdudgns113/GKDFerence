@@ -12,6 +12,7 @@ export const TestButton: FC<PropsWithChildren<TestButtonProps>> = ({
 }) => {
   const className = [
     'btn',
+    'mt-2',
     'border-2 border-gkd-sakura-border',
     'bg-gkd-sakura-testbtn-bg',
     'text-gkd-sakura-testbtn-text',
@@ -21,5 +22,5 @@ export const TestButton: FC<PropsWithChildren<TestButtonProps>> = ({
     _className
   ].join(' ')
 
-  return <button type={type} {...props} className={className} />
+  return <button type={type} {...props} className={className} style={{minWidth: '100px'}} />
 }

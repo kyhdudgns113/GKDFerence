@@ -1,21 +1,37 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Headers} from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Headers,
+  Logger
+} from '@nestjs/common'
 import {AuthService} from './auth.service'
-import {AuthBodyType, AuthObjectType} from 'src/common'
+import {AuthBodyType} from 'src/common'
 import {getJwtFromHeader} from 'src/util'
 
 @Controller('auth')
 export class AuthController {
+  private logger: Logger = new Logger('AuthController')
   constructor(private readonly authService: AuthService) {}
 
   // AREA2 : Post
   @Post('/signup')
   async signUp(@Body() authBody: AuthBodyType) {
-    console.log('/auth/signup called with ', authBody.id)
-    return await this.authService.signup(authBody)
+    console.log(`signup(${authBody.id}): requested`)
+    const ret = await this.authService.signup(authBody)
+    console.log(`signup(${authBody.id}): ${ret.ok}`)
+    return ret
   }
   @Post('/login')
   async login(@Body() authBody: AuthBodyType) {
-    return await this.authService.login(authBody)
+    this.logger.log(`login(${authBody.id}): requested`)
+    const ret = await this.authService.login(authBody)
+    this.logger.log(`login(${authBody.id}): ${ret.ok}`)
+    return ret
   }
 
   // AREA2 : Get

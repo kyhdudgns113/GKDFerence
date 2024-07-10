@@ -5,16 +5,26 @@ import * as C from '../../components/Layout/Sidebar'
 import * as CN from './className'
 import {useSocketContext} from '../../contexts/SocketContext'
 import {SocketTestCountType} from '../../contexts/SocketContext/types'
+import {useAuth} from '../../contexts/AuthContext'
 
 export default function Sidebar() {
   const {testCnt, setTestCnt} = useLayoutContext()
   const {socketP: socket} = useSocketContext()
 
-  const onClickSocketButtontConst = useCallback(
+  const {id, checkToken, refreshToken} = useAuth()
+
+  const onClickInc = useCallback(
+    (e: MouseEvent) => {
+      setTestCnt(prev => prev + 1)
+    },
+    [setTestCnt]
+  )
+
+  const onClickSockInc = useCallback(
     (e: MouseEvent) => {
       if (socket) {
         const sendObj: SocketTestCountType = {
-          id: 'yes',
+          id: id || '',
           cnt: testCnt || 0
         }
         socket.emit('test count', sendObj)
@@ -22,7 +32,21 @@ export default function Sidebar() {
         console.log('Why not socket')
       }
     },
-    [socket, testCnt]
+    [socket, testCnt, id]
+  )
+
+  const onClickCheck = useCallback(
+    (e: MouseEvent) => {
+      checkToken()
+    },
+    [checkToken]
+  )
+
+  const onClickRefresh = useCallback(
+    (e: MouseEvent) => {
+      refreshToken()
+    },
+    [refreshToken]
   )
 
   return (
@@ -32,16 +56,11 @@ export default function Sidebar() {
         <C.ChattingList />
         <C.DocumentList />
       </div>
-      <div className={CN.classNameTestButton}>
-        <TestButton
-          onClick={e => {
-            setTestCnt(prev => prev + 1)
-          }}>
-          Just Increase
-        </TestButton>
-      </div>
-      <div className={CN.classNameTestButton}>
-        <TestButton onClick={onClickSocketButtontConst}>Socket Increase</TestButton>
+      <div className="flex flex-col items-center justify-center mt-2">
+        <TestButton onClick={onClickInc}>Inc</TestButton>
+        <TestButton onClick={onClickSockInc}>Sock Inc</TestButton>
+        <TestButton onClick={onClickCheck}>Token C</TestButton>
+        <TestButton onClick={onClickRefresh}>Token R</TestButton>
       </div>
     </div>
   )
