@@ -44,22 +44,21 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
   const [showChat, setShowChat] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
 
-  const {socketP: socket, socketPInit: socketInit} = useSocketContext()
+  const {socketP, socketPInit} = useSocketContext()
 
   useEffect(() => {
-    socketInit()
-    if (socket) {
-      socket.on('test count', (payload: SocketTestCountType) => {
+    socketPInit()
+    if (socketP) {
+      socketP.on('test count', (payload: SocketTestCountType) => {
         setTestCnt(payload.cnt)
       })
     } else {
-      console.log('Why not socket in LayoutContext?')
     }
 
     return () => {
-      socket?.disconnect()
+      socketP?.disconnect()
     }
-  }, [socket, socketInit])
+  }, [socketP, socketPInit])
 
   const value = {
     testCnt,

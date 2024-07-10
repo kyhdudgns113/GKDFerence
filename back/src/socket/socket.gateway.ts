@@ -31,12 +31,12 @@ export class SocketGateway
 
   @SubscribeMessage('user connected')
   userConnect(client: Socket, payload: SocketUserConnectedType): void {
-    console.log('USER CONNECTED : ', payload.id)
+    this.logger.log('USER CONNECTED : ', payload.id)
     client.emit('message', payload)
   }
   @SubscribeMessage('test count')
   testCount(client: Socket, payload: SocketTestCountType): void {
-    console.log('Test Cnt ', payload)
+    this.logger.log('Test Cnt ')
     payload.cnt++
     client.emit('test count', payload)
   }

@@ -4,10 +4,13 @@ export type AuthBodyType = {
   id?: string
   email?: string
   password?: string
-  _id?: string
 }
 export type AuthObjectType = {
   ok: boolean
   body: AuthBodyType
   errors: {[key: string]: string}
+}
+export interface JwtPayload {
+  id: string
+  email: string
 }

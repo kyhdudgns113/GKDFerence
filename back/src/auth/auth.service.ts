@@ -3,8 +3,7 @@ import * as bcrypt from 'bcrypt'
 import {JwtService} from '@nestjs/jwt'
 
 import {gkdJwtSecret, gkdSaltOrRounds} from '../server_secret'
-import {JwtPayload} from '../jwt'
-import {AuthBodyType, AuthObjectType} from '../common'
+import {AuthBodyType, AuthObjectType, JwtPayload} from '../common'
 import {UserService} from 'src/user/user.service'
 import {CreateUserDto} from 'src/user/dto'
 
@@ -45,13 +44,12 @@ export class AuthService {
           hashedPassword: hashedPassword
         })
 
-        const jwtPayload: JwtPayload = {_id: user._id.toString(), email: user.email}
+        const jwtPayload: JwtPayload = {id: user.id, email: user.email}
         const jwt = this.jwtService.sign(jwtPayload)
 
         ok = true
         body.id = user.id
         body.email = user.email
-        body._id = user._id.toString()
         body.jwt = jwt
       } catch (error) {
         ok = false
@@ -102,12 +100,11 @@ export class AuthService {
 
     /** For forcing type, jwtPayload should be declared as const variable */
     const jwtPayload: JwtPayload = {
-      _id: user._id.toString(),
+      id: user.id,
       email: user.email
     }
     const jwt = this.jwtService.sign(jwtPayload)
     authObject.body.id = authBody.id
-    authObject.body._id = user._id.toString()
     authObject.body.jwt = jwt
 
     return authObject
@@ -155,7 +152,7 @@ export class AuthService {
 
     /** For forcing type, jwtPayload should be declared as const variable */
     const jwtPayload: JwtPayload = {
-      _id: isJwt._id,
+      id: isJwt.id,
       email: isJwt.email
     }
     const newJwt = this.jwtService.sign(jwtPayload)
