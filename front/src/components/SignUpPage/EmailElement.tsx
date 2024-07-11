@@ -2,7 +2,7 @@ import {FC} from 'react'
 import {InputProps, RowInput} from '../Base/Inputs'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
-import {useSignUpContext} from '../../contexts/SignUpContext'
+import {useSignUpContext} from '../../contexts'
 
 export type EmailElementProps = InputProps & {}
 

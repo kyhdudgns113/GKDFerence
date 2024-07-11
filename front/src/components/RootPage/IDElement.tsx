@@ -2,7 +2,7 @@ import {FC} from 'react'
 import {InputProps, RowInput} from '../Base/Inputs'
 import {ErrorLine} from './ErrorLine'
 import {classNames} from './className'
-import {useRootPageContext} from '../../contexts/RootPageContext'
+import {useRootPageContext} from '../../contexts'
 
 export type IDElementProps = InputProps & {
   //
@@ -16,10 +16,10 @@ export const IDElement: FC<IDElementProps> = ({
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
 
-  const {idVal, setIdVal, idErr} = useRootPageContext()
+  const {idVal, setIdVal, idErr, setIdErr} = useRootPageContext()
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" onChange={e => setIdErr('')}>
       <RowInput
         className={classNameToDiv}
         classNameText={classNameText}

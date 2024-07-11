@@ -1,7 +1,6 @@
 import {FC, MouseEvent, useCallback} from 'react'
 import {Button, ButtonCommonProps} from '../Base'
-import {useAuth} from '../../contexts/AuthContext'
-import {useSignUpContext} from '../../contexts/SignUpContext'
+import {useSignUpContext, useAuth} from '../../contexts'
 import {useNavigate} from 'react-router-dom'
 
 export type SubmitButtonProps = ButtonCommonProps & {

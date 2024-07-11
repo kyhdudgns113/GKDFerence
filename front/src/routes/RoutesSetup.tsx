@@ -1,25 +1,24 @@
 import {Routes, Route} from 'react-router-dom'
 import NullPage from '../pages/NullPage'
 import MainPage from '../pages/MainPage'
-import {LayoutProvider} from '../contexts/LayoutContext'
-import {SignUpProvider} from '../contexts/SignUpContext'
-import {RootPageProvider} from '../contexts/RootPageContext'
 import RequireAuth from '../providers/RequireAuth'
+
+import * as CT from '../contexts'
 
 export default function RoutesSetup() {
   return (
     <Routes>
-      <Route path="/" element={<RootPageProvider />}></Route>
+      <Route path="/" element={<CT.RootPageProvider />}></Route>
       <Route
         path="/main"
         element={
           <RequireAuth>
-            <LayoutProvider />
+            <CT.LayoutProvider />
           </RequireAuth>
         }>
         <Route index element={<MainPage />} />
       </Route>
-      <Route path="/signup" element={<SignUpProvider />}></Route>
+      <Route path="/signup" element={<CT.SignUpProvider />}></Route>
       <Route path="/*" element={<NullPage />}></Route>
     </Routes>
     // <Routes>

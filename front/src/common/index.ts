@@ -1,6 +1,6 @@
 /**************************************************
  * This file needs to be changed simultaneously
- * with the front.src.common.index.ts
+ * with the back.common.types.ts
  **************************************************/
 
 import {ObjectId} from 'mongoose'

@@ -3,8 +3,8 @@ import {createContext, useContext, useState, useCallback, useEffect} from 'react
 import * as U from '../../utils'
 import {post, get} from '../../server'
 import {useNavigate} from 'react-router-dom'
-import {AuthObjectType, Callback, ErrorsType} from './types'
 import {writeBodyObject} from './writeBodyObject'
+import {AuthObjectType, Callback, ErrorsType} from '../../common'
 
 type ContextType = {
   alertMsg?: string
@@ -72,8 +72,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         })
         .catch((e: Error) => setAlertMsg(e.message))
     })
-    console.log('🚀 ~ ret ~ user:', user)
-    console.log('🚀 ~ ret ~ user:', user)
     return ret
   }, [])
   const logout = useCallback((callback?: Callback) => {

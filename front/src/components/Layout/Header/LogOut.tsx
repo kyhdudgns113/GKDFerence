@@ -3,7 +3,7 @@ import {DivPropsCommon, className_DivCommon} from './common'
 import {Icon} from '../../Base/Icons'
 
 import {Text} from './Text'
-import {useAuth} from '../../../contexts/AuthContext'
+import {useAuth} from '../../../contexts'
 import {useNavigate} from 'react-router-dom'
 
 export type LogoutProps = DivPropsCommon & {}

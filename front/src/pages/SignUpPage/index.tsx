@@ -1,6 +1,6 @@
 import {classNameSignUpPage} from './className'
 import {styleSignUpPage} from './style'
-import {useSignUpContext} from '../../contexts/SignUpContext'
+import {useSignUpContext} from '../../contexts'
 
 import * as C from '../../components/SignUpPage'
 import * as H from './hooks'

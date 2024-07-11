@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction} from 'react'
 import * as U from '../../utils'
-import type {Callback, AuthBodyType} from './types'
+import {AuthBodyType, Callback} from '../../common'
 
 export const writeBodyObject = (
   body: AuthBodyType | undefined,

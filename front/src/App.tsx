@@ -1,8 +1,7 @@
 import {BrowserRouter} from 'react-router-dom'
 import './App.css'
 import RoutesSetup from './routes/RoutesSetup'
-import {AuthProvider} from './contexts/AuthContext'
-import {SocketProvider} from './contexts/SocketContext'
+import {AuthProvider, SocketProvider} from './contexts'
 
 function App() {
   return (

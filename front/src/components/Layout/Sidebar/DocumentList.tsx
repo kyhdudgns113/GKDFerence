@@ -1,6 +1,6 @@
 import {FC} from 'react'
 import {DivCommonProps, Icon} from '../../Base'
-import {useLayoutContext} from '../../../contexts/LayoutContext'
+import {useLayoutContext} from '../../../contexts'
 import {Text} from '../Header'
 import {classNameRowTitle} from './className'
 

@@ -1,5 +1,5 @@
 import {TextXL, Title} from '../../components'
-import {useLayoutContext} from '../../contexts/LayoutContext'
+import {useLayoutContext} from '../../contexts'
 
 export default function MainPage() {
   const {testCnt} = useLayoutContext()

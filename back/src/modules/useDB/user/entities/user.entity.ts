@@ -1,11 +1,11 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
-import {Document} from 'mongoose'
+import {Document, ObjectId} from 'mongoose'
 
 @Schema()
 export class User extends Document {
   /** Object Id is in extended class Document */
 
-  /** User ID */
+  /** User ID. Not ObjectId */
   @Prop()
   id: string
 
@@ -14,6 +14,12 @@ export class User extends Document {
 
   @Prop()
   hashedPassword: string
+
+  /**
+   * singleChatList[userObjectId] = chatRoomObjectId
+   */
+  @Prop({type: Object})
+  singleChatList: {[userObjectId: string]: ObjectId}
 
   @Prop()
   createdDt: Date

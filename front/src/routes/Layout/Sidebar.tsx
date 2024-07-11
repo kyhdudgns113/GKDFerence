@@ -1,20 +1,19 @@
+import {useState} from 'react' // eslint-disable-line
+
 import {TestButton} from '../../components'
-import {useLayoutContext} from '../../contexts/LayoutContext'
+import {SocketTestCountType} from '../../contexts/SocketContext/types'
+
+import * as CT from '../../contexts'
 import * as C from '../../components/Layout/Sidebar'
 import * as CN from './className'
-import {useSocketContext} from '../../contexts/SocketContext'
-import {SocketTestCountType} from '../../contexts/SocketContext/types'
-import {useAuth} from '../../contexts/AuthContext'
-import {useState} from 'react'
-import {useLayoutModalContext} from '../../contexts/LayoutModalContext'
 
 export default function Sidebar() {
-  const {testCnt, setTestCnt} = useLayoutContext()
-  const {socketP} = useSocketContext()
+  const {testCnt, setTestCnt} = CT.useLayoutContext()
+  const {socketP} = CT.useSocketContext()
 
-  const {id, checkToken, refreshToken} = useAuth()
+  const {id, checkToken, refreshToken} = CT.useAuth()
 
-  const {onOpen} = useLayoutModalContext()
+  const {onTestOpen} = CT.useLayoutModalContext()
 
   return (
     <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>
@@ -41,7 +40,7 @@ export default function Sidebar() {
         </TestButton>
         <TestButton onClick={e => checkToken()}>Token C</TestButton>
         <TestButton onClick={e => refreshToken()}>Token R</TestButton>
-        <TestButton onClick={e => onOpen()}>Open Modal</TestButton>
+        <TestButton onClick={e => onTestOpen()}>Test Modal</TestButton>
       </div>
     </div>
   )

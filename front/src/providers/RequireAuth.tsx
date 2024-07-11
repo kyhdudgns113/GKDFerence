@@ -1,5 +1,5 @@
 import type {FC, PropsWithChildren} from 'react'
-import {useAuth} from '../contexts/AuthContext'
+import {useAuth} from '../contexts'
 import {useNavigate} from 'react-router-dom'
 
 type RequireAuthProps = {}

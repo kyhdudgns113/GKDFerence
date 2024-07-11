@@ -3,15 +3,15 @@ import {createContext, useCallback, useContext, useState} from 'react' // eslint
 import Layout from '../../routes/Layout'
 
 type ContextType = {
-  isOpen: boolean
-  onOpen: () => void
-  onClose: () => void
+  isTestOpen: boolean
+  onTestOpen: () => void
+  onTestClose: () => void
 }
 
 export const LayoutModalContext = createContext<ContextType>({
-  isOpen: false,
-  onOpen: () => {},
-  onClose: () => {}
+  isTestOpen: false,
+  onTestOpen: () => {},
+  onTestClose: () => {}
 })
 
 type LayoutModalProviderProps = {}
@@ -19,20 +19,20 @@ type LayoutModalProviderProps = {}
 export const LayoutModalProvider: FC<PropsWithChildren<LayoutModalProviderProps>> = ({
   children
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isTestOpen, setIsTestOpen] = useState<boolean>(false)
 
-  const onOpen = useCallback(() => {
-    setIsOpen(true)
-  }, [setIsOpen])
+  const onTestOpen = useCallback(() => {
+    setIsTestOpen(true)
+  }, [setIsTestOpen])
 
-  const onClose = useCallback(() => {
-    setIsOpen(false)
-  }, [setIsOpen])
+  const onTestClose = useCallback(() => {
+    setIsTestOpen(false)
+  }, [setIsTestOpen])
 
   const value = {
-    isOpen,
-    onOpen,
-    onClose
+    isTestOpen,
+    onTestOpen,
+    onTestClose
   }
   return <LayoutModalContext.Provider value={value} children={<Layout />} />
 }

@@ -10,6 +10,7 @@ export class UserService {
 
   create(createUserDto: CreateUserDto) {
     const createdUser = new this.userModel(createUserDto)
+    createdUser.createdDt = new Date()
     return createdUser.save()
   }
 
@@ -28,9 +29,40 @@ export class UserService {
     return result
   }
 
+  async findOneByIdOrEmail(idOrEmail: string): Promise<User> {
+    let result = await this.userModel.findOne({id: idOrEmail})
+
+    if (!result) {
+      result = await this.userModel.findOne({email: idOrEmail})
+    }
+
+    return result
+  }
+
   async findOneByObjectId(_id: ObjectId): Promise<User> {
     const result = await this.userModel.findOne({_id: _id})
     return result
+  }
+
+  async findUser(idOrEmail: string) {
+    let user = await this.userModel.findOne({id: idOrEmail})
+
+    if (!user) {
+      user = await this.userModel.findOne({email: idOrEmail})
+      if (!user) {
+        return {
+          ok: false,
+          body: {},
+          errors: {idOrEmail: '유저를 찾을 수 없어요'}
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      body: {userName: user.id},
+      errors: {}
+    }
   }
 
   blankLineFunction() {

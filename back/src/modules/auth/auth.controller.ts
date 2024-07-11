@@ -30,7 +30,7 @@ export class AuthController {
   async login(@Body() authBody: AuthBodyType) {
     this.logger.log(`login(${authBody.id}): requested`)
     const ret = await this.authService.login(authBody)
-    this.logger.log(`login(${authBody.id}): ${ret.ok}`)
+    this.logger.log(`login(${authBody.id}): ${ret.ok}, ${Object.keys(ret.errors)}`)
     return ret
   }
 

@@ -13,10 +13,7 @@ export const Modal: FC<PropsWithChildren<ModalProps>> = ({
   className: _className,
   ...props
 }) => {
-  const className = [
-    '', //
-    _className
-  ].join(' ')
+  const className = ['bg-white p-6 rounded shadow-lg max-w-lg w-full', _className].join(' ')
 
   if (!isOpen) {
     return null
@@ -24,11 +21,9 @@ export const Modal: FC<PropsWithChildren<ModalProps>> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
       onClick={onClose}>
-      <div
-        className="bg-white p-6 rounded shadow-lg max-w-lg w-full"
-        onClick={e => e.stopPropagation()}>
+      <div className={className} onClick={e => e.stopPropagation()} {...props}>
         {children}
       </div>
     </div>
