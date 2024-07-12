@@ -12,6 +12,7 @@ import {
 import {AuthService} from './auth.service'
 import {AuthBodyType} from 'src/common'
 import {getJwtFromHeader} from 'src/util'
+import {testDecorator} from 'src/test'
 
 @Controller('auth')
 export class AuthController {
@@ -36,6 +37,7 @@ export class AuthController {
 
   // AREA2 : Get
   @Get('/checkToken')
+  @testDecorator()
   async checkToken(@Headers() headers) {
     const jwt = getJwtFromHeader(headers) ?? ''
     return await this.authService.checkToken(jwt)

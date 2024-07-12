@@ -1,4 +1,6 @@
-export function LogExecutionTime() {
+import {Logger} from '@nestjs/common'
+
+export function testDecorator() {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
 
@@ -7,10 +9,7 @@ export function LogExecutionTime() {
       const result = await originalMethod.apply(this, args)
       const end = Date.now()
       const executionTime = end - start
-      console.log(
-        `${propertyKey} executed in ${executionTime}ms`,
-        target.constructor.name
-      )
+      Logger.log(`${propertyKey} executed in ${executionTime}ms`, target.constructor.name)
       return result
     }
 

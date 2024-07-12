@@ -10,8 +10,8 @@ import {
 } from 'react'
 import {useToggle} from '../../hooks'
 import {useSocketContext} from '../SocketContext'
-import {SocketTestCountType} from '../SocketContext/types'
 import {LayoutModalProvider} from '../LayoutModalContext'
+import {SocketTestCountType} from '../../common'
 
 type ContextType = {
   testCnt?: number

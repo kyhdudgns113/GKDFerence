@@ -12,7 +12,7 @@ export type KeyObjectIdType = {[_idToString: string]: ObjectId}
 export type AuthBodyType = {
   jwt?: string
   id?: string
-  _id?: ObjectId
+  _id?: string
   email?: string
   password?: string
 }
@@ -27,10 +27,17 @@ export interface JwtPayload {
   _id: ObjectId
   email: string
 }
+export type SocketUserConnectedType = {
+  id: string
+}
+export type SocketTestCountType = {
+  id: string
+  cnt: number
+}
 export type UserBodyType = {
   jwt?: string
   id?: string
-  _id?: ObjectId
+  _id?: string
   email?: string
   singleChatList?: KeyObjectIdType
 }

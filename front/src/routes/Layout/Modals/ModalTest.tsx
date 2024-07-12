@@ -13,7 +13,7 @@ export default function ModalTest() {
   const [errMsg, setErrMsg] = useState<string>('')
 
   const {isTestOpen, onTestClose} = useLayoutModalContext()
-  const {jwt, checkToken} = useAuth()
+  const {checkToken} = useAuth()
 
   const onChangeId = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +29,8 @@ export default function ModalTest() {
         setErrMsg('아이디 or 메일주소를 입력해주세요. ')
         return
       }
+
+      const jwt = ''
       get(`/user/find/${idOrEmail}`, jwt)
         .then(res => res.json())
         .then(result => {
@@ -43,7 +45,7 @@ export default function ModalTest() {
           setErrMsg(`ERROR : ${error.message}`)
         })
     },
-    [jwt, idOrEmail, checkToken, setErrMsg]
+    [idOrEmail, checkToken, setErrMsg]
   )
 
   return (

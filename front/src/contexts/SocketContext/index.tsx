@@ -6,7 +6,7 @@ import {DefaultEventsMap} from 'socket.io/dist/typed-events'
 import {serverUrl} from '../../client_secret'
 
 import * as U from '../../utils'
-import {SocketUserConnectedType} from './types'
+import {SocketUserConnectedType} from '../../common'
 
 type ContextType = {
   socketP?: Socket<DefaultEventsMap, DefaultEventsMap> | null
@@ -22,6 +22,9 @@ export const SocketContext = createContext<ContextType>({
 type SocketProviderProps = {}
 
 export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({children}) => {
+  /**
+   * socketP: It will be reset automatically in LocalContext
+   */
   const [socketP, setSocketP] = useState<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
 
   const socketPInit = () => {

@@ -2,8 +2,6 @@
  *
  * This is TODO list
  *
- * // TODO: -2. 한 쪽 탭에서 refreshJWT 할 때, 다른 탭에도 적용이 되어야 함.
- *
  * // TODO: -1. BackEnd 에 자동 JWT 검사기능 추가
  *
  * // TODO: 0. Create Chat Modal 완벽 구현

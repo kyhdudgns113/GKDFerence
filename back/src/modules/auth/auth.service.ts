@@ -117,15 +117,22 @@ export class AuthService {
       }
       return sendObject
     }
-
-    const isJwt = this.jwtService.verify(jwt)
-    const sendObject: AuthObjectType = {
-      ok: Boolean(isJwt),
-      body: isJwt ? {jwt: jwt} : {},
-      errors: isJwt ? {} : {jwt: 'JWT Invalid'}
+    try {
+      this.jwtService.verify(jwt)
+      const sendObject: AuthObjectType = {
+        ok: true,
+        body: {jwt: jwt},
+        errors: {}
+      }
+      return sendObject
+    } catch (err) {
+      const sendObject: AuthObjectType = {
+        ok: false,
+        body: {},
+        errors: {jwt: 'JWT Invalid'}
+      }
+      return sendObject
     }
-
-    return sendObject
   }
 
   async refreshToken(jwt: string) {
@@ -138,8 +145,22 @@ export class AuthService {
       return sendObject
     }
 
-    const isJwt = this.jwtService.verify(jwt)
-    if (!isJwt) {
+    try {
+      const isJwt = this.jwtService.verify(jwt)
+      /** For forcing type, jwtPayload should be declared as const variable */
+      const jwtPayload: JwtPayload = {
+        id: isJwt.id,
+        _id: isJwt._id,
+        email: isJwt.email
+      }
+      const newJwt = this.jwtService.sign(jwtPayload)
+      const sendObject: AuthObjectType = {
+        ok: Boolean(newJwt),
+        body: {jwt: newJwt},
+        errors: newJwt ? {} : {jwt: 'jwt regenerate error'}
+      }
+      return sendObject
+    } catch (err) {
       const sendObject: AuthObjectType = {
         ok: false,
         body: {},
@@ -147,20 +168,6 @@ export class AuthService {
       }
       return sendObject
     }
-
-    /** For forcing type, jwtPayload should be declared as const variable */
-    const jwtPayload: JwtPayload = {
-      id: isJwt.id,
-      _id: isJwt._id,
-      email: isJwt.email
-    }
-    const newJwt = this.jwtService.sign(jwtPayload)
-    const sendObject: AuthObjectType = {
-      ok: Boolean(newJwt),
-      body: {jwt: newJwt},
-      errors: newJwt ? {} : {jwt: 'jwt regenerate error'}
-    }
-    return sendObject
   }
 
   emptyFunction() {

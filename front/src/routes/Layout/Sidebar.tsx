@@ -1,11 +1,11 @@
 import {useState} from 'react' // eslint-disable-line
 
 import {TestButton} from '../../components'
-import {SocketTestCountType} from '../../contexts/SocketContext/types'
 
 import * as CT from '../../contexts'
 import * as C from '../../components/Layout/Sidebar'
 import * as CN from './className'
+import {SocketTestCountType} from '../../common'
 
 export default function Sidebar() {
   const {testCnt, setTestCnt} = CT.useLayoutContext()
