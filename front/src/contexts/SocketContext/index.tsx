@@ -8,26 +8,30 @@ import {serverUrl} from '../../client_secret'
 import * as U from '../../utils'
 import {SocketUserConnectedType} from '../../common'
 
+type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | undefined | null
+
 type ContextType = {
-  socketP?: Socket<DefaultEventsMap, DefaultEventsMap> | null
+  socketP?: SocketType
   socketPInit: () => void
   socketPReset: () => void
-  addSocketPOn<PayloadType>(event: string, callback: (payload: PayloadType) => void): void
+  addSocketOn: (socket: SocketType, event: string, callback: (payload: any) => void) => void
+  socketEmit: (socket: SocketType, event: string, payload: any) => void
 }
 
 export const SocketContext = createContext<ContextType>({
   socketPInit: () => {},
   socketPReset: () => {},
-  addSocketPOn: () => {}
+  addSocketOn: () => {},
+  socketEmit: () => {}
 })
 
 type SocketProviderProps = {}
 
 export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({children}) => {
   /**
-   * socketP: It will be reset automatically in LocalContext
+   * // NOTE: socketP: It will be reset automatically in LocalContext
    */
-  const [socketP, setSocketP] = useState<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
+  const [socketP, setSocketP] = useState<SocketType>(null)
 
   const socketPInit = () => {
     if (!socketP) {
@@ -56,13 +60,27 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     }
   }
 
-  const addSocketPOn = useCallback(
-    (event: string, callback: (payload: any) => void) => {
-      socketP?.on(event, (payload: any) => {
+  const addSocketOn = useCallback(
+    (socket: SocketType, event: string, callback: (payload: any) => void) => {
+      socket?.on(event, (payload: any) => {
         callback(payload)
       })
     },
-    [socketP]
+    []
+  )
+
+  const socketEmit = useCallback(
+    (socket: SocketType, event: string, payload: any, jwtRefresh: boolean = false) => {
+      // TODO: Check jwt
+      const jwt = payload.jwt
+      if (!jwt) {
+        alert('Payload should include jwt')
+        return
+      }
+
+      socket?.emit(event, payload)
+    },
+    []
   )
 
   useEffect(() => {
@@ -78,7 +96,8 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     socketP,
     socketPInit,
     socketPReset,
-    addSocketPOn
+    addSocketOn,
+    socketEmit
   }
   return <SocketContext.Provider value={value} children={children} />
 }

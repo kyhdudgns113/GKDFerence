@@ -45,7 +45,7 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
   const [showChat, setShowChat] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
 
-  const {addSocketPOn, socketPInit, socketPReset} = useSocketContext()
+  const {socketP, addSocketOn, socketPInit, socketPReset} = useSocketContext()
 
   const callbackTestCount = useCallback((payload: SocketTestCountType) => {
     setTestCnt(payload.cnt)
@@ -53,12 +53,12 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
 
   useEffect(() => {
     socketPInit()
-    addSocketPOn('test count', callbackTestCount)
+    addSocketOn(socketP, 'test count', callbackTestCount)
 
     return () => {
       socketPReset()
     }
-  }, [addSocketPOn, socketPInit, socketPReset, callbackTestCount])
+  }, [socketP, addSocketOn, socketPInit, socketPReset, callbackTestCount])
 
   const value = {
     testCnt,
