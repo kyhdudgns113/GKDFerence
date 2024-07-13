@@ -6,11 +6,11 @@ import {AuthProvider, SocketProvider} from './contexts'
 function App() {
   return (
     <BrowserRouter>
-      <SocketProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <SocketProvider>
           <RoutesSetup />
-        </AuthProvider>
-      </SocketProvider>
+        </SocketProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

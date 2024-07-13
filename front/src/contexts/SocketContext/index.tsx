@@ -7,6 +7,7 @@ import {serverUrl} from '../../client_secret'
 
 import * as U from '../../utils'
 import {SocketUserConnectedType} from '../../common'
+import {useAuth} from '../AuthContext'
 
 type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | undefined | null
 
@@ -32,6 +33,8 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
    * // NOTE: socketP: It will be reset automatically in LocalContext
    */
   const [socketP, setSocketP] = useState<SocketType>(null)
+
+  const {checkToken, refreshToken} = useAuth()
 
   const socketPInit = () => {
     if (!socketP) {
@@ -70,17 +73,11 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
   )
 
   const socketEmit = useCallback(
-    (socket: SocketType, event: string, payload: any, jwtRefresh: boolean = false) => {
-      // TODO: Check jwt
-      const jwt = payload.jwt
-      if (!jwt) {
-        alert('Payload should include jwt')
-        return
-      }
-
+    async (socket: SocketType, event: string, payload: any, jwtRefresh: boolean = false) => {
+      jwtRefresh ? refreshToken() : checkToken()
       socket?.emit(event, payload)
     },
-    []
+    [checkToken, refreshToken]
   )
 
   useEffect(() => {
