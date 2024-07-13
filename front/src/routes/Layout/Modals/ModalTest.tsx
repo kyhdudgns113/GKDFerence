@@ -18,8 +18,18 @@ export default function ModalTest() {
   const onChangeId = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setIdOrMail(e.target.value)
+      setErrMsg('')
     },
     [setIdOrMail]
+  )
+
+  const onClickClose = useCallback(
+    (e: MouseEvent) => {
+      onTestClose()
+      setIdOrMail('')
+      setErrMsg('')
+    },
+    [onTestClose, setErrMsg, setIdOrMail]
   )
 
   const onClickTest = useCallback(
@@ -31,7 +41,7 @@ export default function ModalTest() {
       }
 
       const jwt = ''
-      get(`/user/find/${idOrEmail}`, jwt)
+      get(`/sidebar/findUser/${idOrEmail}`, jwt)
         .then(res => res.json())
         .then(result => {
           const {ok, body, errors} = result
@@ -49,7 +59,7 @@ export default function ModalTest() {
   )
 
   return (
-    <Modal className="flex-col" isOpen={isTestOpen} onClose={onTestClose}>
+    <Modal className="flex-col" isOpen={isTestOpen}>
       <div className="flex justify-center">
         <T.Title className="font-bold">New Chat</T.Title>
       </div>
@@ -67,7 +77,9 @@ export default function ModalTest() {
         <Button className="w-1/4" onClick={onClickTest}>
           Test
         </Button>
-        <Button className="w-1/4">Cancel</Button>
+        <Button className="w-1/4" onClick={onClickClose}>
+          Cancel
+        </Button>
       </div>
     </Modal>
   )

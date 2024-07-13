@@ -8,6 +8,7 @@ import {useAuth} from '../../../contexts'
 export const useGoToMain = () => {
   const navigate = useNavigate()
   const {checkToken} = useAuth()
+
   const successCallback = useCallback(() => {
     navigate('/main')
   }, [navigate])

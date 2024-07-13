@@ -3,7 +3,7 @@ import {DivCommonProps} from '../Props'
 
 export type ModalProps = DivCommonProps & {
   isOpen: boolean
-  onClose: () => void
+  onClose?: () => void
 }
 
 export const Modal: FC<PropsWithChildren<ModalProps>> = ({

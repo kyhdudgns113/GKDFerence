@@ -2,6 +2,15 @@ import {Dispatch, SetStateAction} from 'react'
 import * as U from '../../utils'
 import {AuthBodyType, Callback} from '../../common'
 
+/**
+ * It write jwt in local storage too
+ *
+ * @param body : req body
+ * @param setId : id setter function
+ * @param set_id : _id setter function
+ * @param setEmail : email setter function
+ * @param callback : callback function if writting is finished.
+ */
 export const writeBodyObject = (
   body: AuthBodyType | undefined,
   setId: Dispatch<SetStateAction<string>>,

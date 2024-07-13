@@ -4,6 +4,7 @@ import {
   FC,
   PropsWithChildren,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useState
@@ -44,20 +45,20 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
   const [showChat, setShowChat] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
 
-  const {socketP, socketPInit, socketPReset} = useSocketContext()
+  const {addSocketPOn, socketPInit, socketPReset} = useSocketContext()
+
+  const callbackTestCount = useCallback((payload: SocketTestCountType) => {
+    setTestCnt(payload.cnt)
+  }, [])
 
   useEffect(() => {
     socketPInit()
-    if (socketP) {
-      socketP.on('test count', (payload: SocketTestCountType) => {
-        setTestCnt(payload.cnt)
-      })
-    }
+    addSocketPOn('test count', callbackTestCount)
 
     return () => {
       socketPReset()
     }
-  }, [socketP, socketPInit, socketPReset])
+  }, [addSocketPOn, socketPInit, socketPReset, callbackTestCount])
 
   const value = {
     testCnt,

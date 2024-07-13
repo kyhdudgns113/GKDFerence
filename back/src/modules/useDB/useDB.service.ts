@@ -13,25 +13,21 @@ export class UseDBService {
 
   async findUserById(id: string) {
     const user = await this.userService.findOneById(id)
-
     return user
   }
 
   async findUserByEmail(email: string) {
     const user = await this.userService.findOneByEmail(email)
-
     return user
   }
 
   async findUserByIdOrEmail(idOrEmail: string) {
     const user = await this.userService.findOneByIdOrEmail(idOrEmail)
-
     return user
   }
 
   async createUser(createUserDto: CreateUserDto) {
     const newUser = await this.userService.create(createUserDto)
-
     return newUser
   }
 

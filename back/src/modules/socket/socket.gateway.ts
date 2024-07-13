@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets'
 import {Server, Socket} from 'socket.io'
 import {Logger} from '@nestjs/common'
-import {SocketTestCountType, SocketUserConnectedType} from './socket.types'
+import {SocketTestCountType, SocketUserConnectedType} from 'src/common'
 
 @WebSocketGateway({cors: true}) // Enable CORS if needed
 export class SocketGateway
@@ -17,8 +17,36 @@ export class SocketGateway
   @WebSocketServer() server: Server
   private logger: Logger = new Logger('SocketGateway')
 
+  private sockInfo: {
+    [sockId: string]: {
+      type: 'P' | 'Chat'
+      uOid: string
+    }
+  } = {}
+  private uOidInfo: {
+    [uOid: string]: {
+      numConnectedP: number
+      connectedP: {[sockPid: string]: boolean}
+    }
+  } = {}
+  private sockPidInfo: {
+    [sockPid: string]: {
+      uOid: string
+      sockChatId: string
+      chatId: string
+    } | null
+  } = {}
+  private sockCidInfo: {
+    [sockCid: string]: {
+      uOid: string
+      sockPid: string
+      chatId: string
+    }
+  } = {}
+
   afterInit(server: Server) {
     this.logger.log('Init')
+    server.disconnectSockets()
   }
 
   handleConnection(client: Socket, ...args: any[]) {
@@ -27,13 +55,47 @@ export class SocketGateway
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`)
+
+    const sid = client.id
+
+    // NOTE: If server is reset, this.~~ is also reset.
+    // NOTE: So we need to check if it was validate
+    if (this.sockInfo[sid]) {
+      switch (this.sockInfo[sid].type) {
+        case 'P':
+          {
+            const uOid = this.sockInfo[sid].uOid
+            delete this.sockPidInfo[sid]
+
+            this.uOidInfo[uOid].numConnectedP -= 1
+            delete this.uOidInfo[uOid].connectedP[sid]
+            if (this.uOidInfo[uOid].numConnectedP === 0) {
+              delete this.uOidInfo[uOid]
+            }
+            // TODO: delete chat socket inside socketP
+          }
+          break
+        case 'Chat':
+          {
+            const pid = this.sockCidInfo[sid].sockPid
+
+            this.sockPidInfo[pid].sockChatId = ''
+            this.sockPidInfo[pid].chatId = ''
+          }
+          break
+      }
+    }
+
+    delete this.sockInfo[client.id]
   }
 
   @SubscribeMessage('user connected')
-  userConnect(client: Socket, payload: SocketUserConnectedType): void {
-    this.logger.log('USER CONNECTED : ' + payload.id)
-    client.emit('message', payload)
+  userConnected(client: Socket, payload: SocketUserConnectedType): void {
+    this.logger.log('USER CONNECTED : ' + payload._id)
+    this.initSocketP(client, payload)
+    client.emit('user connected', payload)
   }
+
   @SubscribeMessage('test count')
   testCount(client: Socket, payload: SocketTestCountType): void {
     this.logger.log('Test Cnt from ' + payload.id)
@@ -41,9 +103,29 @@ export class SocketGateway
     client.emit('test count', payload)
   }
 
-  // @SubscribeMessage('message')
-  // message(client: Socket, payload: {sender: string; message: string}): void {
-  //   console.log('MESSAGE ', payload)
-  //   client.emit('message', payload)
-  // }
+  private initSocketP(client: Socket, payload: SocketUserConnectedType) {
+    const uOid = payload._id
+    const sid = client.id
+
+    this.sockInfo[sid] = {
+      type: 'P',
+      uOid: uOid
+    }
+
+    if (!this.uOidInfo[uOid]) {
+      this.uOidInfo[uOid] = {
+        numConnectedP: 0,
+        connectedP: {}
+      }
+    }
+    this.uOidInfo[uOid].numConnectedP += 1
+    this.uOidInfo[uOid].connectedP[sid] = true
+
+    this.sockPidInfo[sid] = {
+      uOid: uOid,
+      chatId: '',
+      sockChatId: ''
+    }
+  }
+  // BLANK LINE COMMENT
 }

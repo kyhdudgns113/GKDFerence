@@ -1,5 +1,5 @@
 import type {FC, PropsWithChildren} from 'react'
-import {createContext, useContext, useEffect, useState} from 'react'
+import {createContext, useCallback, useContext, useEffect, useState} from 'react'
 import {io, Socket} from 'socket.io-client'
 
 import {DefaultEventsMap} from 'socket.io/dist/typed-events'
@@ -12,11 +12,13 @@ type ContextType = {
   socketP?: Socket<DefaultEventsMap, DefaultEventsMap> | null
   socketPInit: () => void
   socketPReset: () => void
+  addSocketPOn<PayloadType>(event: string, callback: (payload: PayloadType) => void): void
 }
 
 export const SocketContext = createContext<ContextType>({
   socketPInit: () => {},
-  socketPReset: () => {}
+  socketPReset: () => {},
+  addSocketPOn: () => {}
 })
 
 type SocketProviderProps = {}
@@ -35,12 +37,12 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
       setSocketP(newSocket)
 
       newSocket.on('user connected', (recvObj: SocketUserConnectedType) => {
-        console.log('USER CONNECTED : ', recvObj.id)
+        console.log('USER CONNECTED : ', recvObj._id)
       })
 
-      U.readStringP('id').then(id => {
+      U.readStringP('_id').then(_id => {
         const sendObj: SocketUserConnectedType = {
-          id: id || ''
+          _id: _id || ''
         }
         newSocket.emit('user connected', sendObj)
       })
@@ -54,6 +56,15 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     }
   }
 
+  const addSocketPOn = useCallback(
+    (event: string, callback: (payload: any) => void) => {
+      socketP?.on(event, (payload: any) => {
+        callback(payload)
+      })
+    },
+    [socketP]
+  )
+
   useEffect(() => {
     return () => {
       if (socketP && socketP.connected) {
@@ -66,7 +77,8 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     /** socket: Before use it, you should call useSocket() */
     socketP,
     socketPInit,
-    socketPReset
+    socketPReset,
+    addSocketPOn
   }
   return <SocketContext.Provider value={value} children={children} />
 }

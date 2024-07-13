@@ -27,6 +27,13 @@ export interface JwtPayload {
   _id: ObjectId
   email: string
 }
+export type SocketUserConnectedType = {
+  _id: string
+}
+export type SocketTestCountType = {
+  id: string
+  cnt: number
+}
 export type UserBodyType = {
   jwt?: string
   id?: string

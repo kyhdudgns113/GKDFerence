@@ -31,14 +31,14 @@ export class AuthService {
     //  Find User: ID
     let existUser = await this.useDBService.findUserById(authBody.id)
     if (existUser) {
-      ret.errors['idOrEmail'] = 'User already exist'
+      ret.errors['id'] = 'ID already exist'
       return ret
     }
 
     //  Find User: Email
     existUser = await this.useDBService.findUserByEmail(authBody.email)
     if (existUser) {
-      ret.errors['idOrEmail'] = 'User already exist'
+      ret.errors['email'] = 'Email already exist'
       return ret
     }
 

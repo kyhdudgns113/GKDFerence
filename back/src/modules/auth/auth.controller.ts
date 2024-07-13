@@ -12,7 +12,6 @@ import {
 import {AuthService} from './auth.service'
 import {AuthBodyType} from 'src/common'
 import {getJwtFromHeader} from 'src/util'
-import {testDecorator} from 'src/test'
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +24,7 @@ export class AuthController {
     console.log(`signup(${authBody.id}): requested`)
     const ret = await this.authService.signup(authBody)
     console.log(`signup(${authBody.id}): ${ret.ok}`)
+    console.log('ERRORS : ', ret.errors)
     return ret
   }
   @Post('/login')
@@ -37,7 +37,6 @@ export class AuthController {
 
   // AREA2 : Get
   @Get('/checkToken')
-  @testDecorator()
   async checkToken(@Headers() headers) {
     const jwt = getJwtFromHeader(headers) ?? ''
     return await this.authService.checkToken(jwt)

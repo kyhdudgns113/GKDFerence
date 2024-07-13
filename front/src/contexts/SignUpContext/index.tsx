@@ -65,10 +65,8 @@ export const SignUpProvider: FC<PropsWithChildren<SignUpProviderProps>> = ({chil
           signup(idVal, email, pwVal)
             .then(() => navigate('/'))
             .catch(errors => {
-              const keys = Object.keys(errors)
-
-              keys.includes('id') && setIdErr(errors['id'])
-              keys.includes('email') && setEmailErr(errors['email'])
+              setIdErr(errors['id'])
+              setEmailErr(errors['email'])
             })
         }
       }

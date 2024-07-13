@@ -55,7 +55,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then(res => res.json())
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
-
           if (ok) {
             writeBodyObject(body, setId, set_id, setEmail)
             resolve({})

@@ -2,7 +2,7 @@
  *
  * This is TODO list
  *
- * // TODO: -1. BackEnd 에 자동 JWT 검사기능 추가
+ * // TODO: -1. 서버에서 소켓 종료시킬 수 있음. 이를 확인하는 코드 필요
  *
  * // TODO: 0. Create Chat Modal 완벽 구현
  *
