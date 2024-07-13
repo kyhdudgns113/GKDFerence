@@ -73,7 +73,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
   )
 
   const socketEmit = useCallback(
-    async (socket: SocketType, event: string, payload: any, jwtRefresh: boolean = false) => {
+    (socket: SocketType, event: string, payload: any, jwtRefresh: boolean = false) => {
       jwtRefresh ? refreshToken() : checkToken()
       socket?.emit(event, payload)
     },
