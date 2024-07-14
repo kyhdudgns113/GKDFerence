@@ -48,7 +48,7 @@ export class SocketGateway
     this.logger.log('Init')
     server.sockets.sockets.forEach(socket => {
       this.logger.log(`Disconnect prev socket : ${socket.id}`)
-      socket.emit('disconnect', 'disconnect')
+      socket.emit('user disconnect', 'disconnect')
     })
   }
 

@@ -10,7 +10,7 @@ export class SidebarService {
     private jwtService: JwtService
   ) {}
 
-  async findUser(jwt: string, idOrEmail: string) {
+  async findUserIdOrEmail(jwt: string, idOrEmail: string) {
     const isJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
     if (!isJwt) {
       return {

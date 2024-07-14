@@ -47,7 +47,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
         console.log('USER CONNECTED : ', recvObj._id)
       })
 
-      newSocket.on('disconnect', (recvObj: any) => {
+      newSocket.on('user disconnect', (recvObj: any) => {
         logout()
       })
 

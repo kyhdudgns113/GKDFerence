@@ -25,8 +25,9 @@ export class SidebarController {
 
   // AREA2 : Get
   @Get('/findUser/:idOrEmail')
-  async findUser(@Headers() headers, @Param() idOrEmail: string) {
+  async findUser(@Headers() headers, @Param('idOrEmail') idOrEmail: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
-    return 'get'
+    const ret = await this.sidebarService.findUserIdOrEmail(jwt, idOrEmail)
+    return ret
   }
 }

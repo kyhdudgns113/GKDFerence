@@ -13,7 +13,7 @@ export default function ModalTest() {
   const [errMsg, setErrMsg] = useState<string>('')
 
   const {isTestOpen, onTestClose} = useLayoutModalContext()
-  const {checkToken} = useAuth()
+  const {checkToken, getJwt} = useAuth()
 
   const onChangeId = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,29 +33,31 @@ export default function ModalTest() {
   )
 
   const onClickTest = useCallback(
-    (e: MouseEvent) => {
+    async (e: MouseEvent) => {
       checkToken()
       if (!idOrEmail) {
         setErrMsg('아이디 or 메일주소를 입력해주세요. ')
         return
       }
 
-      const jwt = ''
+      const jwt = await getJwt()
       get(`/sidebar/findUser/${idOrEmail}`, jwt)
         .then(res => res.json())
         .then(result => {
           const {ok, body, errors} = result
           if (ok) {
-            setErrMsg(`${body.userName} is received`)
+            setErrMsg(`${body.id} is received`)
           } else {
-            setErrMsg(errors['idOrEmail'])
+            const keys = Object.keys(errors)
+            keys.includes('jwt') && setErrMsg(errors['jwt'])
+            keys.includes('idOrEmail') && setErrMsg(errors['idOrEmail'])
           }
         })
         .catch(error => {
           setErrMsg(`ERROR : ${error.message}`)
         })
     },
-    [idOrEmail, checkToken, setErrMsg]
+    [idOrEmail, checkToken, getJwt, setErrMsg]
   )
 
   return (
