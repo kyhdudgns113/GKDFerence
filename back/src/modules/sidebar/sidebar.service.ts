@@ -36,6 +36,33 @@ export class SidebarService {
     }
   }
 
+  // NOTE: It will be upgraded by including group chat list
+  async getUserChatRoomList(jwt: string, uOId: string) {
+    const isJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
+    if (!isJwt) {
+      return {
+        ok: false,
+        body: {},
+        errors: {jwt: 'JWT Error in Sidebar findUser'}
+      }
+    }
+
+    const chatRoomList = await this.useDBService.findChatRoomList(uOId)
+    if (chatRoomList === null) {
+      return {
+        ok: false,
+        body: {},
+        errors: {uOId: "User isn't exist"}
+      }
+    } else {
+      return {
+        ok: true,
+        body: {chatRoomList: chatRoomList},
+        errors: {}
+      }
+    }
+  }
+
   /**
    *
    * @param body : Information for user

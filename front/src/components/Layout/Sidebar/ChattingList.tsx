@@ -9,7 +9,7 @@ export type ChattingListProps = DivCommonProps & {
 }
 
 export const ChattingList: FC<ChattingListProps> = () => {
-  const {showChat, setShowChat} = useLayoutContext() // eslint-disable-line
+  const {showChat, setShowChat, chatRooms} = useLayoutContext() // eslint-disable-line
 
   return (
     <div className="flex flex-col">
@@ -22,6 +22,10 @@ export const ChattingList: FC<ChattingListProps> = () => {
         <Text>&nbsp;&nbsp;Chatting List</Text>
         <Icon className="text-3xl" name={showChat ? 'arrow_drop_down' : 'arrow_right'}></Icon>
       </div>
+      {showChat &&
+        chatRooms?.map(row => {
+          return <p key={`chatRow${row.targetId}`}>{row.targetId}</p>
+        })}
     </div>
   )
 }

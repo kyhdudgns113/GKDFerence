@@ -120,11 +120,14 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         get('/auth/refreshToken', jwt)
           .then(res => res.json())
           .then((result: AuthObjectType) => {
-            const {ok, body} = result
+            const {ok, body, errors} = result
             if (ok) {
               U.writeStringP('jwt', body?.jwt ?? '')
               callback && callback()
             } else {
+              const keys = Object.keys(errors)
+              setAlertMsg(errors[keys[0]])
+
               writeBodyObject({}, setId, set_id, setEmail, () => navigate('/'))
             }
           })
@@ -144,6 +147,18 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
       setAlertMsg('')
     }
   }, [alertMsg])
+
+  useEffect(() => {
+    U.readStringP('id').then(idVal => {
+      U.readStringP('_id').then(_idVal => {
+        U.readStringP('email').then(emailVal => {
+          setId(idVal || '')
+          set_id(_idVal || '')
+          setEmail(emailVal || '')
+        })
+      })
+    })
+  }, [])
 
   const value = {
     alertMsg,

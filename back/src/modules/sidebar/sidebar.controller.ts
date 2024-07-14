@@ -32,6 +32,8 @@ export class SidebarController {
   @Get('/getChatList/:uOId')
   async getChatList(@Headers() headers: any, @Param('uOId') uOId: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
+    const ret = this.sidebarService.getUserChatRoomList(jwt, uOId)
+    return ret
   }
 
   @Get('/findUser/:idOrEmail')

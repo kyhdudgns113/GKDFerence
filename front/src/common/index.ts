@@ -18,11 +18,16 @@ export type AuthObjectType = {
   body: AuthBodyType
   errors: ErrorsType
 }
-export type ErrorsType = KeyValueType | null
+export type ErrorsType = KeyValueType
 export interface JwtPayload {
   id: string
   _id: string
   email: string
+}
+export type RowSingleChatRoomType = {
+  chatRoomOId: string
+  targetUOId: string
+  targetId: string
 }
 export type SidebarBodyType = {
   jwt?: string

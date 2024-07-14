@@ -1,17 +1,19 @@
-import {useCallback} from 'react' // eslint-disable-line
+import {useCallback, useEffect} from 'react' // eslint-disable-line
 
 import {TestButton} from '../../components'
+import {SocketTestCountType} from '../../common'
 
 import * as CT from '../../contexts'
 import * as C from '../../components/Layout/Sidebar'
 import * as CN from './className'
-import {SocketTestCountType} from '../../common'
+import * as U from '../../utils'
+import {get} from '../../server'
 
 export default function Sidebar() {
-  const {testCnt, setTestCnt} = CT.useLayoutContext()
+  const {testCnt, setTestCnt, setChatRooms} = CT.useLayoutContext()
   const {socketP, socketEmit} = CT.useSocketContext()
 
-  const {id, checkToken, refreshToken} = CT.useAuth()
+  const {id, _id, checkToken, refreshToken} = CT.useAuth()
 
   const {onTestOpen} = CT.useLayoutModalContext()
 
@@ -25,6 +27,25 @@ export default function Sidebar() {
     },
     [id, socketP, socketEmit]
   )
+
+  useEffect(() => {
+    if (id && _id) {
+      U.readStringP('jwt').then(jwt => {
+        if (jwt) {
+          get(`/sidebar/getChatList/${_id}`, jwt)
+            .then(res => res.json())
+            .then(res => {
+              const {ok, body} = res
+              if (ok) {
+                setChatRooms(body.chatRoomList)
+              } else {
+              }
+            })
+        } else {
+        }
+      })
+    }
+  }, [id, _id, setChatRooms])
 
   return (
     <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>

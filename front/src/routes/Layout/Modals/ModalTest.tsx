@@ -75,11 +75,9 @@ export default function ModalTest() {
       post(`/sidebar/createSingleChatRoom/${idOrEmail}`, sidebarBody)
         .then(res => res.json())
         .then(res => {
-          const {ok, body, errors} = res
+          const {ok, errors} = res
           if (ok) {
-            onTestClose()
-            setIdOrMail('')
-            setErrMsg('')
+            onClickClose(e)
           } else {
             const keys = Object.keys(errors)
 
@@ -87,7 +85,7 @@ export default function ModalTest() {
           }
         })
     },
-    [id, _id, idOrEmail, email, checkToken, getJwt]
+    [id, _id, idOrEmail, email, checkToken, onClickClose, getJwt]
   )
 
   // BLANK LINE COMMENT

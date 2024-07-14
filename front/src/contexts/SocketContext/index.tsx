@@ -34,11 +34,10 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
    */
   const [socketP, setSocketP] = useState<SocketType>(null)
 
-  const {logout, checkToken, refreshToken} = useAuth()
+  const {checkToken, refreshToken} = useAuth()
 
   const socketPInit = () => {
     if (!socketP) {
-      console.log('UseSocket: Create')
       const newSocket = io(serverUrl)
 
       setSocketP(newSocket)
@@ -47,9 +46,9 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
         console.log('USER CONNECTED : ', recvObj._id)
       })
 
-      newSocket.on('user disconnect', (recvObj: any) => {
-        logout()
-      })
+      // newSocket.on('user disconnect', (recvObj: any) => {
+      //   logout()
+      // })
 
       U.readStringP('_id').then(_id => {
         const sendObj: SocketUserConnectedType = {

@@ -12,7 +12,7 @@ import {
 import {useToggle} from '../../hooks'
 import {useSocketContext} from '../SocketContext'
 import {LayoutModalProvider} from '../LayoutModalContext'
-import {SocketTestCountType} from '../../common'
+import {RowSingleChatRoomType, SocketTestCountType} from '../../common'
 
 type ContextType = {
   testCnt?: number
@@ -24,13 +24,17 @@ type ContextType = {
   setShowChat: Dispatch<SetStateAction<boolean>>
   showDoc?: boolean
   setShowDoc: Dispatch<SetStateAction<boolean>>
+
+  chatRooms?: RowSingleChatRoomType[]
+  setChatRooms: Dispatch<SetStateAction<RowSingleChatRoomType[]>>
 }
 
 export const LayoutContext = createContext<ContextType>({
   setTestCnt: () => {},
   setShowConf: () => {},
   setShowChat: () => {},
-  setShowDoc: () => {}
+  setShowDoc: () => {},
+  setChatRooms: () => {}
 })
 
 type LayoutProviderProps = {}
@@ -44,6 +48,8 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
   const [showConf, setShowConf] = useToggle()
   const [showChat, setShowChat] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
+
+  const [chatRooms, setChatRooms] = useState<RowSingleChatRoomType[]>([])
 
   const {socketP, addSocketOn, socketPInit, socketPReset} = useSocketContext()
 
@@ -69,7 +75,10 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
     showChat,
     setShowChat,
     showDoc,
-    setShowDoc
+    setShowDoc,
+
+    chatRooms,
+    setChatRooms
   }
   return <LayoutContext.Provider value={value} children={<LayoutModalProvider />} />
 }
