@@ -6,22 +6,23 @@ export class User extends Document {
   /** Object Id is in extended class Document */
 
   /** User ID. Not ObjectId */
-  @Prop()
+  @Prop({type: String})
   id: string
 
-  @Prop()
+  @Prop({type: String})
   email: string
 
-  @Prop()
+  @Prop({type: String})
   hashedPassword: string
 
   /**
    * singleChatList[userObjectId] = chatRoomObjectId
+   * Map 으로 해버리면 사용하기가 힘들어진다.
    */
   @Prop({type: Object})
-  singleChatList: {[userObjectId: string]: ObjectId}
+  singleChatList: {[userObjectId: string]: string}
 
-  @Prop()
+  @Prop({type: Date})
   createdDt: Date
 }
 

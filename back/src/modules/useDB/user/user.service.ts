@@ -1,8 +1,8 @@
 import {Injectable} from '@nestjs/common'
 import {InjectModel} from '@nestjs/mongoose'
-import {Model, ObjectId} from 'mongoose'
-import {User} from './entities'
+import {Model, ObjectId, Types} from 'mongoose'
 import {CreateUserDto, UpdateUserDto} from './dto'
+import {User} from './user.entity'
 
 @Injectable()
 export class UserService {
@@ -39,8 +39,9 @@ export class UserService {
     return result
   }
 
-  async findOneByObjectId(_id: ObjectId): Promise<User> {
-    const result = await this.userModel.findOne({_id: _id})
+  async findOneByObjectId(_id: string): Promise<User> {
+    const oid = new Types.ObjectId(_id)
+    const result = await this.userModel.findOne({_id: oid})
     return result
   }
 
@@ -65,7 +66,48 @@ export class UserService {
     }
   }
 
-  blankLineFunction() {
-    //
+  /**
+   * @param id : 어떤 유저의 채팅방을 찾을건가?
+   * @param idOrEmail : 어떤 유저와의 채팅방을 찾을건가?
+   * @returns : 채팅방의 ObjectId to string
+   */
+  async findUsersChatRoom(id: string, idOrEmail: string) {
+    const user = await this.findOneById(id)
+    const targetUser = await this.findOneByIdOrEmail(idOrEmail)
+
+    if (!user || !targetUser) {
+      return null
+    }
+
+    return user.singleChatList && user.singleChatList[targetUser._id.toString()]
   }
+
+  async setUserSingleChatRoom(uOId: string, tUOId: string, chatOId: string) {
+    const _id = new Types.ObjectId(uOId)
+    const ret = await this.userModel.updateOne(
+      {_id: _id},
+      {$set: {[`singleChatList.${tUOId}`]: chatOId}}
+    )
+    return ret
+  }
+
+  async idToOid(id: string) {
+    const user = await this.findOneById(id)
+    if (user) {
+      return user._id.toString()
+    } else {
+      return ''
+    }
+  }
+
+  async idOrEmailToOid(idOrEmail: string) {
+    const user = await this.findOneByIdOrEmail(idOrEmail)
+    if (user) {
+      return user._id.toString()
+    } else {
+      return ''
+    }
+  }
+
+  // BLANK LINE COMMENT
 }

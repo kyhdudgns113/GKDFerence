@@ -9,6 +9,7 @@ import {AuthObjectType, Callback, ErrorsType} from '../../common'
 type ContextType = {
   alertMsg?: string
   id?: string
+  _id?: string
   email?: string
 
   signup: (id: string, email: string, password: string) => Promise<ErrorsType>
@@ -147,6 +148,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
   const value = {
     alertMsg,
     id,
+    _id,
     email,
 
     signup,

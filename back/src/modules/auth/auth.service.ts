@@ -57,7 +57,7 @@ export class AuthService {
 
     const jwtPayload: JwtPayload = {
       id: newUser.id,
-      _id: newUser._id as ObjectId,
+      _id: newUser._id.toString(),
       email: newUser.email
     }
     const jwt = await this.jwtService.signAsync(jwtPayload, gkdJwtSignOption)
@@ -65,7 +65,7 @@ export class AuthService {
     ret.ok = true
     ret.body = {
       id: newUser.id,
-      _id: newUser._id as ObjectId,
+      _id: newUser._id.toString(),
       email: newUser.email,
       jwt: jwt
     }
@@ -92,14 +92,14 @@ export class AuthService {
 
       const jwtPayload: JwtPayload = {
         id: user.id,
-        _id: user._id as ObjectId,
+        _id: user._id.toString(),
         email: user.email
       }
       const jwt = await this.jwtService.signAsync(jwtPayload, gkdJwtSignOption)
       ret.ok = true
       ret.body.id = user.id
       ret.body.email = user.email
-      ret.body._id = user._id as ObjectId
+      ret.body._id = user._id.toString()
       ret.body.jwt = jwt
     } else {
       ret.errors['idOrEmail'] = "User isn't exist"

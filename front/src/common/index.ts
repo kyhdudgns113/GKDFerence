@@ -3,11 +3,8 @@
  * with the back.common.types.ts
  **************************************************/
 
-import {ObjectId} from 'mongoose'
-
 export type Callback = () => void
 export type KeyValueType = {[key: string]: string}
-export type KeyObjectIdType = {[_idToString: string]: ObjectId}
 
 export type AuthBodyType = {
   jwt?: string
@@ -19,13 +16,28 @@ export type AuthBodyType = {
 export type AuthObjectType = {
   ok: boolean
   body: AuthBodyType
-  errors: KeyValueType | null
+  errors: ErrorsType
 }
-export type ErrorsType = KeyValueType
+export type ErrorsType = KeyValueType | null
 export interface JwtPayload {
   id: string
-  _id: ObjectId
+  _id: string
   email: string
+}
+export type SidebarBodyType = {
+  jwt?: string
+  id?: string
+  _id?: string
+  email?: string
+
+  confList?: {[key: string]: string}
+  chatList?: {[key: string]: string}
+  docList?: {[key: string]: string}
+}
+export type SidebarObjectType = {
+  ok: boolean
+  body: SidebarBodyType
+  errors: ErrorsType
 }
 export type SocketUserConnectedType = {
   _id: string
@@ -39,5 +51,5 @@ export type UserBodyType = {
   id?: string
   _id?: string
   email?: string
-  singleChatList?: KeyObjectIdType
+  singleChatList?: KeyValueType
 }

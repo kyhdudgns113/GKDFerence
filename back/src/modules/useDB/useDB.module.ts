@@ -2,12 +2,14 @@ import {Module} from '@nestjs/common'
 import {JwtModule} from '@nestjs/jwt'
 import {PassportModule} from '@nestjs/passport'
 
-import {UserModule} from 'src/modules/useDB/user/user.module'
 import {gkdJwtSecret, gkdJwtSignOption, JwtStrategy} from 'src/common'
 import {UseDBService} from './useDB.service'
+import {ChatRoomModule} from './chatroom/chatroom.module'
+import {UserModule} from './user/user.module'
 
 @Module({
   imports: [
+    ChatRoomModule,
     UserModule, //
     PassportModule,
     JwtModule.register({
