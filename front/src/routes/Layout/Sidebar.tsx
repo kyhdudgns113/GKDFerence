@@ -28,6 +28,10 @@ export default function Sidebar() {
     [id, socketP, socketEmit]
   )
 
+  /**
+   * 새로고침등의 이슈로 setId, set_id 가 호출되지 않을 수 있다.
+   * 이런 경우에 id, _id 는 null 일 수 있다.
+   */
   useEffect(() => {
     if (id && _id) {
       U.readStringP('jwt').then(jwt => {

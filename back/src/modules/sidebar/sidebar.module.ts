@@ -4,9 +4,11 @@ import {SidebarService} from './sidebar.service'
 import {UseDBModule} from '../useDB/useDB.module'
 import {JwtModule} from '@nestjs/jwt'
 import {gkdJwtSecret, gkdJwtSignOption} from 'src/common'
+import {ChatListModule} from './chatList/chatList.module'
 
 @Module({
   imports: [
+    ChatListModule,
     UseDBModule,
     JwtModule.register({
       secret: gkdJwtSecret,

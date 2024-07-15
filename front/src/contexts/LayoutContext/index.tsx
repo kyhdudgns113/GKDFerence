@@ -27,6 +27,9 @@ type ContextType = {
 
   chatRooms?: RowSingleChatRoomType[]
   setChatRooms: Dispatch<SetStateAction<RowSingleChatRoomType[]>>
+
+  pageOId?: string
+  setPageOId: Dispatch<SetStateAction<string>>
 }
 
 export const LayoutContext = createContext<ContextType>({
@@ -34,7 +37,8 @@ export const LayoutContext = createContext<ContextType>({
   setShowConf: () => {},
   setShowChat: () => {},
   setShowDoc: () => {},
-  setChatRooms: () => {}
+  setChatRooms: () => {},
+  setPageOId: () => {}
 })
 
 type LayoutProviderProps = {}
@@ -53,10 +57,13 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
 
   const {socketP, addSocketOn, socketPInit, socketPReset} = useSocketContext()
 
+  const [pageOId, setPageOId] = useState<string>('')
+
   const callbackTestCount = useCallback((payload: SocketTestCountType) => {
     setTestCnt(payload.cnt)
   }, [])
 
+  // NOTE: 소켓 초기화 하는곳
   useEffect(() => {
     socketPInit()
     addSocketOn(socketP, 'test count', callbackTestCount)
@@ -78,7 +85,10 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
     setShowDoc,
 
     chatRooms,
-    setChatRooms
+    setChatRooms,
+
+    pageOId,
+    setPageOId
   }
   return <LayoutContext.Provider value={value} children={<LayoutModalProvider />} />
 }

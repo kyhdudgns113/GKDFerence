@@ -5,6 +5,7 @@ module.exports = {
       // prettier-ignore
       colors: {
         'gkd-sakura-bg': '#F8E8E0',                     //  720 = 8*88
+        'gkd-sakura-bg-70': '#F0D8D8',
         'gkd-sakura-border': '#F0B8B8',                 //  608 = 8*76
         'gkd-sakura-text': '#F89890',                   //  544 = 8*68
         'gkd-sakura-darker-text': '#F05858',            //  416 = 8*52

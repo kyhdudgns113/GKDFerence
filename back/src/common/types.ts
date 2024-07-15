@@ -27,7 +27,7 @@ export type ChatContentType = {
   date: Date
   content: string
 }
-export type ErrorsType = KeyValueType | null
+export type ErrorsType = KeyValueType
 export interface JwtPayload {
   id: string
   _id: string
@@ -53,12 +53,19 @@ export type SidebarObjectType = {
   body: SidebarBodyType
   errors: ErrorsType
 }
+// SocketP Type
 export type SocketUserConnectedType = {
   _id: string
 }
 export type SocketTestCountType = {
   id: string
   cnt: number
+}
+// SocketChat Type
+export type SocketChatConnectedType = {
+  jwt: string
+  uOId: string
+  cOId: string
 }
 export type UserBodyType = {
   jwt?: string

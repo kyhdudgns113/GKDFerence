@@ -8,7 +8,11 @@ import {
 } from '@nestjs/websockets'
 import {Server, Socket} from 'socket.io'
 import {Logger} from '@nestjs/common'
-import {SocketTestCountType, SocketUserConnectedType} from 'src/common'
+import {
+  SocketChatConnectedType,
+  SocketTestCountType,
+  SocketUserConnectedType
+} from 'src/common'
 
 @WebSocketGateway({cors: true}) // Enable CORS if needed
 export class SocketGateway
@@ -92,18 +96,28 @@ export class SocketGateway
     delete this.sockInfo[client.id]
   }
 
+  // AREA1 : socketP Area
   @SubscribeMessage('user connected')
   userConnected(client: Socket, payload: SocketUserConnectedType): void {
     this.logger.log('USER CONNECTED : ' + payload._id)
     this.initSocketP(client, payload)
     client.emit('user connected', payload)
   }
-
   @SubscribeMessage('test count')
   testCount(client: Socket, payload: SocketTestCountType): void {
     this.logger.log('Test Cnt from ' + payload.id)
     payload.cnt++
     client.emit('test count', payload)
+  }
+
+  // AREA1 : socketChatArea
+  @SubscribeMessage('chat connected')
+  chatConnected(client: Socket, payload: SocketChatConnectedType) {
+    this.logger.log('Chat connected')
+    // TODO: JWT 인증
+    // TODO: 채팅방 OId 에 따른 room 구현
+    // TODO: 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
+    client.emit('chat connected', payload)
   }
 
   private initSocketP(client: Socket, payload: SocketUserConnectedType) {

@@ -16,6 +16,7 @@ export const writeBodyObject = (
   setId: Dispatch<SetStateAction<string>>,
   set_id: Dispatch<SetStateAction<string>>,
   setEmail: Dispatch<SetStateAction<string>>,
+  setJwt: Dispatch<SetStateAction<string>>,
   callback?: Callback | undefined
 ) => {
   U.writeStringP('jwt', body?.jwt ?? '').then(() => {
@@ -25,6 +26,7 @@ export const writeBodyObject = (
           setId(body?.id || '')
           set_id(body?._id || '')
           setEmail(body?.email || '')
+          setJwt(body?.jwt || '')
           callback && callback()
         })
       })

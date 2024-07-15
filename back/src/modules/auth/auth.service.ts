@@ -170,7 +170,5 @@ export class AuthService {
     }
   }
 
-  emptyFunction() {
-    // this function is for blank line
-  }
+  // BLANK LINE COMMENT:
 }

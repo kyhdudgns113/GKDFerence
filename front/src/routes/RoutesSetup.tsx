@@ -4,6 +4,7 @@ import MainPage from '../pages/MainPage'
 import RequireAuth from '../providers/RequireAuth'
 
 import * as CT from '../contexts'
+import SingleChatPage from '../pages/SingleChatPage'
 
 export default function RoutesSetup() {
   return (
@@ -17,6 +18,8 @@ export default function RoutesSetup() {
           </RequireAuth>
         }>
         <Route index element={<MainPage />} />
+        <Route path="/main/sc/:scOId" element={<SingleChatPage />} />
+        <Route path="/main/*" element={<NullPage />} />
       </Route>
       <Route path="/signup" element={<CT.SignUpProvider />}></Route>
       <Route path="/*" element={<NullPage />}></Route>

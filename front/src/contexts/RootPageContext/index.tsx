@@ -34,6 +34,7 @@ export const RootPageProvider: FC<PropsWithChildren<RootPageProviderProps>> = ({
   const navigate = useNavigate()
 
   const onLogin = useCallback(() => {
+    refreshToken(() => navigate('/main'))
     if (!idVal || !pwVal) {
       setIdErr(idVal ? '' : 'ID is empty')
       setPwErr(pwVal ? '' : 'PW is empty')
@@ -45,7 +46,7 @@ export const RootPageProvider: FC<PropsWithChildren<RootPageProviderProps>> = ({
         setIdErr(errors['idOrEmail'])
         setPwErr(errors['password'])
       })
-  }, [idVal, pwVal, login, navigate])
+  }, [idVal, pwVal, login, navigate, refreshToken])
 
   // prettier-ignore
   const value = {
