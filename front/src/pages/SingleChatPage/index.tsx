@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react'
 import {io, Socket} from 'socket.io-client'
 import {DefaultEventsMap} from 'socket.io/dist/typed-events'
 
-import {useAuth, useLayoutContext, useSocketContext} from '../../contexts'
+import {useAuth, useLayoutContext} from '../../contexts'
 import {Title} from '../../components'
 import {get} from '../../server'
 import {serverUrl} from '../../client_secret'
@@ -16,7 +16,7 @@ export default function SingleChatPage() {
   const {pageOId, setPageOId} = useLayoutContext()
   const [sockChat, setSockChat] = useState<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
   const {_id, jwt} = useAuth()
-  const {socketPId} = useSocketContext()
+  // const {socketPId} = useSocketContext()
 
   useEffect(() => {
     const getPageOId = window.location.href.split('/main/sc/')[1]
@@ -42,7 +42,7 @@ export default function SingleChatPage() {
         jwt: jwt || '',
         uOId: _id || '',
         cOId: pageOId || '',
-        socketPId: socketPId || ''
+        socketPId: ''
       }
       newSocket.emit('chat connected', payload)
 

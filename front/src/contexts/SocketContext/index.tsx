@@ -13,7 +13,7 @@ type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | undefined | null
 
 type ContextType = {
   socketP?: SocketType
-  socketPId?: string
+  // socketPId?: string
   socketPInit: () => void
   socketPReset: () => void
   addSocketOn: (socket: SocketType, event: string, callback: (payload: any) => void) => void
@@ -34,19 +34,21 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
    * // NOTE: socketP: It will be reset automatically in LocalContext
    */
   const [socketP, setSocketP] = useState<SocketType>(null)
-  const [socketPId, setSocketPId] = useState<string>('')
+  const [socketPId, setSocketPIds] = useState<string>('') // eslint-disable-line
 
   const {checkToken, refreshToken} = useAuth()
 
-  const socketPInit = () => {
+  // NOTE: socketP 는 SocketProvider 가 아니라 Layout 과 수명을 같이 해야한다.
+  // NOTE: 따라서 socketP 를 초기화하는 함수를 만들어서 Layout 쪽에서 호출하도록 한다.
+  const socketPInit = useCallback(() => {
     if (!socketP) {
       const newSocket = io(serverUrl)
 
       setSocketP(newSocket)
 
       newSocket.on('user connected', (recvObj: SocketUserConnectedType) => {
-        console.log('USER CONNECTED : ', recvObj._id)
-        setSocketPId(recvObj._id)
+        console.log('USER CONNECTED : ', recvObj.pid)
+        setSocketPIds(recvObj.pid || '')
       })
 
       // newSocket.on('user disconnect', (recvObj: any) => {
@@ -61,13 +63,14 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
       })
       return newSocket
     }
-  }
+  }, [socketP])
 
-  const socketPReset = () => {
+  const socketPReset = useCallback(() => {
     if (socketP) {
+      socketP.disconnect()
       setSocketP(null)
     }
-  }
+  }, [socketP])
 
   const addSocketOn = useCallback(
     (socket: SocketType, event: string, callback: (payload: any) => void) => {
@@ -97,7 +100,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
   const value = {
     /** socket: Before use it, you should call useSocket() */
     socketP,
-    socketPId,
+    // socketPId,
     socketPInit,
     socketPReset,
     addSocketOn,
