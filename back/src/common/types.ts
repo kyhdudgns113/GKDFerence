@@ -56,6 +56,7 @@ export type SidebarObjectType = {
 // SocketP Type
 export type SocketUserConnectedType = {
   _id: string
+  pid?: string
 }
 export type SocketTestCountType = {
   id: string
@@ -66,6 +67,7 @@ export type SocketChatConnectedType = {
   jwt: string
   uOId: string
   cOId: string
+  socketPId: string
 }
 export type UserBodyType = {
   jwt?: string

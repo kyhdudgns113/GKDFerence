@@ -13,6 +13,7 @@ type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | undefined | null
 
 type ContextType = {
   socketP?: SocketType
+  socketPId?: string
   socketPInit: () => void
   socketPReset: () => void
   addSocketOn: (socket: SocketType, event: string, callback: (payload: any) => void) => void
@@ -33,6 +34,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
    * // NOTE: socketP: It will be reset automatically in LocalContext
    */
   const [socketP, setSocketP] = useState<SocketType>(null)
+  const [socketPId, setSocketPId] = useState<string>('')
 
   const {checkToken, refreshToken} = useAuth()
 
@@ -44,6 +46,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
 
       newSocket.on('user connected', (recvObj: SocketUserConnectedType) => {
         console.log('USER CONNECTED : ', recvObj._id)
+        setSocketPId(recvObj._id)
       })
 
       // newSocket.on('user disconnect', (recvObj: any) => {
@@ -94,6 +97,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
   const value = {
     /** socket: Before use it, you should call useSocket() */
     socketP,
+    socketPId,
     socketPInit,
     socketPReset,
     addSocketOn,

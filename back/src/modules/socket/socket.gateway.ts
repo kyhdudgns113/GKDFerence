@@ -9,10 +9,12 @@ import {
 import {Server, Socket} from 'socket.io'
 import {Logger} from '@nestjs/common'
 import {
+  JwtPayload,
   SocketChatConnectedType,
   SocketTestCountType,
   SocketUserConnectedType
 } from 'src/common'
+import {JwtService} from '@nestjs/jwt'
 
 @WebSocketGateway({cors: true}) // Enable CORS if needed
 export class SocketGateway
@@ -48,6 +50,8 @@ export class SocketGateway
     }
   } = {}
 
+  constructor(private jwtService: JwtService) {}
+
   afterInit(server: Server) {
     this.logger.log('Init')
     server.sockets.sockets.forEach(socket => {
@@ -72,6 +76,7 @@ export class SocketGateway
         case 'P':
           {
             const uOid = this.sockInfo[sid].uOid
+            const sockCId = this.sockPidInfo[sid].sockChatId
             delete this.sockPidInfo[sid]
 
             this.uOidInfo[uOid].numConnectedP -= 1
@@ -79,7 +84,7 @@ export class SocketGateway
             if (this.uOidInfo[uOid].numConnectedP === 0) {
               delete this.uOidInfo[uOid]
             }
-            // TODO: delete chat socket inside socketP
+            delete this.sockCidInfo[sockCId]
           }
           break
         case 'Chat':
@@ -88,6 +93,8 @@ export class SocketGateway
 
             this.sockPidInfo[pid].sockChatId = ''
             this.sockPidInfo[pid].chatId = ''
+
+            delete this.sockCidInfo[sid]
           }
           break
       }
@@ -101,6 +108,7 @@ export class SocketGateway
   userConnected(client: Socket, payload: SocketUserConnectedType): void {
     this.logger.log('USER CONNECTED : ' + payload._id)
     this.initSocketP(client, payload)
+    payload.pid = client.id
     client.emit('user connected', payload)
   }
   @SubscribeMessage('test count')
@@ -112,11 +120,32 @@ export class SocketGateway
 
   // AREA1 : socketChatArea
   @SubscribeMessage('chat connected')
-  chatConnected(client: Socket, payload: SocketChatConnectedType) {
-    this.logger.log('Chat connected')
-    // TODO: JWT 인증
-    // TODO: 채팅방 OId 에 따른 room 구현
-    // TODO: 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
+  async chatConnected(client: Socket, payload: SocketChatConnectedType) {
+    if (!payload.jwt || !payload.cOId || !payload.uOId) {
+      // this.logger.log("Payload isn't include information")
+      return
+    }
+
+    // JWT 인증
+    const jwt = payload.jwt
+    const isJwt = (await this.jwtService.verifyAsync(jwt)) as JwtPayload
+    if (!isJwt || isJwt._id !== payload.uOId) {
+      // this.logger.log('JWT Veryfing error')
+      return
+    }
+    // 채팅방 OId 에 따른 room 구현
+    client.join(payload.cOId)
+
+    // 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
+    this.sockCidInfo[client.id] = {
+      uOid: payload.uOId,
+      sockPid: client.id,
+      chatId: payload.cOId
+    }
+
+    this.sockPidInfo[payload.socketPId].sockChatId = client.id
+    this.sockPidInfo[payload.socketPId].chatId = payload.cOId
+
     client.emit('chat connected', payload)
   }
 
