@@ -1,10 +1,12 @@
-import {FC} from 'react'
+import {FC, MouseEvent, useCallback} from 'react'
 import {DivCommonProps, Icon} from '../../Base'
 import {useLayoutContext} from '../../../contexts'
 import {Text} from '../Header'
 import {classNameRowTitle} from './className'
 
 import * as T from '../../Base/Texts'
+import {useNavigate} from 'react-router-dom'
+import {RowSingleChatRoomType} from '../../../common'
 
 export type ChattingListProps = DivCommonProps & {
   //
@@ -12,6 +14,18 @@ export type ChattingListProps = DivCommonProps & {
 
 export const ChattingList: FC<ChattingListProps> = () => {
   const {showChat, setShowChat, chatRooms, setPageOId} = useLayoutContext() // eslint-disable-line
+  const navigate = useNavigate()
+
+  const onClickChatRoom = useCallback(
+    (row: RowSingleChatRoomType) => (e: MouseEvent) => {
+      e.stopPropagation()
+      setPageOId(row.chatRoomOId)
+      navigate(`/main/sc`, {
+        state: {cOId: row.chatRoomOId, targetId: row.targetId}
+      })
+    },
+    [navigate, setPageOId]
+  )
 
   return (
     <div className="flex flex-col">
@@ -29,14 +43,13 @@ export const ChattingList: FC<ChattingListProps> = () => {
         <div className="mt-2">
           {chatRooms?.map(row => {
             return (
-              <a
+              <div
                 className="pl-8 pt-1 pb-1 flex flex-row cursor-pointer hover:bg-gkd-sakura-bg-70"
-                href={`/main/sc/${row.chatRoomOId}`}
                 key={`chatRow:${row.chatRoomOId}`}
-                onClick={e => setPageOId(row.chatRoomOId)}>
+                onClick={onClickChatRoom(row)}>
                 <Icon name="chat" className="flex items-center text-xl" />
                 <T.TextXL className="flex items-center ml-2">{row.targetId}</T.TextXL>
-              </a>
+              </div>
             )
           })}
         </div>

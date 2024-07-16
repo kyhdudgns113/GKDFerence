@@ -13,7 +13,7 @@ type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | undefined | null
 
 type ContextType = {
   socketP?: SocketType
-  // socketPId?: string
+  socketPId?: string
   socketPInit: () => void
   socketPReset: () => void
   addSocketOn: (socket: SocketType, event: string, callback: (payload: any) => void) => void
@@ -100,7 +100,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
   const value = {
     /** socket: Before use it, you should call useSocket() */
     socketP,
-    // socketPId,
+    socketPId,
     socketPInit,
     socketPReset,
     addSocketOn,

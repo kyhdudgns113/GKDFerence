@@ -121,7 +121,7 @@ export class SocketGateway
   // AREA1 : socketChatArea
   @SubscribeMessage('chat connected')
   async chatConnected(client: Socket, payload: SocketChatConnectedType) {
-    if (!payload.jwt || !payload.cOId || !payload.uOId) {
+    if (!payload.jwt || !payload.cOId || !payload.uOId || !payload.socketPId) {
       // this.logger.log("Payload isn't include information")
       return
     }

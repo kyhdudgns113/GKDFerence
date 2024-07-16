@@ -18,7 +18,7 @@ export default function RoutesSetup() {
           </RequireAuth>
         }>
         <Route index element={<MainPage />} />
-        <Route path="/main/sc/:scOId" element={<SingleChatPage />} />
+        <Route path="/main/sc" element={<SingleChatPage />} />
         <Route path="/main/*" element={<NullPage />} />
       </Route>
       <Route path="/signup" element={<CT.SignUpProvider />}></Route>
