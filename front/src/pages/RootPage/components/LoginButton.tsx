@@ -1,6 +1,6 @@
 import {FC, PropsWithChildren} from 'react'
-import {Button, ButtonProps} from '../Base/Buttons'
-import {useRootPageContext} from '../../contexts'
+import {Button, ButtonProps} from '../../../components'
+import {useRootPageContext} from '../../../contexts'
 
 export type LoginButtonProps = ButtonProps & {
   //

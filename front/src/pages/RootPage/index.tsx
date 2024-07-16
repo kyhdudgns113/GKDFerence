@@ -1,7 +1,7 @@
 import {KeyboardEvent, MouseEvent, useCallback} from 'react' // eslint-disable-line
 import {classNameRootPage} from './className'
 import {styleRootPage} from './style'
-import {IDElement, LoginButton, PWElement, SignUpButton, Title} from '../../components/RootPage'
+import {IDElement, LoginButton, PWElement, SignUpButton, Title} from './components'
 
 import {useRootPageContext} from '../../contexts'
 import {useGoToMain} from './hooks'

@@ -1,18 +1,16 @@
 import {FC} from 'react'
-import {InputProps, RowInput} from '../Base/Inputs'
+import {InputProps, RowInput} from '../../../components'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
-import {useSignUpContext} from '../../contexts'
+import {useSignUpContext} from '../../../contexts'
 
-export type IDElementProps = InputProps & {
-  //
-}
+export type EmailElementProps = InputProps & {}
 
-export const IDElement: FC<IDElementProps> = ({className: _className, ...props}) => {
+export const EmailElement: FC<EmailElementProps> = ({className: _className, ...props}) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
 
-  const {idVal, setIdVal, idErr} = useSignUpContext()
+  const {email, setEmail, emailErr} = useSignUpContext()
 
   return (
     <div className="flex flex-col">
@@ -20,13 +18,13 @@ export const IDElement: FC<IDElementProps> = ({className: _className, ...props})
         className={classNameToDiv}
         classNameText={classNameText}
         inputType="text"
-        setVal={setIdVal}
-        val={idVal}
+        val={email}
+        setVal={setEmail}
         {...props}>
-        ID
+        EMAIL
       </RowInput>
       <div className="flex items-center justify-center h-4">
-        {idErr && <ErrorLine>{idErr}</ErrorLine>}
+        {emailErr && <ErrorLine>{emailErr}</ErrorLine>}
       </div>
     </div>
   )

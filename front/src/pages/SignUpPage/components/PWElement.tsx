@@ -1,18 +1,18 @@
 import {FC} from 'react'
-import {InputProps, RowInput} from '../Base/Inputs'
+import {InputProps, RowInput} from '../../../components'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
-import {useSignUpContext} from '../../contexts'
+import {useSignUpContext} from '../../../contexts'
 
-export type PWCheckElementProps = InputProps & {
+export type PWElementProps = InputProps & {
   //
 }
 
-export const PWCheckElement: FC<PWCheckElementProps> = ({className: _className, ...props}) => {
+export const PWElement: FC<PWElementProps> = ({className: _className, ...props}) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
 
-  const {pw2Val, setPw2Val, pw2Err} = useSignUpContext()
+  const {pwVal, setPwVal, pwErr} = useSignUpContext()
 
   return (
     <div className="flex flex-col">
@@ -20,13 +20,13 @@ export const PWCheckElement: FC<PWCheckElementProps> = ({className: _className, 
         className={classNameToDiv}
         classNameText={classNameText}
         inputType="password"
-        setVal={setPw2Val}
-        val={pw2Val}
+        setVal={setPwVal}
+        val={pwVal}
         {...props}>
-        PW2
+        PW
       </RowInput>
       <div className="flex items-center justify-center h-4">
-        {pw2Err && <ErrorLine>{pw2Err}</ErrorLine>}
+        {pwErr && <ErrorLine>{pwErr}</ErrorLine>}
       </div>
     </div>
   )

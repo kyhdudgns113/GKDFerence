@@ -1,6 +1,6 @@
 import {FC} from 'react'
 
-import * as T from '../Base/Texts'
+import * as T from '../../../components'
 
 export type ErrorLineProps = T.TextProps & {}
 

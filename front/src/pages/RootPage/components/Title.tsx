@@ -1,4 +1,4 @@
-import {TextProps, Title as TitleBase} from '../Base'
+import {TextProps, Title as TitleBase} from '../../../components'
 import {FC} from 'react'
 
 export const Title: FC<TextProps> = ({className: _className, ...props}) => {

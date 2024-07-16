@@ -2,7 +2,7 @@ import {classNameSignUpPage} from './className'
 import {styleSignUpPage} from './style'
 import {useSignUpContext} from '../../contexts'
 
-import * as C from '../../components/SignUpPage'
+import * as C from './components'
 import * as H from './hooks'
 
 export default function SignUpPage() {

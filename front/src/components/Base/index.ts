@@ -1,4 +1,6 @@
 export * from './Buttons'
 export * from './Icons'
+export * from './Inputs'
+export * from './Modal'
 export * from './Props'
 export * from './Texts'

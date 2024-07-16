@@ -1,8 +1,8 @@
 import {FC} from 'react'
-import {InputProps, RowInput} from '../Base/Inputs'
+import {InputProps, RowInput} from '../../../components'
 import {classNames} from './className'
 import {ErrorLine} from './ErrorLine'
-import {useRootPageContext} from '../../contexts'
+import {useRootPageContext} from '../../../contexts'
 
 export type PWElementProps = InputProps & {
   //

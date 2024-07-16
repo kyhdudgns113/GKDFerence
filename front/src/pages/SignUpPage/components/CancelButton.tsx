@@ -1,5 +1,5 @@
 import {FC, MouseEvent, useCallback} from 'react'
-import {Button, ButtonCommonProps} from '../Base'
+import {Button, ButtonCommonProps} from '../../../components'
 import {useNavigate} from 'react-router-dom'
 
 export type CancelButtonProps = ButtonCommonProps & {}

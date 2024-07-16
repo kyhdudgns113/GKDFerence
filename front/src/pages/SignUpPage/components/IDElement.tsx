@@ -1,30 +1,25 @@
 import {FC} from 'react'
-import {InputProps, RowInput} from '../Base/Inputs'
-import {ErrorLine} from './ErrorLine'
+import {InputProps, RowInput} from '../../../components'
 import {classNames} from './className'
-import {useRootPageContext} from '../../contexts'
+import {ErrorLine} from './ErrorLine'
+import {useSignUpContext} from '../../../contexts'
 
 export type IDElementProps = InputProps & {
   //
 }
 
-export const IDElement: FC<IDElementProps> = ({
-  //
-  className: _className,
-  ...props
-}) => {
+export const IDElement: FC<IDElementProps> = ({className: _className, ...props}) => {
   const classNameToDiv = [_className].join(' ')
   const {classNameText} = classNames
 
-  const {idVal, setIdVal, idErr, setIdErr} = useRootPageContext()
+  const {idVal, setIdVal, idErr} = useSignUpContext()
 
   return (
-    <div className="flex flex-col" onChange={e => setIdErr('')}>
+    <div className="flex flex-col">
       <RowInput
         className={classNameToDiv}
         classNameText={classNameText}
         inputType="text"
-        placeholder="id or email"
         setVal={setIdVal}
         val={idVal}
         {...props}>

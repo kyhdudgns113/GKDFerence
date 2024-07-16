@@ -24,7 +24,7 @@ export type AuthObjectType = {
 export type ChatContentType = {
   id: string
   _id: string
-  date: Date
+  date?: Date
   content: string
 }
 export type ErrorsType = KeyValueType

@@ -1,5 +1,5 @@
 import {FC} from 'react'
-import {TextProps, Title as TitleBase} from '../Base'
+import {TextProps, Title as TitleBase} from '../../../components'
 
 export const Title: FC<TextProps> = ({className: _className, ...props}) => {
   const className = ['flex justify-center mb-4', _className].join(' ')
