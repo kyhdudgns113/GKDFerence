@@ -24,7 +24,6 @@ export class UseDBService {
 
     for (let targetUOId of keys) {
       const tUser = await this.userService.findOneByObjectId(targetUOId)
-      console.log('CHAT ROOM ID? ', chatKeyVal[targetUOId])
       ret.push({
         chatRoomOId: chatKeyVal[targetUOId],
         targetUOId: targetUOId,

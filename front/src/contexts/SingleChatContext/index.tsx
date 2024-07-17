@@ -1,20 +1,12 @@
-import type {Dispatch, FC, PropsWithChildren, SetStateAction} from 'react'
-import {createContext, useCallback, useContext, useEffect, useState} from 'react'
-import {io, Socket} from 'socket.io-client'
-import {DefaultEventsMap} from 'socket.io/dist/typed-events'
+import type {FC, PropsWithChildren} from 'react'
+import {createContext, useCallback, useContext, useState} from 'react'
 
-import {ChatContentType, RowSingleChatRoomType, SocketChatConnectedType} from '../../common'
+import {ChatContentType, RowSingleChatRoomType, Setter, SocketType} from '../../common'
 import {useLocation} from 'react-router-dom'
 import SingleChatPage from '../../pages/SingleChatPage'
 import {useAuth} from '../AuthContext'
-import {useSetCOId} from '../../pages/SingleChatPage/hooks'
-import {useSocketContext} from '../SocketContext'
-import {serverUrl} from '../../client_secret'
-import {useLayoutContext} from '../LayoutContext'
-import {get} from '../../server'
 
-type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | null
-type Setter<T> = Dispatch<SetStateAction<T>>
+import * as H from './hooks'
 
 // prettier-ignore
 type ContextType = {
@@ -50,9 +42,7 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const [chatInput, setChatInput] = useState<string>('')
   const [chatBlocks, setChatBlocks] = useState<ChatContentType[]>([])
 
-  const {_id, jwt, refreshToken} = useAuth()
-  const {socketPId} = useSocketContext()
-  const {pageOId, setPageOId} = useLayoutContext()
+  const {refreshToken} = useAuth()
 
   const location = useLocation()
   const lState = location.state as RowSingleChatRoomType
@@ -61,42 +51,10 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const targetOId = lState.targetUOId || ''
   const chatRoomOId = lState.chatRoomOId || ''
 
-  useSetCOId()
-  useEffect(() => {
-    if (!sockChat && jwt && _id && pageOId && socketPId) {
-      const newSocket = io(serverUrl)
-      setSockChat(newSocket)
-
-      newSocket.on('chat connected', (payload: SocketChatConnectedType) => {
-        console.log('CHAT CONNECTED : ', payload.cOId)
-      })
-
-      newSocket.on('chat', payload => {
-        console.log('Chat received ', payload)
-      })
-
-      const payload: SocketChatConnectedType = {
-        jwt: jwt || '',
-        uOId: _id || '',
-        cOId: pageOId || '',
-        socketPId: socketPId || ''
-      }
-      newSocket.emit('chat connected', payload)
-
-      get(`/sidebar/chatList/getChatRoomData/${pageOId}`, jwt)
-        .then(res => res && res.json())
-        .then(res => {
-          // const {ok, body, errors} = res //  eslint-disable-line
-        })
-    }
-
-    // return () => {
-    //   if (sockChat && sockChat.connected) {
-    //     sockChat.disconnect()
-    //     setSockChat(null)
-    //   }
-    // }
-  }, [_id, jwt, pageOId, sockChat, socketPId, setPageOId, setSockChat])
+  H.useGetChatDataFromDB()
+  H.useExecuteSetter(chatRoomOId, targetId, targetOId, setCOId, setTUId, setTUOId)
+  H.useSetSockChat(sockChat, setSockChat, setChatBlocks)
+  H.useExitSocketChat(sockChat, setSockChat)
 
   const sockChatEmit = useCallback(
     (event: string, payload: any) => {
@@ -107,12 +65,6 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
     },
     [sockChat, refreshToken]
   )
-
-  useEffect(() => {
-    setCOId(chatRoomOId)
-    setTUId(targetId)
-    setTUOId(targetOId)
-  }, [chatRoomOId, targetId, targetOId])
 
   // prettier-ignore
   const value = {

@@ -19,12 +19,11 @@ export const ChattingList: FC<ChattingListProps> = () => {
   const onClickChatRoom = useCallback(
     (row: RowSingleChatRoomType) => (e: MouseEvent) => {
       e.stopPropagation()
-      setPageOId(row.chatRoomOId)
       navigate(`/main/sc`, {
         state: {chatRoomOId: row.chatRoomOId, targetId: row.targetId, targetUOId: row.targetUOId}
       })
     },
-    [navigate, setPageOId]
+    [navigate]
   )
 
   return (

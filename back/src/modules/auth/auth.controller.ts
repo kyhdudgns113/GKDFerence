@@ -21,10 +21,9 @@ export class AuthController {
   // AREA2 : Post
   @Post('/signup')
   async signUp(@Body() authBody: AuthBodyType) {
-    console.log(`signup(${authBody.id}): requested`)
+    this.logger.log(`signup(${authBody.id}): requested`)
     const ret = await this.authService.signup(authBody)
-    console.log(`signup(${authBody.id}): ${ret.ok}`)
-    console.log('ERRORS : ', ret.errors)
+    this.logger.log(`signup(${authBody.id}): ${ret.ok}`)
     return ret
   }
   @Post('/login')

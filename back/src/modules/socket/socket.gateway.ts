@@ -107,7 +107,7 @@ export class SocketGateway
   // AREA1 : socketP Area
   @SubscribeMessage('user connected')
   userConnected(client: Socket, payload: SocketUserConnectedType): void {
-    this.logger.log('USER CONNECTED : ' + payload._id)
+    // this.logger.log('USER CONNECTED : ')
     this.initSocketP(client, payload)
     payload.pid = client.id
     client.emit('user connected', payload)
@@ -142,6 +142,13 @@ export class SocketGateway
 
     const cOId = payload.cOId
     payload.body.date = new Date()
+
+    /**
+     *  1. Chatting DB 에 넣는다.
+     *  2. 연결된 유저 확인
+     *  3. 연결 안된 유저는 안 읽은 메시지를 늘린다.
+     *  4. 연결된 유저는 채팅을 전송한다.
+     */
     this.server.to(cOId).emit('chat', payload)
   }
 
@@ -184,7 +191,7 @@ export class SocketGateway
       return false
     }
     // 채팅방 OId 에 따른 room 구현
-    this.logger.log(`${client.id} join to ${payload.cOId}`)
+    // this.logger.log(`${client.id} join to ${payload.cOId}`)
     client.join(payload.cOId)
 
     // 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입

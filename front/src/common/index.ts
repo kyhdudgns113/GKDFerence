@@ -3,8 +3,14 @@
  * with the back.common.types.ts
  **************************************************/
 
+import {Dispatch, SetStateAction} from 'react'
+import {Socket} from 'socket.io-client'
+import {DefaultEventsMap} from 'socket.io/dist/typed-events'
+
 export type Callback = () => void
 export type KeyValueType = {[key: string]: string}
+export type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | null
+export type Setter<T> = Dispatch<SetStateAction<T>>
 
 export type AuthBodyType = {
   jwt?: string

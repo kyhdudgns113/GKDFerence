@@ -19,13 +19,17 @@ export const InputArea: FC<InputAreaMyProps> = () => {
       content: chatInput
     }
 
-    if (chatInput && jwt) {
+    if (chatInput && jwt && cOId) {
       const payload: SocketChatContentType = {
         jwt: jwt || '',
         cOId: cOId,
         body: chatBlock
       }
       sockChatEmit('chat', payload)
+    } else {
+      console.log('InputArea : Something null')
+      console.log(`jwt : ${jwt}`)
+      console.log(`cOId : ${cOId}`)
     }
     setChatInput('')
   }, [cOId, id, _id, jwt, chatInput, setChatInput, sockChatEmit])
