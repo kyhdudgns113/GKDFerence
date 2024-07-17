@@ -11,6 +11,7 @@ import {Logger} from '@nestjs/common'
 import {
   JwtPayload,
   SocketChatConnectedType,
+  SocketChatContentType,
   SocketTestCountType,
   SocketUserConnectedType
 } from 'src/common'
@@ -121,32 +122,27 @@ export class SocketGateway
   // AREA1 : socketChatArea
   @SubscribeMessage('chat connected')
   async chatConnected(client: Socket, payload: SocketChatConnectedType) {
-    if (!payload.jwt || !payload.cOId || !payload.uOId || !payload.socketPId) {
-      // this.logger.log("Payload isn't include information")
-      return
-    }
-
-    // JWT 인증
-    const jwt = payload.jwt
-    const isJwt = (await this.jwtService.verifyAsync(jwt)) as JwtPayload
-    if (!isJwt || isJwt._id !== payload.uOId) {
-      // this.logger.log('JWT Veryfing error')
-      return
-    }
-    // 채팅방 OId 에 따른 room 구현
-    client.join(payload.cOId)
-
-    // 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
-    this.sockCidInfo[client.id] = {
-      uOid: payload.uOId,
-      sockPid: client.id,
-      chatId: payload.cOId
-    }
-
-    this.sockPidInfo[payload.socketPId].sockChatId = client.id
-    this.sockPidInfo[payload.socketPId].chatId = payload.cOId
+    await this.initSocketC(client, payload)
 
     client.emit('chat connected', payload)
+  }
+
+  @SubscribeMessage('chat')
+  async chat(client: Socket, payload: SocketChatContentType) {
+    if (
+      !payload.jwt ||
+      !payload.cOId ||
+      !payload.body ||
+      !payload.body.id ||
+      !payload.body._id ||
+      !payload.body.content
+    ) {
+      return
+    }
+
+    const cOId = payload.cOId
+    payload.body.date = new Date()
+    this.server.to(cOId).emit('chat', payload)
   }
 
   private initSocketP(client: Socket, payload: SocketUserConnectedType) {
@@ -172,6 +168,35 @@ export class SocketGateway
       chatId: '',
       sockChatId: ''
     }
+  }
+
+  private async initSocketC(client: Socket, payload: SocketChatConnectedType) {
+    if (!payload.jwt || !payload.cOId || !payload.uOId || !payload.socketPId) {
+      // this.logger.log("Payload isn't include information")
+      return false
+    }
+
+    // JWT 인증
+    const jwt = payload.jwt
+    const isJwt = (await this.jwtService.verifyAsync(jwt)) as JwtPayload
+    if (!isJwt || isJwt._id !== payload.uOId) {
+      // this.logger.log('JWT Veryfing error')
+      return false
+    }
+    // 채팅방 OId 에 따른 room 구현
+    this.logger.log(`${client.id} join to ${payload.cOId}`)
+    client.join(payload.cOId)
+
+    // 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
+    this.sockCidInfo[client.id] = {
+      uOid: payload.uOId,
+      sockPid: client.id,
+      chatId: payload.cOId
+    }
+
+    this.sockPidInfo[payload.socketPId].sockChatId = client.id
+    this.sockPidInfo[payload.socketPId].chatId = payload.cOId
+    return true
   }
   // BLANK LINE COMMENT
 }

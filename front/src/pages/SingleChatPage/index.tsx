@@ -1,7 +1,6 @@
 import {Title} from '../../components'
 import {useAuth} from '../../contexts'
 import {ChatBlockMy, ChatBlockOther, InputArea} from './components'
-import {useSetCOId, useSetSockChat} from './hooks'
 import {useSingleChatContext} from '../../contexts/SingleChatContext'
 
 // FUTURE: cOId, tUOId, targetID 중 하나라도 없으면 아무것도 띄우지 말자.
@@ -20,9 +19,6 @@ export default function SingleChatPage() {
   } = useSingleChatContext()
   const {id, _id} = useAuth()
   /* eslint-enable */
-
-  useSetCOId()
-  useSetSockChat()
 
   return (
     <div className="mt-2 mb-2 flex flex-col items-center h-full">

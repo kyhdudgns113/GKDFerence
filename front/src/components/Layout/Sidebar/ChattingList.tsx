@@ -21,7 +21,7 @@ export const ChattingList: FC<ChattingListProps> = () => {
       e.stopPropagation()
       setPageOId(row.chatRoomOId)
       navigate(`/main/sc`, {
-        state: {cOId: row.chatRoomOId, targetId: row.targetId, targetUOId: row.targetUOId}
+        state: {chatRoomOId: row.chatRoomOId, targetId: row.targetId, targetUOId: row.targetUOId}
       })
     },
     [navigate, setPageOId]

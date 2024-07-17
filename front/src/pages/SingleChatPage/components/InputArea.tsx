@@ -1,6 +1,6 @@
 import {DetailedHTMLProps, FC, HTMLAttributes, useCallback} from 'react'
 import {Button} from '../../../components'
-import {ChatContentType} from '../../../common'
+import {ChatContentType, SocketChatContentType} from '../../../common'
 import {useAuth} from '../../../contexts'
 import {useSingleChatContext} from '../../../contexts/SingleChatContext'
 
@@ -9,8 +9,8 @@ export type InputAreaMyProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>,
 }
 
 export const InputArea: FC<InputAreaMyProps> = () => {
-  const {chatInput, setChatInput, setChatBlocks} = useSingleChatContext()
-  const {id, _id} = useAuth()
+  const {chatInput, cOId, setChatInput, sockChatEmit} = useSingleChatContext()
+  const {id, _id, jwt} = useAuth()
 
   const onClickSend = useCallback(() => {
     const chatBlock: ChatContentType = {
@@ -18,11 +18,17 @@ export const InputArea: FC<InputAreaMyProps> = () => {
       _id: _id || '',
       content: chatInput
     }
-    if (chatInput) {
-      setChatBlocks(prev => [...prev, chatBlock])
+
+    if (chatInput && jwt) {
+      const payload: SocketChatContentType = {
+        jwt: jwt || '',
+        cOId: cOId,
+        body: chatBlock
+      }
+      sockChatEmit('chat', payload)
     }
     setChatInput('')
-  }, [id, _id, chatInput, setChatBlocks, setChatInput])
+  }, [cOId, id, _id, jwt, chatInput, setChatInput, sockChatEmit])
 
   return (
     <div className="DIV_INPUT flex flex-row w-full h-12 bg-white">

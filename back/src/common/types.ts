@@ -69,6 +69,11 @@ export type SocketChatConnectedType = {
   cOId: string
   socketPId: string
 }
+export type SocketChatContentType = {
+  jwt: string
+  cOId: string
+  body: ChatContentType
+}
 export type UserBodyType = {
   jwt?: string
   id?: string
