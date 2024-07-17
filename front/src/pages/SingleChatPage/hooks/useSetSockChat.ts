@@ -1,22 +1,18 @@
-import {Dispatch, SetStateAction, useEffect} from 'react'
-import {io, Socket} from 'socket.io-client'
-import {DefaultEventsMap} from 'socket.io/dist/typed-events'
+import {useEffect} from 'react'
+import {io} from 'socket.io-client'
 import {useAuth, useLayoutContext, useSocketContext} from '../../../contexts'
 import {serverUrl} from '../../../client_secret'
 import {SocketChatConnectedType} from '../../../common'
 import {get} from '../../../server'
-
-type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | null
-type SetSockType = Dispatch<SetStateAction<SocketType>>
+import {useSingleChatContext} from '../../../contexts/SingleChatContext'
 
 /**
  * 소켓연결을 해두고 DB 에서 정보를 가져와야 한다.
  * 그래야 이후 채팅들을 읽어올 수 있다.
  *
- * @param sockChat
- * @param setSockChat
  */
-export const useSetSockChat = (sockChat: SocketType, setSockChat: SetSockType) => {
+export const useSetSockChat = () => {
+  const {sockChat, setSockChat} = useSingleChatContext()
   const {pageOId, setPageOId} = useLayoutContext()
   const {_id, jwt} = useAuth()
   const {socketPId} = useSocketContext()

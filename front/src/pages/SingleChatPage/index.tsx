@@ -1,45 +1,32 @@
-import {Socket} from 'socket.io-client'
-import {DefaultEventsMap} from 'socket.io/dist/typed-events'
-
-import {Button, Title} from '../../components'
-import {useSetCOId, useSetSockChat, useSetTargetUserOId} from './hooks'
-import {useCallback, useState} from 'react'
-import {useLocation} from 'react-router-dom'
+import {Title} from '../../components'
 import {useAuth} from '../../contexts'
-import {ChatContentType} from '../../common'
-import {ChatBlockMy, ChatBlockOther} from './components'
+import {ChatBlockMy, ChatBlockOther, InputArea} from './components'
+import {useSetCOId, useSetSockChat} from './hooks'
+import {useSingleChatContext} from '../../contexts/SingleChatContext'
 
 // FUTURE: cOId, tUOId, targetID 중 하나라도 없으면 아무것도 띄우지 말자.
 export default function SingleChatPage() {
-  const [sockChat, setSockChat] = useState<Socket<DefaultEventsMap, DefaultEventsMap> | null>(null)
-  const [tUOId, setTUOId] = useState<string>('')
-  const [chatInput, setChatInput] = useState<string>('')
-  const [chatBlocks, setChatBlocks] = useState<ChatContentType[]>([])
-
+  /* eslint-disable */
+  const {
+    sockChat,
+    setSockChat,
+    tUId,
+    tUOId,
+    setTUOId,
+    chatInput,
+    setChatInput,
+    chatBlocks,
+    setChatBlocks
+  } = useSingleChatContext()
   const {id, _id} = useAuth()
-
-  const location = useLocation()
-  const targetId = location.state?.targetId || ''
+  /* eslint-enable */
 
   useSetCOId()
-  useSetSockChat(sockChat, setSockChat)
-  useSetTargetUserOId(tUOId, setTUOId)
-
-  const onClickSend = useCallback(() => {
-    const chatBlock: ChatContentType = {
-      id: id || '',
-      _id: _id || '',
-      content: chatInput
-    }
-    if (chatInput) {
-      setChatBlocks(prev => [...prev, chatBlock])
-    }
-    setChatInput('')
-  }, [id, _id, chatInput])
+  useSetSockChat()
 
   return (
     <div className="mt-2 mb-2 flex flex-col items-center h-full">
-      <Title className="mb-4">Chat Page : {targetId}</Title>
+      <Title className="mb-4">Chat Page : {tUId}</Title>
       <div className="flex flex-col w-1/3 h-full border-2 border-gkd-sakura-border">
         <div className="DIV_CHATS flex flex-col w-full h-full bg-gkd-sakura-bg/70">
           {chatBlocks.map((chatBlock, index) => {
@@ -50,28 +37,7 @@ export default function SingleChatPage() {
             }
           })}
         </div>
-        <div className="DIV_INPUT flex flex-row w-full h-12 bg-white">
-          <textarea
-            className="p-4 w-full resize-none border-2 border-gkd-sakura-border"
-            onChange={e => setChatInput(e.target.value)}
-            onKeyDown={e => {
-              switch (e.key) {
-                case 'Enter':
-                  e.preventDefault()
-                  if (e.altKey) {
-                    setChatInput(prev => prev + '\n')
-                  } else {
-                    onClickSend()
-                  }
-                  break
-              }
-            }}
-            value={chatInput}
-          />
-          <Button className="" onClick={e => onClickSend()}>
-            send
-          </Button>
-        </div>
+        <InputArea />
       </div>
     </div>
   )

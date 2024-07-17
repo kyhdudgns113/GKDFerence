@@ -29,6 +29,7 @@ export default function Sidebar() {
   )
 
   /**
+   * 채팅방 리스트 가져오기
    * 새로고침등의 이슈로 setId, set_id 가 호출되지 않을 수 있다.
    * 이런 경우에 id, _id 는 null 일 수 있다.
    */
