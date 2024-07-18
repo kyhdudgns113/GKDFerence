@@ -4,13 +4,13 @@ import {PassportModule} from '@nestjs/passport'
 
 import {gkdJwtSecret, gkdJwtSignOption, JwtStrategy} from 'src/common'
 import {UseDBService} from './useDB.service'
-import {ChatRoomModule} from './chatroom/chatroom.module'
-import {UserModule} from './user/user.module'
+import {ChatRoomDBModule} from './chatRoomDB/chatRoomDB.module'
+import {UserDBModule} from './userDB/userDB.module'
 
 @Module({
   imports: [
-    ChatRoomModule,
-    UserModule, //
+    ChatRoomDBModule,
+    UserDBModule, //
     PassportModule,
     JwtModule.register({
       secret: gkdJwtSecret,

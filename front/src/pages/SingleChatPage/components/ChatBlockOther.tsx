@@ -12,7 +12,7 @@ export type ChatBlockOtherProps = DetailedHTMLProps<
 
 export const ChatBlockOther: FC<ChatBlockOtherProps> = ({chatBlock, index}) => {
   return (
-    <div className="DATA_DIV flex flex-row w-fit p-2" key={`chatBlock:${index}`}>
+    <div className="DATA_DIV flex flex-row w-fit p-2">
       <Icon
         name="account_circle"
         className="bg-white text-gray-400 rounded-xl border-2 border-gray-800 text-5xl h-fit"

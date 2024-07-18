@@ -20,8 +20,10 @@ export type AuthObjectType = {
 }
 /**
  * It should be synchronized with chatroom.entity.ts
+ * 클라이언트에서 서버로 갈 때는 인덱스를 전달할 수 없으니 ? 로 한다
  */
 export type ChatContentType = {
+  idx?: number
   id: string
   _id: string
   date?: Date

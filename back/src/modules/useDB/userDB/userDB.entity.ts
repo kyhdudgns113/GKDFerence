@@ -1,5 +1,5 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
-import {Document, ObjectId} from 'mongoose'
+import {Document, now, ObjectId} from 'mongoose'
 
 @Schema()
 export class User extends Document {
@@ -19,10 +19,10 @@ export class User extends Document {
    * singleChatList[userObjectId] = chatRoomObjectId
    * Map 으로 해버리면 사용하기가 힘들어진다.
    */
-  @Prop({type: Object})
+  @Prop({type: Object, default: {}})
   singleChatList: {[userObjectId: string]: string}
 
-  @Prop({type: Date})
+  @Prop({type: Date, default: Date.now})
   createdDt: Date
 }
 

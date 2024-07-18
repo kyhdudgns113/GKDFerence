@@ -1,37 +1,37 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
 import {Document} from 'mongoose'
 
-// id: string
-//   _id: string
-//   date: Date
-//   content: string
-
 @Schema()
-export class ChatContentSchema {
-  @Prop({required: true})
+export class ChatBlock {
+  @Prop()
+  idx: number
+
+  @Prop()
   id: string
 
-  @Prop({required: true})
-  _id: string
+  @Prop()
+  uOId: string
 
-  @Prop({required: true})
+  @Prop()
   date: Date
 
-  @Prop({required: true})
+  @Prop()
   content: string
 }
+
+export const ChatBlockSchema = SchemaFactory.createForClass(ChatBlock)
 
 @Schema()
 export class ChatRoom extends Document {
   /** Object Id is in extended class Document */
 
   @Prop({type: Object})
-  users: {[userObjectId: string]: boolean}
+  users: {[uOId: string]: boolean}
 
-  @Prop({type: [ChatContentSchema]})
-  chats: ChatContentSchema[]
+  @Prop({type: [ChatBlockSchema], default: []})
+  chatBlocks: ChatBlock[]
 
-  @Prop()
+  @Prop({type: Date, default: Date.now})
   createdDt: Date
 }
 

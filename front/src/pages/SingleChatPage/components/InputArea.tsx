@@ -27,9 +27,8 @@ export const InputArea: FC<InputAreaMyProps> = () => {
       }
       sockChatEmit('chat', payload)
     } else {
-      console.log('InputArea : Something null')
-      console.log(`jwt : ${jwt}`)
-      console.log(`cOId : ${cOId}`)
+      !jwt && console.log(`jwt is null in InputArea`)
+      !cOId && console.log(`cOId is null in InputArea`)
     }
     setChatInput('')
   }, [cOId, id, _id, jwt, chatInput, setChatInput, sockChatEmit])

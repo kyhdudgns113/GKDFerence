@@ -8,7 +8,7 @@ export type ChatBlockMyProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>,
 
 export const ChatBlockMy: FC<ChatBlockMyProps> = ({chatBlock, index}) => {
   return (
-    <div className="CHATBLOCK_DIV flex flex-col w-fit ml-auto mr-2 p-2" key={`chatBlock:${index}`}>
+    <div className="CHATBLOCK_DIV flex flex-col w-fit ml-auto mr-2 p-2">
       <p className="bg-white border-black border-2 p-2 rounded-lg">{chatBlock.content}</p>
     </div>
   )

@@ -37,7 +37,6 @@ export const ChattingList: FC<ChattingListProps> = () => {
         <Text>&nbsp;&nbsp;Chatting List</Text>
         <Icon className="text-3xl" name={showChat ? 'arrow_drop_down' : 'arrow_right'}></Icon>
       </div>
-      {/* // TODO: 여기 해야돼. */}
       {showChat && (
         <div className="mt-2">
           {chatRooms?.map(row => {

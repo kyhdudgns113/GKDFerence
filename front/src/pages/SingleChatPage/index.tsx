@@ -5,20 +5,8 @@ import {useSingleChatContext} from '../../contexts/SingleChatContext'
 
 // FUTURE: cOId, tUOId, targetID 중 하나라도 없으면 아무것도 띄우지 말자.
 export default function SingleChatPage() {
-  /* eslint-disable */
-  const {
-    sockChat,
-    setSockChat,
-    tUId,
-    tUOId,
-    setTUOId,
-    chatInput,
-    setChatInput,
-    chatBlocks,
-    setChatBlocks
-  } = useSingleChatContext()
-  const {id, _id} = useAuth()
-  /* eslint-enable */
+  const {tUId, chatBlocks} = useSingleChatContext()
+  const {_id} = useAuth()
 
   return (
     <div className="mt-2 mb-2 flex flex-col items-center h-full">
@@ -27,9 +15,17 @@ export default function SingleChatPage() {
         <div className="DIV_CHATS flex flex-col w-full h-full bg-gkd-sakura-bg/70">
           {chatBlocks.map((chatBlock, index) => {
             if (chatBlock._id === _id) {
-              return <ChatBlockMy chatBlock={chatBlock} index={index} />
+              return (
+                <div key={`chat:${index}`}>
+                  <ChatBlockMy chatBlock={chatBlock} index={index} />
+                </div>
+              )
             } else {
-              return <ChatBlockOther chatBlock={chatBlock} index={index} />
+              return (
+                <div key={`chat:${index}`}>
+                  <ChatBlockOther chatBlock={chatBlock} index={index} />
+                </div>
+              )
             }
           })}
         </div>

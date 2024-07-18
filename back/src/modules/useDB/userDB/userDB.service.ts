@@ -1,11 +1,11 @@
 import {Injectable} from '@nestjs/common'
 import {InjectModel} from '@nestjs/mongoose'
-import {Model, ObjectId, Types} from 'mongoose'
-import {CreateUserDto, UpdateUserDto} from './dto'
-import {User} from './user.entity'
+import {Model, Types} from 'mongoose'
+import {CreateUserDto} from './dto'
+import {User} from './userDB.entity'
 
 @Injectable()
-export class UserService {
+export class UserDBService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   create(createUserDto: CreateUserDto) {

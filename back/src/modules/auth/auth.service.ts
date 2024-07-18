@@ -12,8 +12,13 @@ import {
 
 import * as bcrypt from 'bcrypt'
 import {UseDBService} from '../useDB/useDB.service'
-import {CreateUserDto} from '../useDB/user/dto'
+import {CreateUserDto} from '../useDB/userDB/dto'
 
+/**
+ * // NOTE: 여기는 예외적으로 jwtService 를 service 내에서 사용한다.
+ * // NOTE: jwt 토큰을 만드는 작업을 해야 한다.
+ * // NOTE: 또한 auth 모듈 내부에 속해있는 모듈이 없기도 하다.
+ */
 @Injectable()
 export class AuthService {
   constructor(

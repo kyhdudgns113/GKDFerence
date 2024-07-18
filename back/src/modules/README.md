@@ -1,3 +1,14 @@
-Do not combine modules with index.ts
+코드 작성 기본 룰을 적는다.
 
-it will be occured 순환참조에러
+- modules 폴더를 index.ts 로 묶지 않는다.
+
+  - 이유 : 순환참조 오류가 난다.
+
+- modules 폴더에서 1차적으로 접근 가능한 모듈들을 하나의 가족이라 명한다.
+
+- 한 가족 내에서는 부모가 자식을 참조하는 경우를 제외하고는 서로 참조를 하지 않도록 한다.
+
+- 서로 다른 가족의 모듈을 참조할 때에는 그 가족의 조상 모듈만 참조하도록 한다.
+
+- controller 가 존재하는 모듈들은 controller 에서 jwt 를 검증한다.
+  - 예외 : auth 모듈(auth 모듈 내에 설명)

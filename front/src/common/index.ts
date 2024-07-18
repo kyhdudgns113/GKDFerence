@@ -28,6 +28,7 @@ export type AuthObjectType = {
  * It should be synchronized with chatroom.entity.ts
  */
 export type ChatContentType = {
+  idx?: number
   id: string
   _id: string
   date?: Date

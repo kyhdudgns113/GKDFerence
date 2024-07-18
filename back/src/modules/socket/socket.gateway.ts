@@ -143,7 +143,7 @@ export class SocketGateway
     const cOId = payload.cOId
     payload.body.date = new Date()
 
-    /**
+    /** // TODO: 하단에 기록
      *  1. Chatting DB 에 넣는다.
      *  2. 연결된 유저 확인
      *  3. 연결 안된 유저는 안 읽은 메시지를 늘린다.
@@ -205,5 +205,5 @@ export class SocketGateway
     this.sockPidInfo[payload.socketPId].chatId = payload.cOId
     return true
   }
-  // BLANK LINE COMMENT
+  // BLANK LINE COMMENT:
 }

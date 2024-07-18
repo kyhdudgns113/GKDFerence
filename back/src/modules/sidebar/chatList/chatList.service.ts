@@ -1,14 +1,10 @@
 import {Injectable} from '@nestjs/common'
-import {JwtService} from '@nestjs/jwt'
-import {gkdJwtSignOption, SidebarBodyType} from 'src/common'
+import {SidebarBodyType} from 'src/common'
 import {UseDBService} from 'src/modules/useDB/useDB.service'
 
 @Injectable()
 export class ChatListService {
-  constructor(
-    private useDBService: UseDBService,
-    private jwtService: JwtService
-  ) {}
+  constructor(private useDBService: UseDBService) {}
 
   /**
    *
@@ -17,17 +13,6 @@ export class ChatListService {
    * @returns
    */
   async createSingleChatRoom(body: SidebarBodyType, idOrEmail: string) {
-    const {jwt} = body
-
-    const isJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
-    if (!isJwt) {
-      return {
-        ok: false,
-        body: {},
-        errors: {jwt: 'JWT Error in Sidebar findUser'}
-      }
-    }
-
     const user = await this.useDBService.findUserByIdOrEmail(idOrEmail)
     if (!user) {
       return {
@@ -72,16 +57,14 @@ export class ChatListService {
     }
   }
 
-  async getUserChatRoomList(jwt: string, uOId: string) {
-    const isJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
-    if (!isJwt) {
-      return {
-        ok: false,
-        body: {},
-        errors: {jwt: 'JWT Error in Sidebar findUser'}
-      }
-    }
+  // NOTE: uOId 는 나중을 위해 냅둔다.
+  // NOTE: 해당 유저가 안 읽은 메시지 개수 불러올때 쓰일 예정
+  async getChatBlocks(uOId: string, cOId: string) {
+    const chatBlocks = this.useDBService.getChatBlocks(cOId)
+    return chatBlocks
+  }
 
+  async getUserChatRoomList(uOId: string) {
     const chatRoomList = await this.useDBService.findChatRoomList(uOId)
     if (chatRoomList === null) {
       return {
