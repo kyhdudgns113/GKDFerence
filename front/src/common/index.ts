@@ -27,10 +27,10 @@ export type AuthObjectType = {
 /**
  * It should be synchronized with chatroom.entity.ts
  */
-export type ChatContentType = {
+export type ChatBlockType = {
   idx?: number
   id: string
-  _id: string
+  uOId: string
   date?: Date
   content: string
 }
@@ -79,7 +79,7 @@ export type SocketChatConnectedType = {
 export type SocketChatContentType = {
   jwt: string
   cOId: string
-  body: ChatContentType
+  body: ChatBlockType
 }
 export type UserBodyType = {
   jwt?: string

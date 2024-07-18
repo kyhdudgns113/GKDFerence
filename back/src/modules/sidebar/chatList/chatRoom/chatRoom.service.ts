@@ -9,7 +9,6 @@ export class ChatRoomService {
     if (!(await this.useDBService.ChatRoomHasUser(cOId, uOId))) {
       return null
     }
-    // TODO: 코드 리팩토링... 컨트롤러에서 JWT 검증하게 하자.
     return await this.useDBService.getChatRoomUserList(cOId)
   }
   // BLANK LINE COMMENT

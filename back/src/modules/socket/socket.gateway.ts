@@ -9,6 +9,7 @@ import {
 import {Server, Socket} from 'socket.io'
 import {Logger} from '@nestjs/common'
 import {
+  gkdJwtSignOption,
   JwtPayload,
   SocketChatConnectedType,
   SocketChatContentType,
@@ -16,7 +17,13 @@ import {
   SocketUserConnectedType
 } from 'src/common'
 import {JwtService} from '@nestjs/jwt'
+import {UseDBService} from '../useDB/useDB.service'
 
+/**
+ * // NOTE: 클라이언트가 소켓을 전송하기 전에 refreshToken 을 호출한다.
+ * // NOTE: 하지만 해당 소켓을 올바른 유저가 보냈는지 확인해야 한다.
+ * // NOTE: 따라서 jwtService 를 사용한다.
+ */
 @WebSocketGateway({cors: true}) // Enable CORS if needed
 export class SocketGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -51,7 +58,10 @@ export class SocketGateway
     }
   } = {}
 
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private useDBService: UseDBService
+  ) {}
 
   afterInit(server: Server) {
     this.logger.log('Init')
@@ -90,12 +100,14 @@ export class SocketGateway
           break
         case 'Chat':
           {
+            const cOId = this.sockCidInfo[sid].chatId
             const pid = this.sockCidInfo[sid].sockPid
 
             this.sockPidInfo[pid].sockChatId = ''
             this.sockPidInfo[pid].chatId = ''
 
             delete this.sockCidInfo[sid]
+            client.leave(cOId)
           }
           break
       }
@@ -119,12 +131,19 @@ export class SocketGateway
     client.emit('test count', payload)
   }
 
-  // AREA1 : socketChatArea
+  // AREA2 : socketChatArea
   @SubscribeMessage('chat connected')
   async chatConnected(client: Socket, payload: SocketChatConnectedType) {
-    await this.initSocketC(client, payload)
+    const ret = await this.initSocketC(client, payload)
 
-    client.emit('chat connected', payload)
+    if (ret) {
+      const cOId = payload.cOId
+      const uOId = payload.uOId
+      const ret2 = await this.useDBService.setUnreadCnt(uOId, cOId, 0)
+      if (ret2) {
+        client.emit('chat connected', payload)
+      }
+    }
   }
 
   @SubscribeMessage('chat')
@@ -134,22 +153,49 @@ export class SocketGateway
       !payload.cOId ||
       !payload.body ||
       !payload.body.id ||
-      !payload.body._id ||
+      !payload.body.uOId ||
       !payload.body.content
     ) {
       return
     }
 
-    const cOId = payload.cOId
-    payload.body.date = new Date()
+    const jwt = payload.jwt
+    const isJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
+    if (!isJwt) {
+      return
+    }
 
-    /** // TODO: 하단에 기록
-     *  1. Chatting DB 에 넣는다.
-     *  2. 연결된 유저 확인
-     *  3. 연결 안된 유저는 안 읽은 메시지를 늘린다.
-     *  4. 연결된 유저는 채팅을 전송한다.
-     */
+    const cOId = payload.cOId
+    const uOId = payload.body.uOId
+    const isUser = await this.useDBService.ChatRoomHasUser(cOId, uOId)
+    if (!isUser) {
+      return
+    }
+
+    //  1. ChatRoomDB 에 넣고 속해있는 유저 정보{[uOId: string]: boolean}를 가져온다.
+    const isInserted = await this.useDBService.insertChatBlock(cOId, payload.body)
+    if (!isInserted) {
+      return
+    }
+
+    //  2. 연결된 client 확인하는곳
+    const connectedClientIds = Array.from(this.server.sockets.adapter.rooms.get(cOId))
+
+    //  3. 연결된 유저는 채팅을 소켓으로 전송한다.
     this.server.to(cOId).emit('chat', payload)
+
+    //  4. 채팅 소켓 연결 안 된 유저 확인
+    const chatRoomUsers = isInserted
+    connectedClientIds.forEach(clientId => {
+      const uOId = this.sockCidInfo[clientId].uOid
+      delete chatRoomUsers[uOId]
+    })
+    const remainUsers = Object.keys(chatRoomUsers)
+
+    // TODO: 밑에꺼 해라.
+    //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+
+    //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
   }
 
   private initSocketP(client: Socket, payload: SocketUserConnectedType) {

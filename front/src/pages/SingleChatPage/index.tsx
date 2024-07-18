@@ -14,7 +14,7 @@ export default function SingleChatPage() {
       <div className="flex flex-col w-1/3 h-full border-2 border-gkd-sakura-border">
         <div className="DIV_CHATS flex flex-col w-full h-full bg-gkd-sakura-bg/70">
           {chatBlocks.map((chatBlock, index) => {
-            if (chatBlock._id === _id) {
+            if (chatBlock.uOId === _id) {
               return (
                 <div key={`chat:${index}`}>
                   <ChatBlockMy chatBlock={chatBlock} index={index} />

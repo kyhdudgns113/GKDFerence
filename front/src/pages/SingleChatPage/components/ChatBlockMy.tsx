@@ -1,8 +1,8 @@
 import {DetailedHTMLProps, FC, HTMLAttributes} from 'react'
-import {ChatContentType} from '../../../common'
+import {ChatBlockType} from '../../../common'
 
 export type ChatBlockMyProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
-  chatBlock: ChatContentType
+  chatBlock: ChatBlockType
   index: number
 }
 

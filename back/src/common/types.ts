@@ -22,10 +22,10 @@ export type AuthObjectType = {
  * It should be synchronized with chatroom.entity.ts
  * 클라이언트에서 서버로 갈 때는 인덱스를 전달할 수 없으니 ? 로 한다
  */
-export type ChatContentType = {
+export type ChatBlockType = {
   idx?: number
   id: string
-  _id: string
+  uOId: string
   date?: Date
   content: string
 }
@@ -74,7 +74,7 @@ export type SocketChatConnectedType = {
 export type SocketChatContentType = {
   jwt: string
   cOId: string
-  body: ChatContentType
+  body: ChatBlockType
 }
 export type UserBodyType = {
   jwt?: string

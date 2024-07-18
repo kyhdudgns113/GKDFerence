@@ -22,6 +22,9 @@ export class User extends Document {
   @Prop({type: Object, default: {}})
   singleChatList: {[userObjectId: string]: string}
 
+  @Prop({type: Object, default: {}})
+  unReadChats: {[chatRoomObjectId: string]: number}
+
   @Prop({type: Date, default: Date.now})
   createdDt: Date
 }

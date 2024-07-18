@@ -1,6 +1,6 @@
 import {DetailedHTMLProps, FC, HTMLAttributes, useCallback} from 'react'
 import {Button} from '../../../components'
-import {ChatContentType, SocketChatContentType} from '../../../common'
+import {ChatBlockType, SocketChatContentType} from '../../../common'
 import {useAuth} from '../../../contexts'
 import {useSingleChatContext} from '../../../contexts/SingleChatContext'
 
@@ -13,9 +13,9 @@ export const InputArea: FC<InputAreaMyProps> = () => {
   const {id, _id, jwt} = useAuth()
 
   const onClickSend = useCallback(() => {
-    const chatBlock: ChatContentType = {
+    const chatBlock: ChatBlockType = {
       id: id || '',
-      _id: _id || '',
+      uOId: _id || '',
       content: chatInput
     }
 

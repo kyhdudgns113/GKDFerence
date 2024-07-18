@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common'
 
 import {CreateUserDto} from 'src/modules/useDB/userDB/dto'
 import {ChatRoomDBService} from './chatRoomDB/chatRoomDB.service'
-import {RowSingleChatRoomType} from 'src/common'
+import {ChatBlockType, RowSingleChatRoomType} from 'src/common'
 import {UserDBService} from './userDB/userDB.service'
 
 /**
@@ -11,32 +11,32 @@ import {UserDBService} from './userDB/userDB.service'
 @Injectable()
 export class UseDBService {
   constructor(
-    private userService: UserDBService,
-    private chatRoomService: ChatRoomDBService
+    private userDBService: UserDBService,
+    private chatRoomDBService: ChatRoomDBService
   ) {}
 
   async ChatRoomHasUser(cOId: string, uOId: string) {
-    return await this.chatRoomService.chatRoomHasUser(cOId, uOId)
+    return await this.chatRoomDBService.chatRoomHasUser(cOId, uOId)
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const newUser = await this.userService.create(createUserDto)
+    const newUser = await this.userDBService.create(createUserDto)
     return newUser
   }
 
   async createSingleChatRoom(uOId: string, tUOId: string) {
-    const chatRoom = await this.chatRoomService.createChatRoom([uOId, tUOId])
+    const chatRoom = await this.chatRoomDBService.createChatRoom([uOId, tUOId])
     if (chatRoom) {
       const chatRoomOId = chatRoom._id.toString()
-      this.userService.setUserSingleChatRoom(uOId, tUOId, chatRoomOId)
-      this.userService.setUserSingleChatRoom(tUOId, uOId, chatRoomOId)
+      this.userDBService.setUserSingleChatRoom(uOId, tUOId, chatRoomOId)
+      this.userDBService.setUserSingleChatRoom(tUOId, uOId, chatRoomOId)
     }
 
     return chatRoom
   }
 
   async findChatRoomList(uOId: string) {
-    const user = await this.userService.findOneByObjectId(uOId)
+    const user = await this.userDBService.findOneByObjectId(uOId)
     if (!user) {
       return null
     }
@@ -46,7 +46,7 @@ export class UseDBService {
     const keys = Object.keys(chatKeyVal)
 
     for (let targetUOId of keys) {
-      const tUser = await this.userService.findOneByObjectId(targetUOId)
+      const tUser = await this.userDBService.findOneByObjectId(targetUOId)
       ret.push({
         chatRoomOId: chatKeyVal[targetUOId],
         targetUOId: targetUOId,
@@ -62,22 +62,22 @@ export class UseDBService {
    * @param idOrEmail : Target user id
    */
   async findSingleChatRoom(id: string, idOrEmail: string) {
-    const chatRoomOId = await this.userService.findUsersChatRoom(id, idOrEmail)
+    const chatRoomOId = await this.userDBService.findUsersChatRoom(id, idOrEmail)
     return chatRoomOId
   }
 
   async findUserByEmail(email: string) {
-    const user = await this.userService.findOneByEmail(email)
+    const user = await this.userDBService.findOneByEmail(email)
     return user
   }
 
   async findUserById(id: string) {
-    const user = await this.userService.findOneById(id)
+    const user = await this.userDBService.findOneById(id)
     return user
   }
 
   async findUserByIdOrEmail(idOrEmail: string) {
-    const user = await this.userService.findOneByIdOrEmail(idOrEmail)
+    const user = await this.userDBService.findOneByIdOrEmail(idOrEmail)
     return user
   }
 
@@ -87,14 +87,22 @@ export class UseDBService {
    * 왜냐하면 chattingList 에서도 쓰여야 한다.
    */
   async getChatBlocks(cOId: string) {
-    return await this.chatRoomService.getChatBlocks(cOId)
+    return await this.chatRoomDBService.getChatBlocks(cOId)
   }
 
   async getChatRoomUserList(cOId: string) {
-    return await this.chatRoomService.getChatRoomUserList(cOId)
+    return await this.chatRoomDBService.getChatRoomUserList(cOId)
   }
 
-  emptyFunction() {
-    // this function is for blank line
+  async setUnreadCnt(uOId: string, cOId: string, newCnt: number) {
+    return await this.userDBService.setUnreadCnt(uOId, cOId, newCnt)
   }
+
+  /**
+   */
+  async insertChatBlock(cOId: string, chatBlock: ChatBlockType) {
+    const ret = await this.chatRoomDBService.insertChatBlock(cOId, chatBlock)
+    return ret
+  }
+  // BLANK LINE COMMENT:
 }

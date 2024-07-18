@@ -2,7 +2,7 @@ import type {FC, PropsWithChildren} from 'react'
 import {createContext, useCallback, useContext, useEffect, useState} from 'react'
 
 import {
-  ChatContentType,
+  ChatBlockType,
   RowSingleChatRoomType,
   Setter,
   SocketChatConnectedType,
@@ -27,7 +27,7 @@ type ContextType = {
   tUOId: string, setTUOId: Setter<string>,
   tUId: string, setTUId: Setter<string>,
   chatInput: string, setChatInput: Setter<string>,
-  chatBlocks: ChatContentType[], setChatBlocks: Setter<ChatContentType[]>,
+  chatBlocks: ChatBlockType[], setChatBlocks: Setter<ChatBlockType[]>,
 
   sockChatEmit: (event: string, payload: any) => void
 }
@@ -52,8 +52,8 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const [tUOId, setTUOId] = useState<string>('')
   const [tUId, setTUId] = useState<string>('')
   const [chatInput, setChatInput] = useState<string>('')
-  const [chatBlocks, setChatBlocks] = useState<ChatContentType[]>([])
-  const [chatQ, setChatQ] = useState<ChatContentType[]>([])
+  const [chatBlocks, setChatBlocks] = useState<ChatBlockType[]>([])
+  const [chatQ, setChatQ] = useState<ChatBlockType[]>([])
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
 
   const {_id, jwt, refreshToken} = useAuth()
@@ -96,7 +96,7 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   useEffect(() => {
     if (chatQ && chatQ.length > 0 && isDBLoad) {
       const newChatQ = [...chatQ]
-      setChatBlocks(prev => [...prev, newChatQ.pop() as ChatContentType])
+      setChatBlocks(prev => [...prev, newChatQ.pop() as ChatBlockType])
       setChatQ(newChatQ)
     }
   }, [chatQ, isDBLoad])
@@ -106,6 +106,7 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
    */
   useEffect(() => {
     if (!sockChat && socketPId && pageOId) {
+      alert('SockChatConnect')
       const newSocket = io(serverUrl)
       setSockChat(newSocket)
 
@@ -129,6 +130,16 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
       newSocket.emit('chat connected', payload)
     }
   }, [_id, jwt, pageOId, sockChat, socketPId, setSockChat, setChatQ])
+
+  useEffect(() => {
+    return () => {
+      if (sockChat) {
+        alert('SockChatEnd')
+        sockChat.disconnect()
+        setSockChat(null)
+      }
+    }
+  }, [sockChat])
 
   const sockChatEmit = useCallback(
     (event: string, payload: any) => {

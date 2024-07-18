@@ -83,31 +83,29 @@ export class UserDBService {
     return user.singleChatList && user.singleChatList[targetUser._id.toString()]
   }
 
+  async setUnreadCnt(uOId: string, cOId: string, newCnt: number) {
+    const user = await this.findOneByObjectId(uOId)
+    if (!user) {
+      return null
+    }
+
+    user.unReadChats[cOId] = newCnt
+
+    return await user.save()
+  }
+
   async setUserSingleChatRoom(uOId: string, tUOId: string, chatOId: string) {
     const _id = new Types.ObjectId(uOId)
     const ret = await this.userModel.updateOne(
       {_id: _id},
-      {$set: {[`singleChatList.${tUOId}`]: chatOId}}
+      {
+        $set: {
+          [`singleChatList.${tUOId}`]: chatOId,
+          [`unReadChats.${chatOId}`]: 0
+        }
+      }
     )
     return ret
-  }
-
-  async idToOid(id: string) {
-    const user = await this.findOneById(id)
-    if (user) {
-      return user._id.toString()
-    } else {
-      return ''
-    }
-  }
-
-  async idOrEmailToOid(idOrEmail: string) {
-    const user = await this.findOneByIdOrEmail(idOrEmail)
-    if (user) {
-      return user._id.toString()
-    } else {
-      return ''
-    }
   }
 
   // BLANK LINE COMMENT
