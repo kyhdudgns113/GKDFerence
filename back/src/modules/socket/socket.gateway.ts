@@ -13,7 +13,7 @@ import {
   JwtPayload,
   SocketChatConnectedType,
   SocketChatContentType,
-  SocketChatUnreadChatType,
+  SocketSetUnreadChatType,
   SocketTestCountType,
   SocketUserConnectedType
 } from 'src/common'
@@ -143,12 +143,11 @@ export class SocketGateway
       const ret2 = await this.useDBService.setUnreadChat(uOId, cOId, 0)
       if (ret2) {
         client.emit('chat connected', payload)
-        // TODO: 안 읽은 메시지 0개 되나 검증
+        // unreadCnt 는 클라이언트에서 반영해준다.
       }
     }
   }
 
-  // TODO: 검증
   @SubscribeMessage('chat')
   async chat(client: Socket, payload: SocketChatContentType) {
     if (
@@ -197,21 +196,21 @@ export class SocketGateway
 
     remainUsers.forEach(async uOId => {
       //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
-      const unreadChat = await this.useDBService.increaseUnreadChat(uOId, cOId)
+      const newUnreadChat = await this.useDBService.increaseUnreadChat(uOId, cOId)
 
       //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
       if (this.uOidInfo[uOId] && this.uOidInfo[uOId].numConnectedP > 0) {
         const sockPids = Object.keys(this.uOidInfo[uOId].connectedP)
-        const payload: SocketChatUnreadChatType = {
+        const payload: SocketSetUnreadChatType = {
           uOId: uOId,
           cOId: cOId,
-          unreadChat: unreadChat
+          unreadChat: newUnreadChat
         }
         sockPids.forEach(sockPId => {
-          const socket = this.server.sockets.sockets.get(sockPId)
-          if (socket) {
-            // TODO: 안 읽은 메시지 갱신기능 추가 필요
-            socket.emit('chat unread cnt', payload)
+          const socketP = this.server.sockets.sockets.get(sockPId)
+          if (socketP) {
+            // TODO: 클라이언트에서 안 읽은 메시지 갱신기능 추가 필요
+            socketP.emit('set unread chat', payload)
           }
         })
       }

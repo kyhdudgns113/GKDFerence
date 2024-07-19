@@ -78,7 +78,7 @@ export type SocketChatContentType = {
   cOId: string
   body: ChatBlockType
 }
-export type SocketChatUnreadChatType = {
+export type SocketSetUnreadChatType = {
   uOId: string
   cOId: string
   unreadChat: number

@@ -55,12 +55,15 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
 
   const {uOId, jwt, refreshToken} = useAuth()
-  const {pageOId} = useLayoutContext()
+  const {pageOId, setChatRooms} = useLayoutContext()
   const {socketPId} = useSocketContext()
 
   H.useExecuteSetter(setCOId, setTUId, setTUOId)
   H.useExitSocketChat(sockChat, setSockChat)
 
+  /**
+   * DB 로 부터 chatBlocks 받아오는 부분
+   */
   useEffect(() => {
     if (jwt && cOId && !isDBLoad) {
       get(`/sidebar/chatRoom/getChatBlocks/${cOId}`, jwt)
@@ -101,11 +104,19 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
 
       newSocket.on('chat connected', (payload: SocketChatConnectedType) => {
         console.log('CHAT CONNECTED : ', payload.cOId)
+        setChatRooms(chatRooms =>
+          chatRooms.map(chatRoom => {
+            if (chatRoom.cOId === payload.cOId) {
+              chatRoom.unreadChat = 0
+            }
+            return chatRoom
+          })
+        )
       })
-
       newSocket.on('chat', (payload: SocketChatContentType) => {
         setChatQ(prev => [...prev, payload.body])
       })
+
       if (!uOId || !jwt || !pageOId) {
         alert('다음이 NULL 입니다. ' + !uOId && 'uOId ' + !jwt && 'jwt ' + !pageOId && 'pageOId ')
       }
@@ -118,7 +129,7 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
       }
       newSocket.emit('chat connected', payload)
     }
-  }, [uOId, jwt, pageOId, sockChat, socketPId, setSockChat, setChatQ])
+  }, [uOId, jwt, pageOId, sockChat, socketPId, setSockChat, setChatQ, setChatRooms])
 
   useEffect(() => {
     return () => {

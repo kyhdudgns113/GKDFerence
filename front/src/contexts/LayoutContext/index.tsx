@@ -10,7 +10,12 @@ import {
 import {useToggle} from '../../hooks'
 import {useSocketContext} from '../SocketContext'
 import {LayoutModalProvider} from '../LayoutModalContext'
-import {RowSingleChatRoomType, Setter, SocketTestCountType} from '../../common'
+import {
+  RowSingleChatRoomType,
+  Setter,
+  SocketSetUnreadChatType,
+  SocketTestCountType
+} from '../../common'
 
 type ContextType = {
   testCnt?: number
@@ -53,7 +58,7 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
 
   const [chatRooms, setChatRooms] = useState<RowSingleChatRoomType[]>([])
 
-  const {socketP, addSocketOn, socketPInit, socketPReset} = useSocketContext()
+  const {addSocketPOn, socketPInit, socketPReset} = useSocketContext()
 
   const [pageOId, setPageOId] = useState<string>('')
 
@@ -61,15 +66,27 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
     setTestCnt(payload.cnt)
   }, [])
 
+  const callbackSetUnreadChat = useCallback((payload: SocketSetUnreadChatType) => {
+    setChatRooms(chatRooms =>
+      chatRooms.map(chatRoom => {
+        if (chatRoom.cOId === payload.cOId) {
+          chatRoom.unreadChat = payload.unreadChat
+        }
+        return chatRoom
+      })
+    )
+  }, [])
+
   // NOTE: 소켓 초기화 하는곳
   useEffect(() => {
     socketPInit()
-    addSocketOn(socketP, 'test count', callbackTestCount)
+    addSocketPOn('test count', callbackTestCount)
+    addSocketPOn('set unread chat', callbackSetUnreadChat)
 
     return () => {
       socketPReset()
     }
-  }, [socketP, addSocketOn, socketPInit, socketPReset, callbackTestCount])
+  }, [addSocketPOn, socketPInit, socketPReset, callbackTestCount, callbackSetUnreadChat])
 
   const value = {
     testCnt,

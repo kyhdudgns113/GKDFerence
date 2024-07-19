@@ -16,14 +16,14 @@ type ContextType = {
   socketPId?: string
   socketPInit: () => void
   socketPReset: () => void
-  addSocketOn: (socket: SocketType, event: string, callback: (payload: any) => void) => void
+  addSocketPOn: (event: string, callback: (payload: any) => void) => void
   socketEmit: (socket: SocketType, event: string, payload: any) => void
 }
 
 export const SocketContext = createContext<ContextType>({
   socketPInit: () => {},
   socketPReset: () => {},
-  addSocketOn: () => {},
+  addSocketPOn: () => {},
   socketEmit: () => {}
 })
 
@@ -72,13 +72,17 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     }
   }, [socketP])
 
-  const addSocketOn = useCallback(
-    (socket: SocketType, event: string, callback: (payload: any) => void) => {
-      socket?.on(event, (payload: any) => {
-        callback(payload)
-      })
+  //  SocketProvider 내의 Context 에서 선언된 값들을 사용할 때 필요함.
+  //  그 값들을 여기서 쓸 수는 없으니
+  const addSocketPOn = useCallback(
+    (event: string, callback: (payload: any) => void) => {
+      if (socketP) {
+        socketP.on(event, (payload: any) => {
+          callback(payload)
+        })
+      }
     },
-    []
+    [socketP]
   )
 
   const socketEmit = useCallback(
@@ -103,7 +107,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     socketPId,
     socketPInit,
     socketPReset,
-    addSocketOn,
+    addSocketPOn,
     socketEmit
   }
   return <SocketContext.Provider value={value} children={children} />
