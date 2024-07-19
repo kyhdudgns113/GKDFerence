@@ -39,6 +39,7 @@ export type RowSingleChatRoomType = {
   cOId: string
   tUOId: string
   tUId: string
+  unreadChat: number
 }
 export type SidebarBodyType = {
   jwt?: string
@@ -76,10 +77,10 @@ export type SocketChatContentType = {
   cOId: string
   body: ChatBlockType
 }
-export type SocketChatUnreadCntType = {
+export type SocketChatUnreadChatType = {
   uOId: string
   cOId: string
-  unreadCnt: number
+  unreadChat: number
 }
 
 export type UserBodyType = {

@@ -9,7 +9,7 @@ export class ChatRoomService {
     if (!(await this.useDBService.ChatRoomHasUser(cOId, uOId))) {
       return null
     }
-    return await this.useDBService.getChatRoomUserList(cOId)
+    return await this.useDBService.getChatRoomUsers(cOId)
   }
   // BLANK LINE COMMENT
 }

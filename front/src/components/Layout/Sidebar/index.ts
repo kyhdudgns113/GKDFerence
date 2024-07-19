@@ -1,4 +1,4 @@
-export * from './ChattingList'
+export * from './ChatRooms'
 export * from './className'
-export * from './ConferenceList'
-export * from './DocumentList'
+export * from './Conferences'
+export * from './Documents'

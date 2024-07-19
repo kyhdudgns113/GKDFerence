@@ -2,7 +2,7 @@ import {Module} from '@nestjs/common'
 import {JwtModule} from '@nestjs/jwt'
 import {gkdJwtSecret, gkdJwtSignOption} from 'src/common'
 import {UseDBModule} from 'src/modules/useDB/useDB.module'
-import {ChatListService} from './chatList.service'
+import {ChatRoomsService} from './chatRooms.service'
 import {ChatRoomModule} from './chatRoom/chatRoom.module'
 
 @Module({
@@ -14,7 +14,7 @@ import {ChatRoomModule} from './chatRoom/chatRoom.module'
       signOptions: gkdJwtSignOption
     })
   ],
-  providers: [ChatListService],
-  exports: [ChatListService]
+  providers: [ChatRoomsService],
+  exports: [ChatRoomsService]
 })
-export class ChatListModule {}
+export class ChatRoomsModule {}

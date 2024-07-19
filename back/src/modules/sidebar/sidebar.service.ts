@@ -1,14 +1,14 @@
 import {Injectable} from '@nestjs/common'
 import {UseDBService} from '../useDB/useDB.service'
 import {SidebarBodyType} from 'src/common'
-import {ChatListService} from './chatList/chatList.service'
+import {ChatRoomsService} from './chatRooms/chatRooms.service'
 
 // NOTE: JWT 검증은 controller 에서 한다.
 // NOTE: 그 외의 검증은 여기서 해야한다.
 @Injectable()
 export class SidebarService {
   constructor(
-    private chatListService: ChatListService,
+    private chatRoomsService: ChatRoomsService,
     private useDBService: UseDBService
   ) {}
 
@@ -19,7 +19,7 @@ export class SidebarService {
    * @returns
    */
   async createSingleChatRoom(body: SidebarBodyType, idOrEmail: string) {
-    const ret = this.chatListService.createSingleChatRoom(body, idOrEmail)
+    const ret = this.chatRoomsService.createSingleChatRoom(body, idOrEmail)
     return ret
   }
 
@@ -50,7 +50,7 @@ export class SidebarService {
       }
     }
 
-    const chatBlocks = await this.chatListService.getChatBlocks(uOId, cOId)
+    const chatBlocks = await this.chatRoomsService.getChatBlocks(uOId, cOId)
     if (!chatBlocks) {
       return {
         ok: false,
@@ -65,9 +65,9 @@ export class SidebarService {
     }
   }
 
-  // NOTE: It will be upgraded by including group chat list
-  async getUserChatRoomList(uOId: string) {
-    const ret = await this.chatListService.getUserChatRoomList(uOId)
+  // NOTE: It will be upgraded by including group chatRooms
+  async getUserChatRooms(uOId: string) {
+    const ret = await this.chatRoomsService.getUserChatRooms(uOId)
     return ret
   }
 

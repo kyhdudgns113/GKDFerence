@@ -4,23 +4,23 @@ import {useLayoutContext} from '../../../contexts'
 import {Text} from '../Header'
 import {classNameRowTitle} from './className'
 
-export type DocumentListProps = DivCommonProps & {
+export type ConferencesProps = DivCommonProps & {
   //
 }
 
-export const DocumentList: FC<DocumentListProps> = () => {
-  const {showDoc, setShowDoc} = useLayoutContext() // eslint-disable-line
+export const Conferences: FC<ConferencesProps> = () => {
+  const {showConf, setShowConf} = useLayoutContext() // eslint-disable-line
 
   return (
     <div className="flex flex-col">
       <div
         className={classNameRowTitle}
         onClick={e => {
-          setShowDoc(prev => !prev)
+          setShowConf(prev => !prev)
         }}
         style={{userSelect: 'none'}}>
-        <Text>&nbsp;&nbsp;Document List</Text>
-        <Icon className="text-3xl" name={showDoc ? 'arrow_drop_down' : 'arrow_right'}></Icon>
+        <Text>&nbsp;&nbsp;Conferences</Text>
+        <Icon className="text-3xl" name={showConf ? 'arrow_drop_down' : 'arrow_right'}></Icon>
       </div>
     </div>
   )

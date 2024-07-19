@@ -13,7 +13,7 @@ import {
   JwtPayload,
   SocketChatConnectedType,
   SocketChatContentType,
-  SocketChatUnreadCntType,
+  SocketChatUnreadChatType,
   SocketTestCountType,
   SocketUserConnectedType
 } from 'src/common'
@@ -140,7 +140,7 @@ export class SocketGateway
     if (ret) {
       const cOId = payload.cOId
       const uOId = payload.uOId
-      const ret2 = await this.useDBService.setUnreadCnt(uOId, cOId, 0)
+      const ret2 = await this.useDBService.setUnreadChat(uOId, cOId, 0)
       if (ret2) {
         client.emit('chat connected', payload)
         // TODO: 안 읽은 메시지 0개 되나 검증
@@ -197,15 +197,15 @@ export class SocketGateway
 
     remainUsers.forEach(async uOId => {
       //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
-      const unreadCnt = await this.useDBService.increaseUnreadCnt(uOId, cOId)
+      const unreadChat = await this.useDBService.increaseUnreadChat(uOId, cOId)
 
       //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
       if (this.uOidInfo[uOId].numConnectedP > 0) {
         const sockPids = Object.keys(this.uOidInfo[uOId].connectedP)
-        const payload: SocketChatUnreadCntType = {
+        const payload: SocketChatUnreadChatType = {
           uOId: uOId,
           cOId: cOId,
-          unreadCnt: unreadCnt
+          unreadChat: unreadChat
         }
         sockPids.forEach(sockPId => {
           const socket = this.server.sockets.sockets.get(sockPId)

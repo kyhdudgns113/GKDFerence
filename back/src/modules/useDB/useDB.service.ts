@@ -27,30 +27,32 @@ export class UseDBService {
   async createSingleChatRoom(uOId: string, tUOId: string) {
     const chatRoom = await this.chatRoomDBService.createChatRoom([uOId, tUOId])
     if (chatRoom) {
-      const chatRoomOId = chatRoom._id.toString()
-      this.userDBService.setUserSingleChatRoom(uOId, tUOId, chatRoomOId)
-      this.userDBService.setUserSingleChatRoom(tUOId, uOId, chatRoomOId)
+      const cOId = chatRoom._id.toString()
+      this.userDBService.setUserSingleChatRoom(uOId, tUOId, cOId)
+      this.userDBService.setUserSingleChatRoom(tUOId, uOId, cOId)
     }
 
     return chatRoom
   }
 
-  async findChatRoomList(uOId: string) {
+  async findChatRooms(uOId: string) {
     const user = await this.userDBService.findOneByObjectId(uOId)
     if (!user) {
       return null
     }
-    const chatKeyVal = user.singleChatRooms
+    const singleChatRooms = user.singleChatRooms
 
     const ret: RowSingleChatRoomType[] = []
-    const keys = Object.keys(chatKeyVal)
+    const tUOIds = Object.keys(singleChatRooms)
 
-    for (let tOId of keys) {
-      const tUser = await this.userDBService.findOneByObjectId(tOId)
+    for (let tUOId of tUOIds) {
+      const cOId = singleChatRooms[tUOId]
+      const tUser = await this.userDBService.findOneByObjectId(tUOId)
       ret.push({
-        cOId: chatKeyVal[tOId],
-        tUOId: tOId,
-        tUId: tUser.id
+        cOId: cOId,
+        tUOId: tUOId,
+        tUId: tUser.id,
+        unreadChat: user.unReadChats[cOId]
       })
     }
 
@@ -84,22 +86,22 @@ export class UseDBService {
   /**
    * chatBlocks 만 가져온다.
    * 안 읽은 메시지 개수는 다른 함수에서 가져오는게 맞다.
-   * 왜냐하면 chattingList 에서도 쓰여야 한다.
+   * 왜냐하면 chatRooms 에서도 쓰여야 한다.
    */
   async getChatBlocks(cOId: string) {
     return await this.chatRoomDBService.getChatBlocks(cOId)
   }
 
-  async getChatRoomUserList(cOId: string) {
-    return await this.chatRoomDBService.getChatRoomUserList(cOId)
+  async getChatRoomUsers(cOId: string) {
+    return await this.chatRoomDBService.getChatRoomUsers(cOId)
   }
 
-  async setUnreadCnt(uOId: string, cOId: string, newCnt: number) {
-    return await this.userDBService.setUnreadCnt(uOId, cOId, newCnt)
+  async setUnreadChat(uOId: string, cOId: string, newCnt: number) {
+    return await this.userDBService.setUnreadChat(uOId, cOId, newCnt)
   }
 
-  async increaseUnreadCnt(uOId: string, cOId: string) {
-    const ret = await this.userDBService.increaseUnreadCnt(uOId, cOId)
+  async increaseUnreadChat(uOId: string, cOId: string) {
+    const ret = await this.userDBService.increaseUnreadChat(uOId, cOId)
     return ret
   }
 

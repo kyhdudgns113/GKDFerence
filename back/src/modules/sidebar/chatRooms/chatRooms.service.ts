@@ -3,7 +3,7 @@ import {SidebarBodyType} from 'src/common'
 import {UseDBService} from 'src/modules/useDB/useDB.service'
 
 @Injectable()
-export class ChatListService {
+export class ChatRoomsService {
   constructor(private useDBService: UseDBService) {}
 
   /**
@@ -64,9 +64,10 @@ export class ChatListService {
     return chatBlocks
   }
 
-  async getUserChatRoomList(uOId: string) {
-    const chatRoomList = await this.useDBService.findChatRoomList(uOId)
-    if (chatRoomList === null) {
+  async getUserChatRooms(uOId: string) {
+    const chatRooms = await this.useDBService.findChatRooms(uOId)
+    console.log('getUserChatRooms : ', chatRooms)
+    if (chatRooms === null) {
       return {
         ok: false,
         body: {},
@@ -75,7 +76,7 @@ export class ChatListService {
     } else {
       return {
         ok: true,
-        body: {chatRoomList: chatRoomList},
+        body: {chatRooms: chatRooms},
         errors: {}
       }
     }

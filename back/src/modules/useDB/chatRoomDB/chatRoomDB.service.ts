@@ -17,14 +17,14 @@ export class ChatRoomDBService {
     @InjectModel(ChatBlock.name) private chatBlockModel: Model<ChatBlock>
   ) {}
 
-  async createChatRoom(uOIds: string[]) {
-    const users = {}
-    uOIds.forEach(uOId => {
-      users[uOId] = true
+  async createChatRoom(uOIdArray: string[]) {
+    const uOIds = {}
+    uOIdArray.forEach(uOId => {
+      uOIds[uOId] = true
     })
 
     const newChatRoom = new this.chatRoomModel({
-      users: users,
+      uOIds: uOIds,
       createdDt: new Date()
     })
 
@@ -53,7 +53,7 @@ export class ChatRoomDBService {
     return chatBlocks
   }
 
-  async getChatRoomUserList(cOId: string) {
+  async getChatRoomUsers(cOId: string) {
     const chatRoom = await this.findOneByOId(cOId)
     if (!chatRoom) {
       return null

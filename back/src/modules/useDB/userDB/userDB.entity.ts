@@ -16,14 +16,14 @@ export class User extends Document {
   hashedPassword: string
 
   /**
-   * singleChatList[userObjectId] = chatRoomObjectId
+   * singleChatRooms[uOId] = cOId
    * Map 으로 해버리면 사용하기가 힘들어진다.
    */
   @Prop({type: Object, default: {}})
-  singleChatRooms: {[userObjectId: string]: string}
+  singleChatRooms: {[uOId: string]: string}
 
   @Prop({type: Object, default: {}})
-  unReadChats: {[chatRoomObjectId: string]: number}
+  unReadChats: {[cOId: string]: number}
 
   @Prop({type: Date, default: Date.now})
   createdDt: Date

@@ -87,7 +87,7 @@ export class UserDBService {
    * @returns 업데이트 된 unReadChats[cOId] 값. socket.gateway.chat 에서 쓴다
    * - socketP만 연결된 uOId 가 안 읽은 cOId 개수를 socketP 를 통해 전달하는 용도
    */
-  async increaseUnreadCnt(uOId: string, cOId: string) {
+  async increaseUnreadChat(uOId: string, cOId: string) {
     const _id = new Types.ObjectId(uOId)
     await this.userModel.updateOne(
       {_id: _id},
@@ -102,7 +102,7 @@ export class UserDBService {
     return user.unReadChats[cOId]
   }
 
-  async setUnreadCnt(uOId: string, cOId: string, newCnt: number) {
+  async setUnreadChat(uOId: string, cOId: string, newCnt: number) {
     const _id = new Types.ObjectId(uOId)
     const ret = await this.userModel.updateOne(
       {_id: _id},
@@ -116,14 +116,14 @@ export class UserDBService {
     return ret
   }
 
-  async setUserSingleChatRoom(uOId: string, tUOId: string, chatOId: string) {
+  async setUserSingleChatRoom(uOId: string, tUOId: string, cOId: string) {
     const _id = new Types.ObjectId(uOId)
     const ret = await this.userModel.updateOne(
       {_id: _id},
       {
         $set: {
-          [`singleChatList.${tUOId}`]: chatOId,
-          [`unReadChats.${chatOId}`]: 0
+          [`singleChatRooms.${tUOId}`]: cOId,
+          [`unReadChats.${cOId}`]: 0
         }
       }
     )

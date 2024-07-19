@@ -8,11 +8,11 @@ import * as T from '../../Base/Texts'
 import {useNavigate} from 'react-router-dom'
 import {RowSingleChatRoomType} from '../../../common'
 
-export type ChattingListProps = DivCommonProps & {
+export type ChatRoomsProps = DivCommonProps & {
   //
 }
 
-export const ChattingList: FC<ChattingListProps> = () => {
+export const ChatRooms: FC<ChatRoomsProps> = () => {
   const {showChat, setShowChat, chatRooms} = useLayoutContext()
   const navigate = useNavigate()
 
@@ -34,7 +34,7 @@ export const ChattingList: FC<ChattingListProps> = () => {
           setShowChat(prev => !prev)
         }}
         style={{userSelect: 'none'}}>
-        <Text>&nbsp;&nbsp;Chatting List</Text>
+        <Text>&nbsp;&nbsp;Chat Rooms</Text>
         <Icon className="text-3xl" name={showChat ? 'arrow_drop_down' : 'arrow_right'}></Icon>
       </div>
       {showChat && (

@@ -58,7 +58,6 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const {pageOId} = useLayoutContext()
   const {socketPId} = useSocketContext()
 
-  // H.useGetChatDataFromDB()
   H.useExecuteSetter(setCOId, setTUId, setTUOId)
   H.useExitSocketChat(sockChat, setSockChat)
 

@@ -84,8 +84,8 @@ export class SidebarController {
     return ret
   }
 
-  @Get('/getChatList/:uOId')
-  async getChatList(@Headers() headers: any, @Param('uOId') uOId: string) {
+  @Get('/getChatRooms/:uOId')
+  async getChatRooms(@Headers() headers: any, @Param('uOId') uOId: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
     try {
       await this.jwtService.verifyAsync(jwt)
@@ -97,7 +97,7 @@ export class SidebarController {
       }
     }
 
-    const ret = this.sidebarService.getUserChatRoomList(uOId)
+    const ret = this.sidebarService.getUserChatRooms(uOId)
     return ret
   }
   // BLANK LINE COMMENT:

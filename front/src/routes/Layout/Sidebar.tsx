@@ -37,12 +37,12 @@ export default function Sidebar() {
     if (id && uOId) {
       U.readStringP('jwt').then(jwt => {
         if (jwt) {
-          get(`/sidebar/getChatList/${uOId}`, jwt)
+          get(`/sidebar/getChatRooms/${uOId}`, jwt)
             .then(res => res.json())
             .then(res => {
               const {ok, body} = res
               if (ok) {
-                setChatRooms(body.chatRoomList)
+                setChatRooms(body.chatRooms)
               } else {
               }
             })
@@ -55,9 +55,9 @@ export default function Sidebar() {
   return (
     <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>
       <div className="GKD_LIST_AREA">
-        <C.ConferenceList />
-        <C.ChattingList />
-        <C.DocumentList />
+        <C.Conferences />
+        <C.ChatRooms />
+        <C.Documents />
       </div>
       <div className="GKD_TestBtn_Area flex flex-col items-center justify-center mt-2">
         <TestButton onClick={e => setTestCnt(prev => prev + 1)}>Inc</TestButton>
