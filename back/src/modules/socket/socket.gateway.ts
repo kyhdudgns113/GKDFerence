@@ -200,7 +200,7 @@ export class SocketGateway
       const unreadChat = await this.useDBService.increaseUnreadChat(uOId, cOId)
 
       //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
-      if (this.uOidInfo[uOId].numConnectedP > 0) {
+      if (this.uOidInfo[uOId] && this.uOidInfo[uOId].numConnectedP > 0) {
         const sockPids = Object.keys(this.uOidInfo[uOId].connectedP)
         const payload: SocketChatUnreadChatType = {
           uOId: uOId,
@@ -210,7 +210,7 @@ export class SocketGateway
         sockPids.forEach(sockPId => {
           const socket = this.server.sockets.sockets.get(sockPId)
           if (socket) {
-            // TODO: 클라이언트가 이거 받는 부분
+            // TODO: 안 읽은 메시지 갱신기능 추가 필요
             socket.emit('chat unread cnt', payload)
           }
         })

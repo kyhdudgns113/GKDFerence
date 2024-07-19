@@ -47,7 +47,7 @@ export const ChatRooms: FC<ChatRoomsProps> = () => {
                 onClick={onClickChatRoom(row)}>
                 <Icon name="chat" className="flex items-center text-xl" />
                 <T.TextXL className="flex items-center ml-2">{row.tUId}</T.TextXL>
-                <p className="ml-auto">1</p>
+                <p className="ml-auto">{row.unreadChat}</p>
               </div>
             )
           })}

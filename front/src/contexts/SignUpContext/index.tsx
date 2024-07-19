@@ -1,21 +1,22 @@
-import type {Dispatch, FC, PropsWithChildren, SetStateAction} from 'react'
+import type {FC, PropsWithChildren} from 'react'
 import {createContext, useCallback, useContext, useState} from 'react'
 import {useStateRow} from '../../pages/SignUpPage/hooks'
 import {useAuth} from '../AuthContext'
 import {useNavigate} from 'react-router-dom'
 import SignUpPage from '../../pages/SignUpPage'
+import {Setter} from '../../common'
 
 // prettier-ignore
 type ContextType = {
-  idVal: string, setIdVal: Dispatch<SetStateAction<string>>
-  idErr: string, setIdErr: Dispatch<SetStateAction<string>>
-  email: string, setEmail: Dispatch<SetStateAction<string>>
-  emailErr: string, setEmailErr: Dispatch<SetStateAction<string>>
-  pwVal: string, setPwVal: Dispatch<SetStateAction<string>>
-  pwErr: string, setPwErr: Dispatch<SetStateAction<string>>
-  pw2Val: string, setPw2Val: Dispatch<SetStateAction<string>>
-  pw2Err: string, setPw2Err: Dispatch<SetStateAction<string>>
-  submitLock: boolean, setSubmitLock: Dispatch<SetStateAction<boolean>>
+  idVal: string, setIdVal: Setter<string>,
+  idErr: string, setIdErr: Setter<string>,
+  email: string, setEmail: Setter<string>,
+  emailErr: string, setEmailErr: Setter<string>,
+  pwVal: string, setPwVal: Setter<string>,
+  pwErr: string, setPwErr: Setter<string>,
+  pw2Val: string, setPw2Val: Setter<string>,
+  pw2Err: string, setPw2Err: Setter<string>,
+  submitLock: boolean, setSubmitLock: Setter<boolean>,
   submitFunction: () => void
 }
 

@@ -1,14 +1,15 @@
-import {ChangeEvent, Dispatch, FC, PropsWithChildren, SetStateAction} from 'react'
+import {ChangeEvent, FC, PropsWithChildren} from 'react'
 
 import {Input, InputProps} from './Input'
 
 import * as T from '../Texts'
+import {Setter} from '../../../common'
 
 export type RowInputProps = InputProps & {
   val: string
   placeholder?: string
   inputType: string
-  setVal: Dispatch<SetStateAction<string>>
+  setVal: Setter<string>
 
   classNameText?: string
 }

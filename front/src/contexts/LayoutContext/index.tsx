@@ -1,9 +1,7 @@
 import {
   createContext,
-  Dispatch,
   FC,
   PropsWithChildren,
-  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -12,24 +10,24 @@ import {
 import {useToggle} from '../../hooks'
 import {useSocketContext} from '../SocketContext'
 import {LayoutModalProvider} from '../LayoutModalContext'
-import {RowSingleChatRoomType, SocketTestCountType} from '../../common'
+import {RowSingleChatRoomType, Setter, SocketTestCountType} from '../../common'
 
 type ContextType = {
   testCnt?: number
-  setTestCnt: Dispatch<SetStateAction<number>>
+  setTestCnt: Setter<number>
 
   showConf?: boolean
-  setShowConf: Dispatch<SetStateAction<boolean>>
+  setShowConf: Setter<boolean>
   showChat?: boolean
-  setShowChat: Dispatch<SetStateAction<boolean>>
+  setShowChat: Setter<boolean>
   showDoc?: boolean
-  setShowDoc: Dispatch<SetStateAction<boolean>>
+  setShowDoc: Setter<boolean>
 
   chatRooms?: RowSingleChatRoomType[]
-  setChatRooms: Dispatch<SetStateAction<RowSingleChatRoomType[]>>
+  setChatRooms: Setter<RowSingleChatRoomType[]>
 
   pageOId?: string
-  setPageOId: Dispatch<SetStateAction<string>>
+  setPageOId: Setter<string>
 }
 
 export const LayoutContext = createContext<ContextType>({

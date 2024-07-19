@@ -1,15 +1,16 @@
-import type {Dispatch, FC, PropsWithChildren, SetStateAction} from 'react'
+import type {FC, PropsWithChildren} from 'react'
 import {createContext, useCallback, useContext, useState} from 'react'
 import RootPage from '../../pages/RootPage'
 import {useAuth} from '../AuthContext'
 import {useNavigate} from 'react-router-dom'
+import {Setter} from '../../common'
 
 // prettier-ignore
 type ContextType = {
-  idVal: string, setIdVal: Dispatch<SetStateAction<string>>,
-  pwVal: string, setPwVal: Dispatch<SetStateAction<string>>,
-  idErr: string, setIdErr: Dispatch<SetStateAction<string>>,
-  pwErr: string, setPwErr: Dispatch<SetStateAction<string>>,
+  idVal: string, setIdVal: Setter<string>,
+  pwVal: string, setPwVal: Setter<string>,
+  idErr: string, setIdErr: Setter<string>,
+  pwErr: string, setPwErr: Setter<string>,
   onLogin: () => void
 }
 

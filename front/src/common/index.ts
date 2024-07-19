@@ -34,6 +34,7 @@ export type ChatBlockType = {
   date?: Date
   content: string
 }
+export type ChatBlocksType = ChatBlockType[]
 export type ErrorsType = KeyValueType
 export interface JwtPayload {
   id: string

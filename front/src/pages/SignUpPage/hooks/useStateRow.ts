@@ -1,11 +1,7 @@
-import {Dispatch, SetStateAction, useState} from 'react'
+import {useState} from 'react'
+import {Setter} from '../../../common'
 
-export type useStateRowType = [
-  string,
-  Dispatch<SetStateAction<string>>,
-  string,
-  Dispatch<SetStateAction<string>>
-]
+export type useStateRowType = [string, Setter<string>, string, Setter<string>]
 
 export const useStateRow = () => {
   const [val, setVal] = useState<string>('')

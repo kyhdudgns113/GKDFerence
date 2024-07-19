@@ -1,9 +1,7 @@
-import {Dispatch, SetStateAction, useEffect} from 'react'
+import {useEffect} from 'react'
+import {Setter} from '../../../common'
 
-export const useSubmitLock = (
-  submitLock: boolean,
-  setSubmitLock: Dispatch<SetStateAction<boolean>>
-) => {
+export const useSubmitLock = (submitLock: boolean, setSubmitLock: Setter<boolean>) => {
   useEffect(() => {
     if (submitLock) {
       let yes = 0

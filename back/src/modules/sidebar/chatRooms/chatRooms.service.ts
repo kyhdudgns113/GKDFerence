@@ -66,7 +66,6 @@ export class ChatRoomsService {
 
   async getUserChatRooms(uOId: string) {
     const chatRooms = await this.useDBService.findChatRooms(uOId)
-    console.log('getUserChatRooms : ', chatRooms)
     if (chatRooms === null) {
       return {
         ok: false,

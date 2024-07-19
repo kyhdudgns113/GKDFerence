@@ -1,6 +1,5 @@
-import {Dispatch, SetStateAction} from 'react'
 import * as U from '../../utils'
-import {AuthBodyType, Callback} from '../../common'
+import {AuthBodyType, Callback, Setter} from '../../common'
 
 /**
  * It write jwt in local storage too
@@ -13,10 +12,10 @@ import {AuthBodyType, Callback} from '../../common'
  */
 export const writeBodyObject = (
   body: AuthBodyType | undefined,
-  setId: Dispatch<SetStateAction<string>>,
-  setUOId: Dispatch<SetStateAction<string>>,
-  setEmail: Dispatch<SetStateAction<string>>,
-  setJwt: Dispatch<SetStateAction<string>>,
+  setId: Setter<string>,
+  setUOId: Setter<string>,
+  setEmail: Setter<string>,
+  setJwt: Setter<string>,
   callback?: Callback | undefined
 ) => {
   U.writeStringP('jwt', body?.jwt ?? '').then(() => {

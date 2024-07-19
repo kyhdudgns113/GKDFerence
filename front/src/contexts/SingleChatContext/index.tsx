@@ -96,7 +96,6 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
    */
   useEffect(() => {
     if (!sockChat && socketPId && pageOId) {
-      alert('SockChatConnect')
       const newSocket = io(serverUrl)
       setSockChat(newSocket)
 
@@ -124,7 +123,6 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   useEffect(() => {
     return () => {
       if (sockChat) {
-        alert('SockChatEnd')
         sockChat.disconnect()
         setSockChat(null)
       }
