@@ -39,7 +39,7 @@ export class ChatListService {
     }
 
     const chatRoom = await this.useDBService.createSingleChatRoom(
-      body._id,
+      body.uOId,
       user._id.toString()
     )
     if (chatRoom) {

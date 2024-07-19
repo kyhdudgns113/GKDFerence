@@ -40,17 +40,17 @@ export class UseDBService {
     if (!user) {
       return null
     }
-    const chatKeyVal = user.singleChatList
+    const chatKeyVal = user.singleChatRooms
 
     const ret: RowSingleChatRoomType[] = []
     const keys = Object.keys(chatKeyVal)
 
-    for (let targetUOId of keys) {
-      const tUser = await this.userDBService.findOneByObjectId(targetUOId)
+    for (let tOId of keys) {
+      const tUser = await this.userDBService.findOneByObjectId(tOId)
       ret.push({
-        chatRoomOId: chatKeyVal[targetUOId],
-        targetUOId: targetUOId,
-        targetId: tUser.id
+        cOId: chatKeyVal[tOId],
+        tUOId: tOId,
+        tUId: tUser.id
       })
     }
 
@@ -96,6 +96,11 @@ export class UseDBService {
 
   async setUnreadCnt(uOId: string, cOId: string, newCnt: number) {
     return await this.userDBService.setUnreadCnt(uOId, cOId, newCnt)
+  }
+
+  async increaseUnreadCnt(uOId: string, cOId: string) {
+    const ret = await this.userDBService.increaseUnreadCnt(uOId, cOId)
+    return ret
   }
 
   /**

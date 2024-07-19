@@ -20,7 +20,7 @@ export class User extends Document {
    * Map 으로 해버리면 사용하기가 힘들어진다.
    */
   @Prop({type: Object, default: {}})
-  singleChatList: {[userObjectId: string]: string}
+  singleChatRooms: {[userObjectId: string]: string}
 
   @Prop({type: Object, default: {}})
   unReadChats: {[chatRoomObjectId: string]: number}

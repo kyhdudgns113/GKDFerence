@@ -9,7 +9,7 @@ import {AuthObjectType, Callback, ErrorsType} from '../../common'
 type ContextType = {
   alertMsg?: string
   id?: string
-  _id?: string
+  uOId?: string
   email?: string
   jwt?: string
 
@@ -33,7 +33,7 @@ type AuthProviderProps = {}
 export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children}) => {
   const [alertMsg, setAlertMsg] = useState<string>('')
   const [id, setId] = useState<string>('')
-  const [_id, set_id] = useState<string>('')
+  const [uOId, setUOId] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [jwt, setJwt] = useState<string>('')
 
@@ -57,7 +57,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
           if (ok) {
-            writeBodyObject(body, setId, set_id, setEmail, setJwt)
+            writeBodyObject(body, setId, setUOId, setEmail, setJwt)
             resolve({})
           } else {
             reject(errors)
@@ -75,7 +75,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
           if (ok) {
-            writeBodyObject(body, setId, set_id, setEmail, setJwt, callback)
+            writeBodyObject(body, setId, setUOId, setEmail, setJwt, callback)
             resolve({})
           } else {
             reject(errors)
@@ -86,7 +86,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     return ret
   }, [])
   const logout = useCallback((callback?: Callback) => {
-    writeBodyObject({}, setId, set_id, setEmail, setJwt, callback)
+    writeBodyObject({}, setId, setUOId, setEmail, setJwt, callback)
   }, [])
   const checkToken = useCallback(
     async (successCallBack?: Callback, failCallBack?: Callback) => {
@@ -99,7 +99,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
             if (ok) {
               successCallBack && successCallBack()
             } else {
-              writeBodyObject({}, setId, set_id, setEmail, setJwt, () => {
+              writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => {
                 failCallBack ? failCallBack() : navigate('/')
               })
             }
@@ -129,7 +129,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
               const keys = Object.keys(errors)
               setAlertMsg(errors[keys[0]])
 
-              writeBodyObject({}, setId, set_id, setEmail, setJwt, () => navigate('/'))
+              writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => navigate('/'))
             }
           })
           .catch((e: Error) => {
@@ -150,15 +150,15 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
   }, [alertMsg])
 
   /**
-   * 새로고침등의 이슈로 useState 에 저장되어있던 id, _id, email 이 날아가는 경우가 있다.
+   * 새로고침등의 이슈로 useState 에 저장되어있던 id, uOId, email 이 날아가는 경우가 있다.
    */
   useEffect(() => {
     U.readStringP('jwt').then(jwtVal => {
       U.readStringP('id').then(idVal => {
-        U.readStringP('_id').then(_idVal => {
+        U.readStringP('uOId').then(uOIdVal => {
           U.readStringP('email').then(emailVal => {
             setId(idVal || '')
-            set_id(_idVal || '')
+            setUOId(uOIdVal || '')
             setEmail(emailVal || '')
             setJwt(jwtVal || '')
           })
@@ -170,7 +170,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
   const value = {
     alertMsg,
     id,
-    _id,
+    uOId,
     email,
     jwt,
 

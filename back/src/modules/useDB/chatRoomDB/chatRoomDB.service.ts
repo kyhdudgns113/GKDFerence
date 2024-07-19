@@ -33,7 +33,7 @@ export class ChatRoomDBService {
 
   async chatRoomHasUser(cOId: string, uOId: string) {
     const chatRoom = await this.findOneByOId(cOId)
-    if (!chatRoom || !chatRoom.users[uOId]) {
+    if (!chatRoom || !chatRoom.uOIds[uOId]) {
       return false
     }
     return true
@@ -58,7 +58,7 @@ export class ChatRoomDBService {
     if (!chatRoom) {
       return null
     }
-    return chatRoom.users
+    return chatRoom.uOIds
   }
 
   async insertChatBlock(cOId: string, chatBlock: ChatBlockType) {
@@ -74,7 +74,7 @@ export class ChatRoomDBService {
     const newChatBlock = new this.chatBlockModel(chatBlock)
     chatRoom.chatBlocks.push(newChatBlock)
     await chatRoom.save()
-    return chatRoom.users
+    return chatRoom.uOIds
   }
 
   // BLANK LINE COMMENT:

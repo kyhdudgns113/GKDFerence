@@ -9,7 +9,7 @@ export type KeyValueType = {[key: string]: string}
 export type AuthBodyType = {
   jwt?: string
   id?: string
-  _id?: string
+  uOId?: string
   email?: string
   password?: string
 }
@@ -32,23 +32,23 @@ export type ChatBlockType = {
 export type ErrorsType = KeyValueType
 export interface JwtPayload {
   id: string
-  _id: string
+  uOId: string
   email: string
 }
 export type RowSingleChatRoomType = {
-  chatRoomOId: string
-  targetUOId: string
-  targetId: string
+  cOId: string
+  tUOId: string
+  tUId: string
 }
 export type SidebarBodyType = {
   jwt?: string
   id?: string
-  _id?: string
+  uOId?: string
   email?: string
 
-  confList?: {[key: string]: string}
-  chatList?: {[key: string]: string}
-  docList?: {[key: string]: string}
+  conferences?: {[key: string]: string}
+  chatRooms?: {[key: string]: string}
+  documents?: {[key: string]: string}
 }
 export type SidebarObjectType = {
   ok: boolean
@@ -57,8 +57,8 @@ export type SidebarObjectType = {
 }
 // SocketP Type
 export type SocketUserConnectedType = {
-  _id: string
-  pid?: string
+  uOId: string
+  socketPId?: string
 }
 export type SocketTestCountType = {
   id: string
@@ -76,10 +76,16 @@ export type SocketChatContentType = {
   cOId: string
   body: ChatBlockType
 }
+export type SocketChatUnreadCntType = {
+  uOId: string
+  cOId: string
+  unreadCnt: number
+}
+
 export type UserBodyType = {
   jwt?: string
   id?: string
-  _id?: string
+  uOId?: string
   email?: string
-  singleChatList?: KeyValueType
+  singleChatRooms?: KeyValueType
 }

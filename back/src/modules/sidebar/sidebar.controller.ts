@@ -79,7 +79,7 @@ export class SidebarController {
         errors: {jwt: 'Jwt invalid'}
       }
     }
-    const uOId = returnedJwt._id
+    const uOId = returnedJwt.uOId
     const ret = this.sidebarService.getChatBlocks(uOId, cOId)
     return ret
   }

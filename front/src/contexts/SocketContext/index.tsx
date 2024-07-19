@@ -47,17 +47,17 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
       setSocketP(newSocket)
 
       newSocket.on('user connected', (recvObj: SocketUserConnectedType) => {
-        console.log('USER CONNECTED : ', recvObj.pid)
-        setSocketPIds(recvObj.pid || '')
+        console.log('USER CONNECTED : ', recvObj.socketPId)
+        setSocketPIds(recvObj.socketPId || '')
       })
 
       // newSocket.on('user disconnect', (recvObj: any) => {
       //   logout()
       // })
 
-      U.readStringP('_id').then(_id => {
+      U.readStringP('uOId').then(uOId => {
         const sendObj: SocketUserConnectedType = {
-          _id: _id || ''
+          uOId: uOId || ''
         }
         newSocket.emit('user connected', sendObj)
       })

@@ -39,8 +39,8 @@ export class UserDBService {
     return result
   }
 
-  async findOneByObjectId(_id: string): Promise<User> {
-    const oid = new Types.ObjectId(_id)
+  async findOneByObjectId(uOId: string): Promise<User> {
+    const oid = new Types.ObjectId(uOId)
     const result = await this.userModel.findOne({_id: oid})
 
     return result
@@ -80,18 +80,40 @@ export class UserDBService {
       return null
     }
 
-    return user.singleChatList && user.singleChatList[targetUser._id.toString()]
+    return user.singleChatRooms && user.singleChatRooms[targetUser._id.toString()]
+  }
+
+  /**
+   * @returns 업데이트 된 unReadChats[cOId] 값. socket.gateway.chat 에서 쓴다
+   * - socketP만 연결된 uOId 가 안 읽은 cOId 개수를 socketP 를 통해 전달하는 용도
+   */
+  async increaseUnreadCnt(uOId: string, cOId: string) {
+    const _id = new Types.ObjectId(uOId)
+    await this.userModel.updateOne(
+      {_id: _id},
+      {
+        $inc: {
+          [`unReadChats.${cOId}`]: 1
+        }
+      }
+    )
+
+    const user = await this.findOneByObjectId(uOId)
+    return user.unReadChats[cOId]
   }
 
   async setUnreadCnt(uOId: string, cOId: string, newCnt: number) {
-    const user = await this.findOneByObjectId(uOId)
-    if (!user) {
-      return null
-    }
+    const _id = new Types.ObjectId(uOId)
+    const ret = await this.userModel.updateOne(
+      {_id: _id},
+      {
+        $set: {
+          [`unReadChats.${cOId}`]: newCnt
+        }
+      }
+    )
 
-    user.unReadChats[cOId] = newCnt
-
-    return await user.save()
+    return ret
   }
 
   async setUserSingleChatRoom(uOId: string, tUOId: string, chatOId: string) {

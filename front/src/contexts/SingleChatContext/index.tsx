@@ -3,13 +3,11 @@ import {createContext, useCallback, useContext, useEffect, useState} from 'react
 
 import {
   ChatBlockType,
-  RowSingleChatRoomType,
   Setter,
   SocketChatConnectedType,
   SocketChatContentType,
   SocketType
 } from '../../common'
-import {useLocation} from 'react-router-dom'
 import SingleChatPage from '../../pages/SingleChatPage'
 import {useAuth} from '../AuthContext'
 
@@ -56,24 +54,17 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const [chatQ, setChatQ] = useState<ChatBlockType[]>([])
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
 
-  const {_id, jwt, refreshToken} = useAuth()
+  const {uOId, jwt, refreshToken} = useAuth()
   const {pageOId} = useLayoutContext()
   const {socketPId} = useSocketContext()
 
-  const location = useLocation()
-  const lState = location.state as RowSingleChatRoomType
-
-  const targetId = lState.targetId || ''
-  const targetOId = lState.targetUOId || ''
-  const chatRoomOId = lState.chatRoomOId || ''
-
   // H.useGetChatDataFromDB()
-  H.useExecuteSetter(chatRoomOId, targetId, targetOId, setCOId, setTUId, setTUOId)
+  H.useExecuteSetter(setCOId, setTUId, setTUOId)
   H.useExitSocketChat(sockChat, setSockChat)
 
   useEffect(() => {
-    if (jwt && chatRoomOId && !isDBLoad) {
-      get(`/sidebar/chatRoom/getChatBlocks/${chatRoomOId}`, jwt)
+    if (jwt && cOId && !isDBLoad) {
+      get(`/sidebar/chatRoom/getChatBlocks/${cOId}`, jwt)
         .then(res => res.json())
         .then(res => {
           const {ok, body, errors} = res
@@ -87,7 +78,7 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
           }
         })
     }
-  }, [jwt, isDBLoad, chatRoomOId])
+  }, [jwt, isDBLoad, cOId])
 
   /**
    * Queue 에 쌓여있는걸 chatBlocks 로 옮기는 부분
@@ -117,19 +108,19 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
       newSocket.on('chat', (payload: SocketChatContentType) => {
         setChatQ(prev => [...prev, payload.body])
       })
-      if (!_id || !jwt || !pageOId) {
-        alert('다음이 NULL 입니다. ' + !_id && '_id ' + !jwt && 'jwt ' + !pageOId && 'pageOId ')
+      if (!uOId || !jwt || !pageOId) {
+        alert('다음이 NULL 입니다. ' + !uOId && 'uOId ' + !jwt && 'jwt ' + !pageOId && 'pageOId ')
       }
 
       const payload: SocketChatConnectedType = {
         jwt: jwt || '',
-        uOId: _id || '',
+        uOId: uOId || '',
         cOId: pageOId || '',
         socketPId: socketPId || ''
       }
       newSocket.emit('chat connected', payload)
     }
-  }, [_id, jwt, pageOId, sockChat, socketPId, setSockChat, setChatQ])
+  }, [uOId, jwt, pageOId, sockChat, socketPId, setSockChat, setChatQ])
 
   useEffect(() => {
     return () => {

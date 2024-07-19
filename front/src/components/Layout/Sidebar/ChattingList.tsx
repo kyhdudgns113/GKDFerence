@@ -13,14 +13,14 @@ export type ChattingListProps = DivCommonProps & {
 }
 
 export const ChattingList: FC<ChattingListProps> = () => {
-  const {showChat, setShowChat, chatRooms, setPageOId} = useLayoutContext() // eslint-disable-line
+  const {showChat, setShowChat, chatRooms} = useLayoutContext()
   const navigate = useNavigate()
 
   const onClickChatRoom = useCallback(
     (row: RowSingleChatRoomType) => (e: MouseEvent) => {
       e.stopPropagation()
       navigate(`/main/sc`, {
-        state: {chatRoomOId: row.chatRoomOId, targetId: row.targetId, targetUOId: row.targetUOId}
+        state: {cOId: row.cOId, tUId: row.tUId, tUOId: row.tUOId}
       })
     },
     [navigate]
@@ -43,10 +43,11 @@ export const ChattingList: FC<ChattingListProps> = () => {
             return (
               <div
                 className="pl-8 pt-1 pb-1 flex flex-row cursor-pointer hover:bg-gkd-sakura-bg-70"
-                key={`chatRow:${row.chatRoomOId}`}
+                key={`chatRow:${row.cOId}`}
                 onClick={onClickChatRoom(row)}>
                 <Icon name="chat" className="flex items-center text-xl" />
-                <T.TextXL className="flex items-center ml-2">{row.targetId}</T.TextXL>
+                <T.TextXL className="flex items-center ml-2">{row.tUId}</T.TextXL>
+                <p className="ml-auto">1</p>
               </div>
             )
           })}

@@ -13,7 +13,7 @@ export default function Sidebar() {
   const {testCnt, setTestCnt, setChatRooms} = CT.useLayoutContext()
   const {socketP, socketEmit} = CT.useSocketContext()
 
-  const {id, _id, checkToken, refreshToken} = CT.useAuth()
+  const {id, uOId, checkToken, refreshToken} = CT.useAuth()
 
   const {onTestOpen} = CT.useLayoutModalContext()
 
@@ -30,14 +30,14 @@ export default function Sidebar() {
 
   /**
    * 채팅방 리스트 가져오기
-   * 새로고침등의 이슈로 setId, set_id 가 호출되지 않을 수 있다.
-   * 이런 경우에 id, _id 는 null 일 수 있다.
+   * 새로고침등의 이슈로 setId, setUOId 가 호출되지 않을 수 있다.
+   * 이런 경우에 id, uOId 는 null 일 수 있다.
    */
   useEffect(() => {
-    if (id && _id) {
+    if (id && uOId) {
       U.readStringP('jwt').then(jwt => {
         if (jwt) {
-          get(`/sidebar/getChatList/${_id}`, jwt)
+          get(`/sidebar/getChatList/${uOId}`, jwt)
             .then(res => res.json())
             .then(res => {
               const {ok, body} = res
@@ -50,7 +50,7 @@ export default function Sidebar() {
         }
       })
     }
-  }, [id, _id, setChatRooms])
+  }, [id, uOId, setChatRooms])
 
   return (
     <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>

@@ -10,12 +10,12 @@ export type InputAreaMyProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>,
 
 export const InputArea: FC<InputAreaMyProps> = () => {
   const {chatInput, cOId, setChatInput, sockChatEmit} = useSingleChatContext()
-  const {id, _id, jwt} = useAuth()
+  const {id, uOId, jwt} = useAuth()
 
   const onClickSend = useCallback(() => {
     const chatBlock: ChatBlockType = {
       id: id || '',
-      uOId: _id || '',
+      uOId: uOId || '',
       content: chatInput
     }
 
@@ -31,7 +31,7 @@ export const InputArea: FC<InputAreaMyProps> = () => {
       !cOId && console.log(`cOId is null in InputArea`)
     }
     setChatInput('')
-  }, [cOId, id, _id, jwt, chatInput, setChatInput, sockChatEmit])
+  }, [cOId, id, uOId, jwt, chatInput, setChatInput, sockChatEmit])
 
   return (
     <div className="DIV_INPUT flex flex-row w-full h-12 bg-white">

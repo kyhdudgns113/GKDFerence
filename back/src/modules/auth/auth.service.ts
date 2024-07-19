@@ -62,7 +62,7 @@ export class AuthService {
 
     const jwtPayload: JwtPayload = {
       id: newUser.id,
-      _id: newUser._id.toString(),
+      uOId: newUser._id.toString(),
       email: newUser.email
     }
     const jwt = await this.jwtService.signAsync(jwtPayload, gkdJwtSignOption)
@@ -70,7 +70,7 @@ export class AuthService {
     ret.ok = true
     ret.body = {
       id: newUser.id,
-      _id: newUser._id.toString(),
+      uOId: newUser._id.toString(),
       email: newUser.email,
       jwt: jwt
     }
@@ -97,14 +97,14 @@ export class AuthService {
 
       const jwtPayload: JwtPayload = {
         id: user.id,
-        _id: user._id.toString(),
+        uOId: user._id.toString(),
         email: user.email
       }
       const jwt = await this.jwtService.signAsync(jwtPayload, gkdJwtSignOption)
       ret.ok = true
       ret.body.id = user.id
       ret.body.email = user.email
-      ret.body._id = user._id.toString()
+      ret.body.uOId = user._id.toString()
       ret.body.jwt = jwt
     } else {
       ret.errors['idOrEmail'] = "User isn't exist"
@@ -155,7 +155,7 @@ export class AuthService {
       /** For forcing type, jwtPayload should be declared as const variable */
       const jwtPayload: JwtPayload = {
         id: isJwt.id,
-        _id: isJwt._id,
+        uOId: isJwt.uOId,
         email: isJwt.email
       }
       const newJwt = this.jwtService.sign(jwtPayload)

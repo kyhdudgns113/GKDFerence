@@ -35,7 +35,7 @@ export class SidebarService {
 
     return {
       ok: true,
-      body: {id: user.id, email: user.email, _id: user._id},
+      body: {id: user.id, email: user.email, uOId: user._id},
       errors: {}
     }
   }

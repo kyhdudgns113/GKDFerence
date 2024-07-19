@@ -14,7 +14,7 @@ export default function ModalTest() {
   const [errMsg, setErrMsg] = useState<string>('')
 
   const {isTestOpen, onTestClose} = useLayoutModalContext()
-  const {id, _id, email, jwt, checkToken} = useAuth()
+  const {id, uOId, email, jwt, checkToken} = useAuth()
 
   const onChangeIdAndErrMsg = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +67,7 @@ export default function ModalTest() {
       const sidebarBody: SidebarBodyType = {
         jwt: jwt,
         id: id,
-        _id: _id,
+        uOId: uOId,
         email: email
       }
       post(`/sidebar/createSingleChatRoom/${idOrEmail}`, sidebarBody)
@@ -83,7 +83,7 @@ export default function ModalTest() {
           }
         })
     },
-    [id, _id, idOrEmail, email, jwt, checkToken, onClickClose]
+    [id, uOId, idOrEmail, email, jwt, checkToken, onClickClose]
   )
 
   // BLANK LINE COMMENT

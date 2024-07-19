@@ -26,7 +26,7 @@ export class ChatRoom extends Document {
   /** Object Id is in extended class Document */
 
   @Prop({type: Object})
-  users: {[uOId: string]: boolean}
+  uOIds: {[uOId: string]: boolean}
 
   @Prop({type: [ChatBlockSchema], default: []})
   chatBlocks: ChatBlock[]

@@ -13,6 +13,7 @@ import {
   JwtPayload,
   SocketChatConnectedType,
   SocketChatContentType,
+  SocketChatUnreadCntType,
   SocketTestCountType,
   SocketUserConnectedType
 } from 'src/common'
@@ -34,7 +35,7 @@ export class SocketGateway
   private sockInfo: {
     [sockId: string]: {
       type: 'P' | 'Chat'
-      uOid: string
+      uOId: string
     }
   } = {}
   private uOidInfo: {
@@ -47,14 +48,14 @@ export class SocketGateway
     [sockPid: string]: {
       uOid: string
       sockChatId: string
-      chatId: string
+      cOId: string
     } | null
   } = {}
   private sockCidInfo: {
     [sockCid: string]: {
       uOid: string
       sockPid: string
-      chatId: string
+      cOId: string
     }
   } = {}
 
@@ -86,7 +87,7 @@ export class SocketGateway
       switch (this.sockInfo[sid].type) {
         case 'P':
           {
-            const uOid = this.sockInfo[sid].uOid
+            const uOid = this.sockInfo[sid].uOId
             const sockCId = this.sockPidInfo[sid].sockChatId
             delete this.sockPidInfo[sid]
 
@@ -100,11 +101,11 @@ export class SocketGateway
           break
         case 'Chat':
           {
-            const cOId = this.sockCidInfo[sid].chatId
+            const cOId = this.sockCidInfo[sid].cOId
             const pid = this.sockCidInfo[sid].sockPid
 
             this.sockPidInfo[pid].sockChatId = ''
-            this.sockPidInfo[pid].chatId = ''
+            this.sockPidInfo[pid].cOId = ''
 
             delete this.sockCidInfo[sid]
             client.leave(cOId)
@@ -121,7 +122,7 @@ export class SocketGateway
   userConnected(client: Socket, payload: SocketUserConnectedType): void {
     // this.logger.log('USER CONNECTED : ')
     this.initSocketP(client, payload)
-    payload.pid = client.id
+    payload.socketPId = client.id
     client.emit('user connected', payload)
   }
   @SubscribeMessage('test count')
@@ -142,10 +143,12 @@ export class SocketGateway
       const ret2 = await this.useDBService.setUnreadCnt(uOId, cOId, 0)
       if (ret2) {
         client.emit('chat connected', payload)
+        // TODO: 안 읽은 메시지 0개 되나 검증
       }
     }
   }
 
+  // TODO: 검증
   @SubscribeMessage('chat')
   async chat(client: Socket, payload: SocketChatContentType) {
     if (
@@ -192,19 +195,38 @@ export class SocketGateway
     })
     const remainUsers = Object.keys(chatRoomUsers)
 
-    // TODO: 밑에꺼 해라.
-    //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+    remainUsers.forEach(async uOId => {
+      //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+      const unreadCnt = await this.useDBService.increaseUnreadCnt(uOId, cOId)
 
-    //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
+      //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
+      if (this.uOidInfo[uOId].numConnectedP > 0) {
+        const sockPids = Object.keys(this.uOidInfo[uOId].connectedP)
+        const payload: SocketChatUnreadCntType = {
+          uOId: uOId,
+          cOId: cOId,
+          unreadCnt: unreadCnt
+        }
+        sockPids.forEach(sockPId => {
+          const socket = this.server.sockets.sockets.get(sockPId)
+          if (socket) {
+            // TODO: 클라이언트가 이거 받는 부분
+            socket.emit('chat unread cnt', payload)
+          }
+        })
+      }
+    })
   }
 
+  // AREA1 : Private function Area
+
   private initSocketP(client: Socket, payload: SocketUserConnectedType) {
-    const uOid = payload._id
+    const uOid = payload.uOId
     const sid = client.id
 
     this.sockInfo[sid] = {
       type: 'P',
-      uOid: uOid
+      uOId: uOid
     }
 
     if (!this.uOidInfo[uOid]) {
@@ -218,7 +240,7 @@ export class SocketGateway
 
     this.sockPidInfo[sid] = {
       uOid: uOid,
-      chatId: '',
+      cOId: '',
       sockChatId: ''
     }
   }
@@ -232,7 +254,7 @@ export class SocketGateway
     // JWT 인증
     const jwt = payload.jwt
     const isJwt = (await this.jwtService.verifyAsync(jwt)) as JwtPayload
-    if (!isJwt || isJwt._id !== payload.uOId) {
+    if (!isJwt || isJwt.uOId !== payload.uOId) {
       // this.logger.log('JWT Veryfing error')
       return false
     }
@@ -244,11 +266,11 @@ export class SocketGateway
     this.sockCidInfo[client.id] = {
       uOid: payload.uOId,
       sockPid: client.id,
-      chatId: payload.cOId
+      cOId: payload.cOId
     }
 
     this.sockPidInfo[payload.socketPId].sockChatId = client.id
-    this.sockPidInfo[payload.socketPId].chatId = payload.cOId
+    this.sockPidInfo[payload.socketPId].cOId = payload.cOId
     return true
   }
   // BLANK LINE COMMENT:
