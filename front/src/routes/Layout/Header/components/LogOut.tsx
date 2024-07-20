@@ -1,9 +1,9 @@
 import {FC} from 'react'
 import {DivPropsCommon, className_DivCommon} from './common'
-import {Icon} from '../../Base/Icons'
+import {Icon} from '../../../../components/Base'
 
 import {Text} from './Text'
-import {useAuth} from '../../../contexts'
+import {useAuth} from '../../../../contexts'
 import {useNavigate} from 'react-router-dom'
 
 export type LogoutProps = DivPropsCommon & {}

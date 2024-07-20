@@ -1,3 +1,8 @@
+export const classNameRowTitle = [
+  'flex flex-row',
+  'items-center justify-between',
+  'cursor-pointer'
+].join(' ')
 export const classNameEntireSidebar = [
   'flex flex-col',
   'pb-2',

@@ -1,7 +1,7 @@
 import {FC} from 'react'
-import {DivCommonProps, Icon} from '../../Base'
-import {useLayoutContext} from '../../../contexts'
-import {Text} from '../Header'
+import {DivCommonProps, Icon} from '../../../../components/Base'
+import {useLayoutContext} from '../../../../contexts'
+import {Text} from '../../Header/components'
 import {classNameRowTitle} from './className'
 
 export type DocumentsProps = DivCommonProps & {
@@ -9,7 +9,7 @@ export type DocumentsProps = DivCommonProps & {
 }
 
 export const Documents: FC<DocumentsProps> = () => {
-  const {showDoc, setShowDoc} = useLayoutContext() // eslint-disable-line
+  const {showDoc, setShowDoc} = useLayoutContext()
 
   return (
     <div className="flex flex-col">

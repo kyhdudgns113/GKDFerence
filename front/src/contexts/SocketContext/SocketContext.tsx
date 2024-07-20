@@ -7,7 +7,7 @@ import {serverUrl} from '../../client_secret'
 
 import * as U from '../../utils'
 import {SocketUserConnectedType} from '../../common'
-import {useAuth} from '../AuthContext'
+import {useAuth} from '../AuthContext/AuthContext'
 
 type SocketType = Socket<DefaultEventsMap, DefaultEventsMap> | undefined | null
 
@@ -34,7 +34,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
    * // NOTE: socketP: It will be reset automatically in LocalContext
    */
   const [socketP, setSocketP] = useState<SocketType>(null)
-  const [socketPId, setSocketPIds] = useState<string>('') // eslint-disable-line
+  const [socketPId, setSocketPIds] = useState<string>('')
 
   const {checkToken, refreshToken} = useAuth()
 

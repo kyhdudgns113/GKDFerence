@@ -1,8 +1,8 @@
 import {Outlet} from 'react-router-dom'
-import Header from './Header'
+import Header from './Header/Header'
 import Footer from './Footer'
-import Sidebar from './Sidebar'
-import Modals from './Modals'
+import Sidebar from './Sidebar/Sidebar'
+import Modals from './Modals/Modals'
 
 export default function Layout() {
   return (

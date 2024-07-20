@@ -2,7 +2,7 @@ import {FC} from 'react'
 import {useNavigate} from 'react-router-dom'
 
 import {className_DivCommon} from './common'
-import {Icon} from '../../Base/Icons'
+import {Icon} from '../../../../components/Base'
 import {DivPropsCommon} from './common'
 import {Text} from './Text'
 

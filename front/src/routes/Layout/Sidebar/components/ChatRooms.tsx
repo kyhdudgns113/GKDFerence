@@ -1,12 +1,12 @@
 import {FC, MouseEvent, useCallback} from 'react'
-import {DivCommonProps, Icon} from '../../Base'
-import {useLayoutContext} from '../../../contexts'
-import {Text} from '../Header'
+import {DivCommonProps, Icon} from '../../../../components/Base'
+import {useLayoutContext} from '../../../../contexts'
+import {Text} from '../../Header/components'
 import {classNameRowTitle} from './className'
 
-import * as T from '../../Base/Texts'
+import * as T from '../../../../components/Base/Texts'
 import {useNavigate} from 'react-router-dom'
-import {RowSingleChatRoomType} from '../../../common'
+import {RowSingleChatRoomType} from '../../../../common'
 
 export type ChatRoomsProps = DivCommonProps & {
   //
@@ -19,7 +19,7 @@ export const ChatRooms: FC<ChatRoomsProps> = () => {
   const onClickChatRoom = useCallback(
     (row: RowSingleChatRoomType) => (e: MouseEvent) => {
       e.stopPropagation()
-      navigate(`/main/sc`, {
+      navigate(`/main/sc/${row.cOId}`, {
         state: {cOId: row.cOId, tUId: row.tUId, tUOId: row.tUOId}
       })
     },

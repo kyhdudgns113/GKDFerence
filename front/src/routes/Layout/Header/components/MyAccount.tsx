@@ -1,6 +1,6 @@
 import {FC} from 'react'
 import {DivPropsCommon, className_DivCommon} from './common'
-import {Icon} from '../../Base/Icons'
+import {Icon} from '../../../../components/Base'
 
 import {Text} from './Text'
 

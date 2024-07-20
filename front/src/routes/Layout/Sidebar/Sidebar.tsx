@@ -1,13 +1,12 @@
-import {useCallback, useEffect} from 'react' // eslint-disable-line
+import {useCallback, useEffect} from 'react'
 
-import {TestButton} from '../../components'
-import {SocketTestCountType} from '../../common'
+import {TestButton} from '../../../components'
+import {SocketTestCountType} from '../../../common'
 
-import * as CT from '../../contexts'
-import * as C from '../../components/Layout/Sidebar'
-import * as CN from './className'
-import * as U from '../../utils'
-import {get} from '../../server'
+import * as CT from '../../../contexts'
+import * as C from './components'
+import * as U from '../../../utils'
+import {get} from '../../../server'
 
 export default function Sidebar() {
   const {testCnt, setTestCnt, setChatRooms} = CT.useLayoutContext()
@@ -53,7 +52,7 @@ export default function Sidebar() {
   }, [id, uOId, setChatRooms])
 
   return (
-    <div className={CN.classNameEntireSidebar} style={{minWidth: '250px'}}>
+    <div className={C.classNameEntireSidebar} style={{minWidth: '250px'}}>
       <div className="GKD_LIST_AREA">
         <C.Conferences />
         <C.ChatRooms />

@@ -1,5 +1,5 @@
 import type {FC, PropsWithChildren} from 'react'
-import {createContext, useCallback, useContext, useState} from 'react' // eslint-disable-line
+import {createContext, useCallback, useContext, useState} from 'react'
 import Layout from '../../routes/Layout'
 
 type ContextType = {

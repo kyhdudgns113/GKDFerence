@@ -1,5 +1,5 @@
-import * as U from '../../utils'
-import {AuthBodyType, Callback, Setter} from '../../common'
+import * as U from '.'
+import {AuthBodyType, Callback, Setter} from '../common'
 
 /**
  * It write jwt in local storage too

@@ -1,9 +1,9 @@
 import type {FC, PropsWithChildren} from 'react'
 import {createContext, useCallback, useContext, useState} from 'react'
 import {useStateRow} from '../../pages/SignUpPage/hooks'
-import {useAuth} from '../AuthContext'
+import {useAuth} from '../AuthContext/AuthContext'
 import {useNavigate} from 'react-router-dom'
-import SignUpPage from '../../pages/SignUpPage'
+import SignUpPage from '../../pages/SignUpPage/SignUpPage'
 import {Setter} from '../../common'
 
 // prettier-ignore
@@ -45,7 +45,7 @@ export const SignUpProvider: FC<PropsWithChildren<SignUpProviderProps>> = ({chil
   const [email, setEmail, emailErr, setEmailErr] = useStateRow()
   const [pwVal, setPwVal, pwErr, setPwErr] = useStateRow()
   const [pw2Val, setPw2Val, pw2Err, setPw2Err] = useStateRow()
-  const [submitLock, setSubmitLock] = useState<boolean>(false) //eslint-disable-line
+  const [submitLock, setSubmitLock] = useState<boolean>(false)
 
   const {signup} = useAuth()
   const navigate = useNavigate()

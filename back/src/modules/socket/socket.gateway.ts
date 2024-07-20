@@ -77,7 +77,7 @@ export class SocketGateway
   }
 
   handleDisconnect(client: Socket) {
-    // this.logger.log(`Client disconnected: ${client.id}`)
+    this.logger.log(`Client disconnected: ${client.id}`)
 
     const sid = client.id
 
@@ -209,7 +209,6 @@ export class SocketGateway
         sockPids.forEach(sockPId => {
           const socketP = this.server.sockets.sockets.get(sockPId)
           if (socketP) {
-            // TODO: 클라이언트에서 안 읽은 메시지 갱신기능 추가 필요
             socketP.emit('set unread chat', payload)
           }
         })

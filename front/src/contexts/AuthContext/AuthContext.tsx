@@ -3,7 +3,6 @@ import {createContext, useContext, useState, useCallback, useEffect} from 'react
 import * as U from '../../utils'
 import {post, get} from '../../server'
 import {useNavigate} from 'react-router-dom'
-import {writeBodyObject} from './writeBodyObject'
 import {AuthObjectType, Callback, ErrorsType} from '../../common'
 
 type ContextType = {
@@ -57,7 +56,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
           if (ok) {
-            writeBodyObject(body, setId, setUOId, setEmail, setJwt)
+            U.writeBodyObject(body, setId, setUOId, setEmail, setJwt)
             resolve({})
           } else {
             reject(errors)
@@ -75,7 +74,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
           if (ok) {
-            writeBodyObject(body, setId, setUOId, setEmail, setJwt, callback)
+            U.writeBodyObject(body, setId, setUOId, setEmail, setJwt, callback)
             resolve({})
           } else {
             reject(errors)
@@ -86,7 +85,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     return ret
   }, [])
   const logout = useCallback((callback?: Callback) => {
-    writeBodyObject({}, setId, setUOId, setEmail, setJwt, callback)
+    U.writeBodyObject({}, setId, setUOId, setEmail, setJwt, callback)
   }, [])
   const checkToken = useCallback(
     async (successCallBack?: Callback, failCallBack?: Callback) => {
@@ -99,7 +98,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
             if (ok) {
               successCallBack && successCallBack()
             } else {
-              writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => {
+              U.writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => {
                 failCallBack ? failCallBack() : navigate('/')
               })
             }
@@ -129,7 +128,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
               const keys = Object.keys(errors)
               setAlertMsg(errors[keys[0]])
 
-              writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => navigate('/'))
+              U.writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => navigate('/'))
             }
           })
           .catch((e: Error) => {

@@ -1,8 +1,8 @@
 import {FC} from 'react'
 
-import {ParagraphCommonProps} from '../../Base/Props'
+import {ParagraphCommonProps} from '../../../../components/Base'
 
-import * as T from '../../Base/Texts'
+import * as T from '../../../../components/Base'
 
 export type TextProps = ParagraphCommonProps & {}
 

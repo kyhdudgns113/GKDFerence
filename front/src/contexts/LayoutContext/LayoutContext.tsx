@@ -8,8 +8,8 @@ import {
   useState
 } from 'react'
 import {useToggle} from '../../hooks'
-import {useSocketContext} from '../SocketContext'
-import {LayoutModalProvider} from '../LayoutModalContext'
+import {useSocketContext} from '../SocketContext/SocketContext'
+import {LayoutModalProvider} from '../LayoutModalContext/LayoutModalContext'
 import {
   RowSingleChatRoomType,
   Setter,

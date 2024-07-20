@@ -1,7 +1,7 @@
 import {MouseEvent, useCallback} from 'react'
-import {Home, Logout, MyAccount, Text} from '../../components/Layout/Header'
-import {Icon} from '../../components'
-import {useLayoutContext} from '../../contexts'
+import {Home, Logout, MyAccount, Text} from './components'
+import {Icon} from '../../../components'
+import {useLayoutContext} from '../../../contexts'
 
 export default function Header() {
   const {testCnt, setTestCnt} = useLayoutContext()

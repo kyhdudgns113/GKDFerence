@@ -1,6 +1,6 @@
 import {Routes, Route} from 'react-router-dom'
-import NullPage from '../pages/NullPage'
-import MainPage from '../pages/MainPage'
+import NullPage from '../pages/NullPage/NullPage'
+import MainPage from '../pages/MainPage/MainPage'
 import RequireAuth from '../providers/RequireAuth'
 
 import * as CT from '../contexts'
@@ -17,7 +17,7 @@ export default function RoutesSetup() {
           </RequireAuth>
         }>
         <Route index element={<MainPage />} />
-        <Route path="/main/sc" element={<CT.SingleChatProvider />} />
+        <Route path="/main/sc/:cOId" element={<CT.SingleChatProvider />} />
         <Route path="/main/*" element={<NullPage />} />
       </Route>
       <Route path="/signup" element={<CT.SignUpProvider />} />

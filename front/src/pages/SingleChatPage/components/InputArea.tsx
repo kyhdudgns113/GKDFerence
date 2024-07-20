@@ -2,7 +2,7 @@ import {DetailedHTMLProps, FC, HTMLAttributes, useCallback} from 'react'
 import {Button} from '../../../components'
 import {ChatBlockType, SocketChatContentType} from '../../../common'
 import {useAuth} from '../../../contexts'
-import {useSingleChatContext} from '../../../contexts/SingleChatContext'
+import {useSingleChatContext} from '../../../contexts/SingleChatContext/SingleChatContext'
 
 export type InputAreaMyProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   //

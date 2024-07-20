@@ -1,7 +1,7 @@
 import {Title} from '../../components'
 import {useAuth} from '../../contexts'
 import {ChatBlockMy, ChatBlockOther, InputArea} from './components'
-import {useSingleChatContext} from '../../contexts/SingleChatContext'
+import {useSingleChatContext} from '../../contexts/SingleChatContext/SingleChatContext'
 
 // FUTURE: cOId, tUOId, targetID 중 하나라도 없으면 아무것도 띄우지 말자.
 export default function SingleChatPage() {

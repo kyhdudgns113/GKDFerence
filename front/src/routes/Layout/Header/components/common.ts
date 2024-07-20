@@ -1,4 +1,4 @@
-import {DivCommonProps} from '../../Base/Props'
+import {DivCommonProps} from '../../../../components/Base'
 
 export const className_DivCommon = [
   // 'btn',

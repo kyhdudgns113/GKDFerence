@@ -1,7 +1,7 @@
 import type {FC, PropsWithChildren} from 'react'
 import {createContext, useCallback, useContext, useState} from 'react'
-import RootPage from '../../pages/RootPage'
-import {useAuth} from '../AuthContext'
+import RootPage from '../../pages/RootPage/RootPage'
+import {useAuth} from '../AuthContext/AuthContext'
 import {useNavigate} from 'react-router-dom'
 import {Setter} from '../../common'
 
