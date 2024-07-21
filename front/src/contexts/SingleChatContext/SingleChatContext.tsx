@@ -1,12 +1,20 @@
 import type {FC, PropsWithChildren} from 'react'
 import {createContext, useCallback, useContext, useRef, useState} from 'react'
 
-import {ChatBlocksType, ChatBlockType, DivRefType, Setter, SocketChatConnectedType, SocketChatContentType, SocketType} from '../../common'
+import {
+  ChatBlocksType,
+  ChatBlockType,
+  DivRefType,
+  Setter,
+  SocketChatConnectedType,
+  SocketChatContentType,
+  SocketType
+} from '../../common'
 import SingleChatPage from '../../pages/SingleChatPage/SingleChatPage'
 import {useAuth} from '../AuthContext/AuthContext'
 
 import * as H from './hooks'
-import { useLayoutContext } from '../LayoutContext/LayoutContext'
+import {useLayoutContext} from '../LayoutContext/LayoutContext'
 
 // prettier-ignore
 type ContextType = {
@@ -17,6 +25,8 @@ type ContextType = {
   chatInput: string, setChatInput: Setter<string>,
   chatBlocks: ChatBlockType[], setChatBlocks: Setter<ChatBlockType[]>,
   goToBot: boolean, setGoToBot: Setter<boolean>
+  scrollYVal: number, setScrollYVal: Setter<number>
+  scrollYMax: number, setScrollYMax: Setter<number>
 
   divChatsBodyRef: DivRefType
 
@@ -32,6 +42,8 @@ export const SingleChatContext = createContext<ContextType>({
   chatInput: '', setChatInput: () => {},
   chatBlocks: [], setChatBlocks: () => {},
   goToBot: false, setGoToBot: () => {},
+  scrollYVal: 0, setScrollYVal: () => {},
+  scrollYMax: 0, setScrollYMax: () => {},
 
   divChatsBodyRef: null,
 
@@ -50,38 +62,37 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   const [chatQ, setChatQ] = useState<ChatBlocksType>([])
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
   const [goToBot, setGoToBot] = useState<boolean>(false)
+  const [scrollYVal, setScrollYVal] = useState<number>(0)
+  const [scrollYMax, setScrollYMax] = useState<number>(0)
 
   const divChatsBodyRef = useRef<HTMLDivElement | null>(null)
 
   const {refreshToken} = useAuth()
   const {setChatRooms} = useLayoutContext()
 
-  const onChatConnected = useCallback((newSocket: SocketType) => {
-    if (newSocket) {
-      newSocket.on('chat connected', (payload: SocketChatConnectedType) => {
-        // console.log('CHAT CONNECTED : ', payload.cOId)
-        setChatRooms(chatRooms =>
-          chatRooms.map(chatRoom => {
-            if (chatRoom.cOId === payload.cOId) {
-              chatRoom.unreadChat = 0
-            }
-            return chatRoom
-          })
-        )
-      })
-    }
-  }, [setChatRooms])
+  const onChatConnected = useCallback(
+    (newSocket: SocketType) => {
+      if (newSocket) {
+        newSocket.on('chat connected', (payload: SocketChatConnectedType) => {
+          // console.log('CHAT CONNECTED : ', payload.cOId)
+          setChatRooms(chatRooms =>
+            chatRooms.map(chatRoom => {
+              if (chatRoom.cOId === payload.cOId) {
+                chatRoom.unreadChat = 0
+              }
+              return chatRoom
+            })
+          )
+        })
+      }
+    },
+    [setChatRooms]
+  )
 
   const onChat = useCallback((newSocket: SocketType) => {
     if (newSocket) {
       newSocket.on('chat', (payload: SocketChatContentType) => {
         setChatQ(prev => [...prev, payload.body])
-        if (divChatsBodyRef && divChatsBodyRef.current) {
-          const {scrollTop, scrollHeight, clientHeight} = divChatsBodyRef.current
-          if (scrollTop + clientHeight > scrollHeight) {
-            setGoToBot(true)
-          } 
-        }
       })
     }
   }, [])
@@ -89,7 +100,7 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
   H.useExecuteSetter(setCOId, setTUId, setTUOId, setIsDBLoad, setSockChat, setChatInput, setChatQ)
   H.useGetChatBlocksFromDB(cOId, isDBLoad, setChatBlocks, setIsDBLoad)
   H.useSetSockChat(sockChat, setSockChat, onChatConnected, onChat)
-  H.useFromQToChatBlocks(chatQ, isDBLoad, setChatBlocks, setChatQ)
+  H.useFromQToChatBlocks(chatQ, isDBLoad, divChatsBodyRef, setGoToBot, setChatBlocks, setChatQ)
   H.useSetScrollBottom(chatBlocks, divChatsBodyRef, goToBot, setGoToBot)
   H.useExitSocketChat(sockChat, setSockChat)
 
@@ -112,6 +123,8 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
     chatInput, setChatInput,
     chatBlocks, setChatBlocks,
     goToBot, setGoToBot,
+    scrollYVal, setScrollYVal,
+    scrollYMax, setScrollYMax,
 
     divChatsBodyRef,
 

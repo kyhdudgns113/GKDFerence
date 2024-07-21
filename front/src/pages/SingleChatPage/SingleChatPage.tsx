@@ -2,21 +2,25 @@ import {Button, Title} from '../../components'
 import {useAuth} from '../../contexts'
 import {ChatBlockMy, ChatBlockOther, InputArea} from './components'
 import {useSingleChatContext} from '../../contexts/SingleChatContext/SingleChatContext'
-import {useState} from 'react'
 import {get} from '../../server'
 
 // FUTURE: cOId, tUOId, targetID 중 하나라도 없으면 아무것도 띄우지 말자.
 export default function SingleChatPage() {
-  const [scrollYVal, setScrollYVal] = useState<number>(0)
-
-  const {chatBlocks, cOId, divChatsBodyRef, tUId, setChatBlocks} = useSingleChatContext()
+  const {
+    chatBlocks,
+    cOId,
+    divChatsBodyRef,
+    tUId,
+    scrollYVal,
+    setScrollYVal,
+    setScrollYMax,
+    setChatBlocks
+  } = useSingleChatContext()
   const {uOId, jwt} = useAuth()
 
   return (
     <div className="mt-2 mb-2 flex flex-col items-center h-full ">
-      <Title className="mb-4">
-        Chat Page : {tUId}, {scrollYVal}, {chatBlocks.length > 0 && chatBlocks[0].idx}
-      </Title>
+      <Title className="mb-4">Chat Page : {tUId}</Title>
       <div className="DIV_3BODY flex flex-row w-full h-[800px]">
         <div className="DIV_LEFT_BODY w-1/3 h-full">
           <p>&nbsp;</p>
@@ -36,7 +40,6 @@ export default function SingleChatPage() {
                       const {ok, body} = res
                       if (ok) {
                         setChatBlocks(prev => [...body.chatBlocks, ...prev])
-                      } else {
                       }
                     })
                 }}>
@@ -46,7 +49,10 @@ export default function SingleChatPage() {
 
           <div
             className="DIV_CHATS flex flex-col w-full h-full bg-gkd-sakura-bg/70 overflow-y-scroll"
-            onScroll={e => setScrollYVal(divChatsBodyRef?.current?.scrollTop || 0)}
+            onScroll={e => {
+              setScrollYVal(divChatsBodyRef?.current?.scrollTop || 0)
+              setScrollYMax(divChatsBodyRef?.current?.scrollHeight || 0)
+            }}
             ref={divChatsBodyRef}>
             {chatBlocks.map(chatBlock => {
               if (chatBlock.uOId === uOId) {
@@ -71,7 +77,9 @@ export default function SingleChatPage() {
           <Button
             className="m-2"
             onClick={e => {
-              console.log(divChatsBodyRef?.current?.scrollTop)
+              if (divChatsBodyRef?.current) {
+                divChatsBodyRef.current.scrollTop = divChatsBodyRef.current.scrollHeight
+              }
             }}>
             Test 1
           </Button>

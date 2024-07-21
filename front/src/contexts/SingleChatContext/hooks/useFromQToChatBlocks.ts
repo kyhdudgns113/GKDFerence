@@ -1,9 +1,11 @@
 import {useEffect} from 'react'
-import {ChatBlocksType, ChatBlockType, Setter} from '../../../common'
+import {ChatBlocksType, ChatBlockType, DivRefType, Setter} from '../../../common'
 
 export const useFromQToChatBlocks = (
   chatQ: ChatBlocksType,
   isDBLoad: boolean,
+  divChatsBodyRef: DivRefType,
+  setGoToBot: Setter<boolean>,
   setChatBlocks: Setter<ChatBlocksType>,
   setChatQ: Setter<ChatBlocksType>
 ) => {
@@ -12,6 +14,12 @@ export const useFromQToChatBlocks = (
       const newChatQ = [...chatQ]
       setChatBlocks(prev => [...prev, newChatQ.pop() as ChatBlockType])
       setChatQ(newChatQ)
+      if (divChatsBodyRef?.current) {
+        const {scrollTop, clientHeight, scrollHeight} = divChatsBodyRef.current
+        if (scrollTop + clientHeight >= scrollHeight) {
+          setGoToBot(true)
+        }
+      }
     }
-  }, [chatQ, isDBLoad, setChatBlocks, setChatQ])
+  }, [chatQ, isDBLoad, divChatsBodyRef, setGoToBot, setChatBlocks, setChatQ])
 }
