@@ -12,7 +12,7 @@ export const useGetChatBlocksFromDB = (
   const {jwt} = useAuth()
   useEffect(() => {
     if (jwt && cOId && !isDBLoad) {
-      get(`/sidebar/chatRoom/getChatBlocks/${cOId}`, jwt)
+      get(`/sidebar/chatRoom/getChatBlocks/${cOId}/0`, jwt)
         .then(res => res.json())
         .then(res => {
           const {ok, body, errors} = res

@@ -12,7 +12,7 @@ export default function Layout() {
       </div>
       <div className="flex flex-row h-full">
         <Sidebar />
-        <div className="flex flex-col w-full h-full border-2 border-gkd-sakura-border">
+        <div className="flex flex-col w-full h-screen border-2 border-gkd-sakura-border">
           <Outlet />
           <Footer />
         </div>

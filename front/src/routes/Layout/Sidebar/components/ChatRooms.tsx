@@ -13,7 +13,7 @@ export type ChatRoomsProps = DivCommonProps & {
 }
 
 export const ChatRooms: FC<ChatRoomsProps> = () => {
-  const {showChat, setShowChat, chatRooms} = useLayoutContext()
+  const {showChatRooms, setShowChatRooms, chatRooms} = useLayoutContext()
   const navigate = useNavigate()
 
   const onClickChatRoom = useCallback(
@@ -31,23 +31,27 @@ export const ChatRooms: FC<ChatRoomsProps> = () => {
       <div
         className={classNameRowTitle}
         onClick={e => {
-          setShowChat(prev => !prev)
+          setShowChatRooms(prev => !prev)
         }}
         style={{userSelect: 'none'}}>
-        <Text>&nbsp;&nbsp;Chat Rooms</Text>
-        <Icon className="text-3xl" name={showChat ? 'arrow_drop_down' : 'arrow_right'}></Icon>
+        <Text>&nbsp;&nbsp;Chats</Text>
+        <Icon className="text-3xl" name={showChatRooms ? 'arrow_drop_down' : 'arrow_right'}></Icon>
       </div>
-      {showChat && (
+      {showChatRooms && (
         <div className="mt-2">
           {chatRooms?.map(row => {
             return (
               <div
-                className="pl-8 pt-1 pb-1 flex flex-row cursor-pointer hover:bg-gkd-sakura-bg-70"
+                className="pl-8 pt-1 pb-1 flex flex-row cursor-pointer hover:bg-gkd-sakura-bg-70 items-center"
                 key={`chatRow:${row.cOId}`}
                 onClick={onClickChatRoom(row)}>
                 <Icon name="chat" className="flex items-center text-xl" />
                 <T.TextXL className="flex items-center ml-2">{row.tUId}</T.TextXL>
-                <p className="ml-auto">{row.unreadChat}</p>
+                {row.unreadChat > 0 && (
+                  <div className="flex items-center pl-2 pr-2 rounded-lg bg-gkd-sakura-text ml-auto mr-2 text-gkd-sakura-bg">
+                    {row.unreadChat}
+                  </div>
+                )}
               </div>
             )
           })}

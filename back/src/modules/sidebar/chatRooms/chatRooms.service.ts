@@ -59,9 +59,14 @@ export class ChatRoomsService {
 
   // NOTE: uOId 는 나중을 위해 냅둔다.
   // NOTE: 해당 유저가 안 읽은 메시지 개수 불러올때 쓰일 예정
-  async getChatBlocks(uOId: string, cOId: string) {
-    const chatBlocks = this.useDBService.getChatBlocks(cOId)
-    return chatBlocks
+  async getChatBlocks(uOId: string, cOId: string, firstIdx: number) {
+    const chatBlocks = await this.useDBService.getChatBlocks(cOId)
+    if (firstIdx > 0) {
+      return chatBlocks.slice(firstIdx >= 10 ? firstIdx - 10 : 0, firstIdx)
+    } else {
+      const len = chatBlocks.length
+      return chatBlocks.slice(len - 10, len)
+    }
   }
 
   async getUserChatRooms(uOId: string) {

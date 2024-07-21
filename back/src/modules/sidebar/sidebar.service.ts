@@ -40,7 +40,7 @@ export class SidebarService {
     }
   }
 
-  async getChatBlocks(uOId: string, cOId: string) {
+  async getChatBlocks(uOId: string, cOId: string, firstIdx: number) {
     const valid = await this.useDBService.ChatRoomHasUser(cOId, uOId)
     if (!valid) {
       return {
@@ -50,7 +50,7 @@ export class SidebarService {
       }
     }
 
-    const chatBlocks = await this.chatRoomsService.getChatBlocks(uOId, cOId)
+    const chatBlocks = await this.chatRoomsService.getChatBlocks(uOId, cOId, firstIdx)
     if (!chatBlocks) {
       return {
         ok: false,

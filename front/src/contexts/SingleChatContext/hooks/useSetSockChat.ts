@@ -1,9 +1,7 @@
 import {useEffect} from 'react'
 import {
-  ChatBlocksType,
   Setter,
   SocketChatConnectedType,
-  SocketChatContentType,
   SocketType
 } from '../../../common'
 import {useSocketContext} from '../../SocketContext/SocketContext'
@@ -14,11 +12,11 @@ import {useAuth} from '../../AuthContext/AuthContext'
 
 export const useSetSockChat = (
   sockChat: SocketType,
-  uOId: string | undefined,
   setSockChat: Setter<SocketType>,
-  setChatQ: Setter<ChatBlocksType>
+  onChatConnected: (newSocket: SocketType) => void,
+  onChat: (newSocket: SocketType) => void
 ) => {
-  const {jwt} = useAuth()
+  const {jwt, uOId} = useAuth()
   const {socketPId} = useSocketContext()
   const {pageOId, setChatRooms} = useLayoutContext()
 
@@ -27,25 +25,12 @@ export const useSetSockChat = (
       const newSocket = io(serverUrl)
       setSockChat(newSocket)
 
-      newSocket.on('chat connected', (payload: SocketChatConnectedType) => {
-        console.log('CHAT CONNECTED : ', payload.cOId)
-        setChatRooms(chatRooms =>
-          chatRooms.map(chatRoom => {
-            if (chatRoom.cOId === payload.cOId) {
-              chatRoom.unreadChat = 0
-            }
-            return chatRoom
-          })
-        )
-      })
-      newSocket.on('chat', (payload: SocketChatContentType) => {
-        setChatQ(prev => [...prev, payload.body])
-      })
+      onChatConnected(newSocket)
+      onChat(newSocket)
 
       if (!uOId || !jwt || !pageOId) {
         alert('다음이 NULL 입니다. ' + !uOId && 'uOId ' + !jwt && 'jwt ' + !pageOId && 'pageOId ')
       }
-
       const payload: SocketChatConnectedType = {
         jwt: jwt || '',
         uOId: uOId || '',
@@ -54,5 +39,15 @@ export const useSetSockChat = (
       }
       newSocket.emit('chat connected', payload)
     }
-  }, [uOId, jwt, pageOId, sockChat, socketPId, setSockChat, setChatQ, setChatRooms])
+  }, [
+    uOId,
+    jwt,
+    pageOId,
+    sockChat,
+    socketPId,
+    setSockChat,
+    setChatRooms,
+    onChatConnected,
+    onChat
+  ])
 }

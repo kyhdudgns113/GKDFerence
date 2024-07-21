@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common'
 import {SidebarService} from './sidebar.service'
 import {getJwtFromHeader} from 'src/util'
-import {JwtPayload, SidebarBodyType} from 'src/common'
+import {gkdJwtSignOption, JwtPayload, SidebarBodyType} from 'src/common'
 import {JwtService} from '@nestjs/jwt'
 
 // NOTE: JWT 검증은 controller 에서 해야한다.
@@ -66,12 +66,16 @@ export class SidebarController {
     return ret
   }
 
-  @Get('/chatRoom/getChatBlocks/:cOId')
-  async getChatBlocks(@Headers() headers: any, @Param('cOId') cOId: string) {
+  @Get('/chatRoom/getChatBlocks/:cOId/:firstIdx')
+  async getChatBlocks(
+    @Headers() headers: any,
+    @Param('cOId') cOId: string,
+    @Param('firstIdx') firstIdx: number
+  ) {
     const jwt = getJwtFromHeader(headers) ?? ''
     let returnedJwt: JwtPayload
     try {
-      returnedJwt = await this.jwtService.verifyAsync(jwt)
+      returnedJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
     } catch (error) {
       return {
         ok: false,
@@ -79,8 +83,9 @@ export class SidebarController {
         errors: {jwt: 'Jwt invalid'}
       }
     }
+
     const uOId = returnedJwt.uOId
-    const ret = this.sidebarService.getChatBlocks(uOId, cOId)
+    const ret = await this.sidebarService.getChatBlocks(uOId, cOId, firstIdx)
     return ret
   }
 
@@ -97,7 +102,7 @@ export class SidebarController {
       }
     }
 
-    const ret = this.sidebarService.getUserChatRooms(uOId)
+    const ret = await this.sidebarService.getUserChatRooms(uOId)
     return ret
   }
   // BLANK LINE COMMENT:

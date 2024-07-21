@@ -47,7 +47,7 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
       setSocketP(newSocket)
 
       newSocket.on('user connected', (recvObj: SocketUserConnectedType) => {
-        console.log('USER CONNECTED : ', recvObj.socketPId)
+        // console.log('USER CONNECTED : ', recvObj.socketPId)
         setSocketPIds(recvObj.socketPId || '')
       })
 

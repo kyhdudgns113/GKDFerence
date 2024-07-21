@@ -23,8 +23,8 @@ type ContextType = {
 
   showConf?: boolean
   setShowConf: Setter<boolean>
-  showChat?: boolean
-  setShowChat: Setter<boolean>
+  showChatRooms?: boolean
+  setShowChatRooms: Setter<boolean>
   showDoc?: boolean
   setShowDoc: Setter<boolean>
 
@@ -38,7 +38,7 @@ type ContextType = {
 export const LayoutContext = createContext<ContextType>({
   setTestCnt: () => {},
   setShowConf: () => {},
-  setShowChat: () => {},
+  setShowChatRooms: () => {},
   setShowDoc: () => {},
   setChatRooms: () => {},
   setPageOId: () => {}
@@ -53,7 +53,7 @@ type LayoutProviderProps = {}
 export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({children}) => {
   const [testCnt, setTestCnt] = useState<number>(0)
   const [showConf, setShowConf] = useToggle()
-  const [showChat, setShowChat] = useToggle()
+  const [showChatRooms, setShowChatRooms] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
 
   const [chatRooms, setChatRooms] = useState<RowSingleChatRoomType[]>([])
@@ -94,8 +94,8 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
 
     showConf,
     setShowConf,
-    showChat,
-    setShowChat,
+    showChatRooms,
+    setShowChatRooms,
     showDoc,
     setShowDoc,
 
