@@ -19,6 +19,7 @@ import {
 } from 'src/common'
 import {JwtService} from '@nestjs/jwt'
 import {UseDBService} from '../useDB/useDB.service'
+import {LockService} from '../lock/lock.service'
 
 /**
  * // NOTE: 클라이언트가 소켓을 전송하기 전에 refreshToken 을 호출한다.
@@ -61,6 +62,7 @@ export class SocketGateway
 
   constructor(
     private jwtService: JwtService,
+    private lockService: LockService,
     private useDBService: UseDBService
   ) {}
 
@@ -77,7 +79,7 @@ export class SocketGateway
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`)
+    // this.logger.log(`Client disconnected: ${client.id}`)
 
     const sid = client.id
 
@@ -131,6 +133,15 @@ export class SocketGateway
     payload.cnt++
     client.emit('test count', payload)
   }
+  @SubscribeMessage('test lock')
+  async testLock(client: Socket, payload: any): Promise<void> {
+    // console.log(`client ${client.id} is come`)
+    let res1: number = -1
+
+    const readyNumber = await this.lockService.getLock('test')
+
+    this.lockService.releaseLock('test', readyNumber)
+  }
 
   // AREA2 : socketChatArea
   @SubscribeMessage('chat connected')
@@ -147,7 +158,6 @@ export class SocketGateway
       }
     }
   }
-
   @SubscribeMessage('chat')
   async chat(client: Socket, payload: SocketChatContentType) {
     if (

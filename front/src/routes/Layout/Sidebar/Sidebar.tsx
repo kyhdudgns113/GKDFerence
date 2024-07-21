@@ -64,6 +64,12 @@ export default function Sidebar() {
         <TestButton onClick={e => checkToken()}>Token C</TestButton>
         <TestButton onClick={e => refreshToken()}>Token R</TestButton>
         <TestButton onClick={e => onTestOpen()}>Test Modal</TestButton>
+        <TestButton
+          onClick={e => {
+            socketEmit(socketP, 'test lock', 'yes')
+          }}>
+          Test Modal
+        </TestButton>
       </div>
     </div>
   )
