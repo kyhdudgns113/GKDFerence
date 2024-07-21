@@ -135,10 +135,9 @@ export class SocketGateway
   }
   @SubscribeMessage('test lock')
   async testLock(client: Socket, payload: any): Promise<void> {
-    // console.log(`client ${client.id} is come`)
-    let res1: number = -1
+    const readyNumber = await this.lockService.readyLock('test')
 
-    const readyNumber = await this.lockService.getLock('test')
+    // NOTE: DO SOMETHING
 
     this.lockService.releaseLock('test', readyNumber)
   }
@@ -184,6 +183,9 @@ export class SocketGateway
       return
     }
 
+    // 0. chat 에 lock 을 얻을때까지 기다리고 얻은 뒤에는 lock 을 건다.
+    const readyNumber = await this.lockService.readyLock(`chat:${cOId}`)
+
     //  1. ChatRoomDB 에 넣고 속해있는 유저 정보{[uOId: string]: boolean}를 가져온다.
     const isInserted = await this.useDBService.insertChatBlock(cOId, payload.body)
     if (!isInserted) {
@@ -224,6 +226,9 @@ export class SocketGateway
         })
       }
     })
+
+    //  7. Lock 을 풀어준다.
+    this.lockService.releaseLock(`chat:${cOId}`, readyNumber)
   }
 
   // AREA1 : Private function Area
