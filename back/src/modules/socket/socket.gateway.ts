@@ -170,25 +170,27 @@ export class SocketGateway
       return
     }
 
-    const jwt = payload.jwt
-    const isJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
+    const isJwt = await this.jwtService.verifyAsync(payload.jwt, gkdJwtSignOption)
     if (!isJwt) {
       return
     }
 
     const cOId = payload.cOId
     const uOId = payload.body.uOId
+
+    //  0. chat 에 lock 을 얻을때까지 기다리고 얻은 뒤에는 lock 을 건다.
+    const readyNumber = await this.lockService.readyLock(`chat:${cOId}`)
+
     const isUser = await this.useDBService.ChatRoomHasUser(cOId, uOId)
     if (!isUser) {
+      this.lockService.releaseLock(readyNumber)
       return
     }
-
-    // 0. chat 에 lock 을 얻을때까지 기다리고 얻은 뒤에는 lock 을 건다.
-    const readyNumber = await this.lockService.readyLock(`chat:${cOId}`)
 
     //  1. ChatRoomDB 에 넣고 속해있는 유저 정보{[uOId: string]: boolean}를 가져온다.
     const isInserted = await this.useDBService.insertChatBlock(cOId, payload.body)
     if (!isInserted) {
+      this.lockService.releaseLock(readyNumber)
       return
     }
 
@@ -199,39 +201,29 @@ export class SocketGateway
     this.server.to(cOId).emit('chat', payload)
 
     //  4. 채팅 소켓 연결 안 된 유저 확인
-    const chatRoomUsers = isInserted
-    connectedClientIds.forEach(clientId => {
-      const uOId = this.sockCidInfo[clientId].uOid
-      delete chatRoomUsers[uOId]
-    })
-    const remainUsers = Object.keys(chatRoomUsers)
+    const chatRoomUsers = this.getUnconnectedUsers(isInserted, connectedClientIds)
 
-    remainUsers.forEach(async uOId => {
-      //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
-      const newUnreadChat = await this.useDBService.increaseUnreadChat(uOId, cOId)
-
-      //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
-      if (this.uOidInfo[uOId] && this.uOidInfo[uOId].numConnectedP > 0) {
-        const sockPids = Object.keys(this.uOidInfo[uOId].connectedP)
-        const payload: SocketSetUnreadChatType = {
-          uOId: uOId,
-          cOId: cOId,
-          unreadChat: newUnreadChat
-        }
-        sockPids.forEach(sockPId => {
-          const socketP = this.server.sockets.sockets.get(sockPId)
-          if (socketP) {
-            socketP.emit('set unread chat', payload)
-          }
-        })
-      }
-    })
+    //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+    //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
+    this.processingUnconnectedUsers(chatRoomUsers, cOId)
 
     //  7. Lock 을 풀어준다.
     this.lockService.releaseLock(readyNumber)
   }
 
   // AREA1 : Private function Area
+
+  private getUnconnectedUsers(
+    usersObject: {[uOId: string]: boolean},
+    connectedClientIds: string[]
+  ) {
+    const result = {...usersObject}
+    connectedClientIds.forEach(clientId => {
+      const uOId = this.sockCidInfo[clientId].uOid
+      delete result[uOId]
+    })
+    return result
+  }
 
   private initSocketP(client: Socket, payload: SocketUserConnectedType) {
     const uOid = payload.uOId
@@ -285,6 +277,33 @@ export class SocketGateway
     this.sockPidInfo[payload.socketPId].sockChatId = client.id
     this.sockPidInfo[payload.socketPId].cOId = payload.cOId
     return true
+  }
+
+  private processingUnconnectedUsers(
+    chatRoomUsers: {[suOId: string]: boolean},
+    cOId: string
+  ) {
+    const remainUsers = Object.keys(chatRoomUsers)
+    remainUsers.forEach(async _uOId => {
+      //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+      const newUnreadChat = await this.useDBService.increaseUnreadChat(_uOId, cOId)
+
+      //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
+      if (this.uOidInfo[_uOId] && this.uOidInfo[_uOId].numConnectedP > 0) {
+        const sockPids = Object.keys(this.uOidInfo[_uOId].connectedP)
+        const payload: SocketSetUnreadChatType = {
+          uOId: _uOId,
+          cOId: cOId,
+          unreadChat: newUnreadChat
+        }
+        sockPids.forEach(sockPId => {
+          const socketP = this.server.sockets.sockets.get(sockPId)
+          if (socketP) {
+            socketP.emit('set unread chat', payload)
+          }
+        })
+      }
+    })
   }
   // BLANK LINE COMMENT:
 }

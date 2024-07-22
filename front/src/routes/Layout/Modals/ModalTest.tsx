@@ -14,7 +14,7 @@ export default function ModalTest() {
   const [errMsg, setErrMsg] = useState<string>('')
 
   const {isTestOpen, onTestClose} = useLayoutModalContext()
-  const {id, uOId, email, jwt, checkToken} = useAuth()
+  const {id, uOId, email, checkToken, getJwt} = useAuth()
 
   const onChangeIdAndErrMsg = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +41,8 @@ export default function ModalTest() {
         return
       }
 
+      const jwt = await getJwt()
+
       get(`/sidebar/findUser/${idOrEmail}`, jwt)
         .then(res => res.json())
         .then(result => {
@@ -57,12 +59,14 @@ export default function ModalTest() {
           setErrMsg(`ERROR : ${error.message}`)
         })
     },
-    [idOrEmail, jwt, checkToken, setErrMsg]
+    [idOrEmail, checkToken, getJwt, setErrMsg]
   )
 
   const onClickCreate = useCallback(
     async (e: MouseEvent) => {
       checkToken()
+
+      const jwt = await getJwt()
 
       const sidebarBody: SidebarBodyType = {
         jwt: jwt,
@@ -83,7 +87,7 @@ export default function ModalTest() {
           }
         })
     },
-    [id, uOId, idOrEmail, email, jwt, checkToken, onClickClose]
+    [id, uOId, idOrEmail, email, checkToken, getJwt, onClickClose]
   )
 
   // BLANK LINE COMMENT

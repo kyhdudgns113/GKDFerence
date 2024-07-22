@@ -10,14 +10,16 @@ export type InputAreaMyProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>,
 
 export const InputArea: FC<InputAreaMyProps> = () => {
   const {chatInput, cOId, setChatInput, sockChatEmit} = useSingleChatContext()
-  const {id, uOId, jwt} = useAuth()
+  const {id, uOId, getJwt} = useAuth()
 
-  const onClickSend = useCallback(() => {
+  const onClickSend = useCallback(async () => {
     const chatBlock: ChatBlockType = {
       id: id || '',
       uOId: uOId || '',
       content: chatInput
     }
+
+    const jwt = await getJwt()
 
     if (chatInput && jwt && cOId) {
       const payload: SocketChatContentType = {
@@ -31,7 +33,7 @@ export const InputArea: FC<InputAreaMyProps> = () => {
       !cOId && console.log(`cOId is null in InputArea`)
     }
     setChatInput('')
-  }, [cOId, id, uOId, jwt, chatInput, setChatInput, sockChatEmit])
+  }, [cOId, id, uOId, chatInput, getJwt, setChatInput, sockChatEmit])
 
   return (
     <div className="DIV_INPUT flex flex-row w-full h-12 bg-white">

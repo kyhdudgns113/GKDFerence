@@ -15,7 +15,6 @@ export const writeBodyObject = (
   setId: Setter<string>,
   setUOId: Setter<string>,
   setEmail: Setter<string>,
-  setJwt: Setter<string>,
   callback?: Callback | undefined
 ) => {
   U.writeStringP('jwt', body?.jwt ?? '').then(() => {
@@ -25,7 +24,6 @@ export const writeBodyObject = (
           setId(body?.id || '')
           setUOId(body?.uOId || '')
           setEmail(body?.email || '')
-          setJwt(body?.jwt || '')
           callback && callback()
         })
       })

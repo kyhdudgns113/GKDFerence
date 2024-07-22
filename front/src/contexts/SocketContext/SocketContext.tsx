@@ -72,8 +72,9 @@ export const SocketProvider: FC<PropsWithChildren<SocketProviderProps>> = ({chil
     }
   }, [socketP])
 
-  //  SocketProvider 내의 Context 에서 선언된 값들을 사용할 때 필요함.
-  //  그 값들을 여기서 쓸 수는 없으니
+  /**
+   *    SocketProvider 내의 Context 에서 선언된 값들을 사용할 때 필요함.
+   */
   const addSocketPOn = useCallback(
     (event: string, callback: (payload: any) => void) => {
       if (socketP) {

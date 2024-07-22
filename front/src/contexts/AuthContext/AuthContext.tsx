@@ -10,13 +10,14 @@ type ContextType = {
   id?: string
   uOId?: string
   email?: string
-  jwt?: string
 
   signup: (id: string, email: string, password: string) => Promise<ErrorsType>
   login: (id: string, password: string) => Promise<ErrorsType>
   logout: (callback?: Callback) => void
   checkToken: (successCallBack?: Callback, failCallBack?: Callback) => void
   refreshToken: (callback?: Callback) => void
+
+  getJwt: () => Promise<string>
 }
 
 export const AuthContext = createContext<ContextType>({
@@ -24,7 +25,8 @@ export const AuthContext = createContext<ContextType>({
   login: async (id: string, password: string) => ({}),
   logout: (callback?: Callback) => {},
   checkToken: (successCallBack?: Callback, failCallBack?: Callback) => {},
-  refreshToken: (callback?: Callback) => {}
+  refreshToken: (callback?: Callback) => {},
+  getJwt: async () => ''
 })
 
 type AuthProviderProps = {}
@@ -34,7 +36,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
   const [id, setId] = useState<string>('')
   const [uOId, setUOId] = useState<string>('')
   const [email, setEmail] = useState<string>('')
-  const [jwt, setJwt] = useState<string>('')
 
   const navigate = useNavigate()
 
@@ -56,7 +57,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
           if (ok) {
-            U.writeBodyObject(body, setId, setUOId, setEmail, setJwt)
+            U.writeBodyObject(body, setId, setUOId, setEmail)
             resolve({})
           } else {
             reject(errors)
@@ -74,7 +75,7 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
         .then((result: AuthObjectType) => {
           const {ok, body, errors} = result
           if (ok) {
-            U.writeBodyObject(body, setId, setUOId, setEmail, setJwt, callback)
+            U.writeBodyObject(body, setId, setUOId, setEmail, callback)
             resolve({})
           } else {
             reject(errors)
@@ -85,60 +86,61 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     return ret
   }, [])
   const logout = useCallback((callback?: Callback) => {
-    U.writeBodyObject({}, setId, setUOId, setEmail, setJwt, callback)
+    U.writeBodyObject({}, setId, setUOId, setEmail, callback)
   }, [])
   const checkToken = useCallback(
     async (successCallBack?: Callback, failCallBack?: Callback) => {
-      const jwt = await getJwt()
-      if (jwt) {
-        get('/auth/checkToken', jwt)
-          .then(res => res.json())
-          .then((result: AuthObjectType) => {
-            const {ok} = result
-            if (ok) {
-              successCallBack && successCallBack()
-            } else {
-              U.writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => {
-                failCallBack ? failCallBack() : navigate('/')
-              })
-            }
-          })
-          .catch((e: Error) => {
-            console.log(e.message)
-          })
-      } else {
-        failCallBack && failCallBack()
-      }
+      U.readStringP('jwt').then(jwt => {
+        if (jwt) {
+          get('/auth/checkToken', jwt)
+            .then(res => res.json())
+            .then((result: AuthObjectType) => {
+              const {ok} = result
+              if (ok) {
+                successCallBack && successCallBack()
+              } else {
+                U.writeBodyObject({}, setId, setUOId, setEmail, () => {
+                  failCallBack ? failCallBack() : navigate('/')
+                })
+              }
+            })
+            .catch((e: Error) => {
+              console.log(e.message)
+            })
+        } else {
+          failCallBack && failCallBack()
+        }
+      })
     },
-    [getJwt, navigate]
+    [navigate]
   )
   const refreshToken = useCallback(
     async (callback?: Callback) => {
-      const jwt = await getJwt()
-      if (jwt) {
-        get('/auth/refreshToken', jwt)
-          .then(res => res.json())
-          .then((result: AuthObjectType) => {
-            const {ok, body, errors} = result
-            if (ok) {
-              U.writeStringP('jwt', body?.jwt ?? '')
-              setJwt(body?.jwt || '')
-              callback && callback()
-            } else {
-              const keys = Object.keys(errors)
-              setAlertMsg(errors[keys[0]])
+      U.readStringP('jwt').then(jwt => {
+        if (jwt) {
+          get('/auth/refreshToken', jwt)
+            .then(res => res.json())
+            .then((result: AuthObjectType) => {
+              const {ok, body, errors} = result
+              if (ok) {
+                U.writeStringP('jwt', body?.jwt ?? '')
+                callback && callback()
+              } else {
+                const keys = Object.keys(errors)
+                setAlertMsg(errors[keys[0]])
 
-              U.writeBodyObject({}, setId, setUOId, setEmail, setJwt, () => navigate('/'))
-            }
-          })
-          .catch((e: Error) => {
-            console.log(e.message)
-          })
-      } else {
-        navigate('/')
-      }
+                U.writeBodyObject({}, setId, setUOId, setEmail, () => navigate('/'))
+              }
+            })
+            .catch((e: Error) => {
+              console.log(e.message)
+            })
+        } else {
+          navigate('/')
+        }
+      })
     },
-    [getJwt, navigate]
+    [navigate]
   )
 
   useEffect(() => {
@@ -150,17 +152,18 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
 
   /**
    * 새로고침등의 이슈로 useState 에 저장되어있던 id, uOId, email 이 날아가는 경우가 있다.
+   * jwt 는 읽어오지 않는다. 어차피 setJwt 같은거 해봐야 쓸데도 없다.
+   * 한 쪽 tab 에서 refreshToken 호출되었을 때, 다른 탭에서도 호출이 되지는 않기 때문이다.
+   * 그러면 갱신되지 않은 탭에서 뭔가를 하려고 할 때, 로컬 스토리지에는 싱싱한 jwt 가 있음에도 불구하고
+   * 이미 만료가 된 jwt 로 인증을 하려다가 로그아웃 당할 수 있다.
    */
   useEffect(() => {
-    U.readStringP('jwt').then(jwtVal => {
-      U.readStringP('id').then(idVal => {
-        U.readStringP('uOId').then(uOIdVal => {
-          U.readStringP('email').then(emailVal => {
-            setId(idVal || '')
-            setUOId(uOIdVal || '')
-            setEmail(emailVal || '')
-            setJwt(jwtVal || '')
-          })
+    U.readStringP('id').then(idVal => {
+      U.readStringP('uOId').then(uOIdVal => {
+        U.readStringP('email').then(emailVal => {
+          setId(idVal || '')
+          setUOId(uOIdVal || '')
+          setEmail(emailVal || '')
         })
       })
     })
@@ -171,14 +174,15 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     id,
     uOId,
     email,
-    jwt,
 
     signup,
     login,
     logout,
 
     checkToken,
-    refreshToken
+    refreshToken,
+
+    getJwt
   }
   return <AuthContext.Provider value={value} children={children} />
 }

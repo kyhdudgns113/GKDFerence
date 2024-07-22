@@ -16,7 +16,7 @@ export default function SingleChatPage() {
     setScrollYMax,
     setChatBlocks
   } = useSingleChatContext()
-  const {uOId, jwt} = useAuth()
+  const {uOId, getJwt} = useAuth()
 
   return (
     <div className="mt-2 mb-2 flex flex-col items-center h-full ">
@@ -33,7 +33,9 @@ export default function SingleChatPage() {
             chatBlocks[0].idx > 0 && (
               <div
                 className="absolute flex justify-center w-full h-fit bg-black/30 z-20 cursor-pointer select-none"
-                onClick={e => {
+                onClick={async e => {
+                  const jwt = await getJwt()
+
                   get(`/sidebar/chatRoom/getChatBlocks/${cOId}/${chatBlocks[0].idx ?? 0}`, jwt)
                     .then(res => res.json())
                     .then(res => {
