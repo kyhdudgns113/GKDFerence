@@ -1,10 +1,11 @@
-import {Injectable} from '@nestjs/common'
+import {Injectable, Logger} from '@nestjs/common'
 
 // FUTURE: ready = now + 1 일 경우, 너무 오래 기다리면 문제가 생겼다는걸 알려보자
 @Injectable()
 export class LockService {
   private lockInfo: {[key: string]: {readyNumber: number; nowNumber: number}} = {}
-  private refreshDurationMilliSecond: number = 100
+  private refreshDurationMilliSecond: number = 10
+  private logger = new Logger('LockService')
 
   constructor() {}
 
@@ -20,9 +21,11 @@ export class LockService {
     const thisReadyNumber = this.lockInfo[key].readyNumber
     this.lockInfo[key].readyNumber += 1
 
-    console.log(`start : ${thisReadyNumber} / ${this.lockInfo[key].nowNumber}`)
+    const retReadyLock = thisReadyNumber.toString() + '___' + key
 
-    const newPromise = new Promise<number>((resolve, reject) => {
+    // this.logger.log(`start : ${thisReadyNumber} / ${this.lockInfo[key].nowNumber}`)
+
+    const newPromise = new Promise<string>((resolve, reject) => {
       const intervalId = setInterval(() => {
         const nowNumber = this.lockInfo[key].nowNumber
         const readyNumber = thisReadyNumber
@@ -31,10 +34,10 @@ export class LockService {
           // LOCKED:
         } else if (readyNumber === nowNumber) {
           clearInterval(intervalId)
-          resolve(readyNumber)
+          resolve(retReadyLock)
         } else {
           clearInterval(intervalId)
-          reject(readyNumber)
+          reject(retReadyLock)
         }
       }, this.refreshDurationMilliSecond)
     })
@@ -43,8 +46,17 @@ export class LockService {
   }
 
   // FUTURE: lockData 를 적당한걸 넣어줘야 한다.
-  async releaseLock(key: string, lockData: any) {
-    this.lockInfo[key].nowNumber += 1
+  async releaseLock(readyLock: string) {
+    const [readyNumberString, key] = readyLock.split('___')
+    if (!this.lockInfo[key]) {
+      this.logger.log(`lock ${key} isn't exist`)
+    } else if (this.lockInfo[key].nowNumber === parseInt(readyNumberString)) {
+      this.lockInfo[key].nowNumber += 1
+    } else {
+      this.logger.log(
+        `readyNumber incorrect in ${key} : ${readyNumberString} / ${this.lockInfo[key].nowNumber}`
+      )
+    }
   }
 
   private initLock(key: string) {

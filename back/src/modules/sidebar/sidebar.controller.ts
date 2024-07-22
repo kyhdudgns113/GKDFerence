@@ -13,6 +13,7 @@ import {SidebarService} from './sidebar.service'
 import {getJwtFromHeader} from 'src/util'
 import {gkdJwtSignOption, JwtPayload, SidebarBodyType} from 'src/common'
 import {JwtService} from '@nestjs/jwt'
+import {LockService} from '../lock/lock.service'
 
 // NOTE: JWT 검증은 controller 에서 해야한다.
 // NOTE: JWT 검증은 controller 에서 해야한다.
@@ -21,6 +22,7 @@ import {JwtService} from '@nestjs/jwt'
 export class SidebarController {
   private logger: Logger = new Logger('SidebarController')
   constructor(
+    private readonly lockService: LockService,
     private readonly sidebarService: SidebarService,
     private readonly jwtService: JwtService
   ) {}
@@ -84,8 +86,10 @@ export class SidebarController {
       }
     }
 
+    const readyLock = await this.lockService.readyLock(`chat:${cOId}`)
     const uOId = returnedJwt.uOId
     const ret = await this.sidebarService.getChatBlocks(uOId, cOId, firstIdx)
+    this.lockService.releaseLock(readyLock)
     return ret
   }
 

@@ -139,7 +139,7 @@ export class SocketGateway
 
     // NOTE: DO SOMETHING
 
-    this.lockService.releaseLock('test', readyNumber)
+    this.lockService.releaseLock(readyNumber)
   }
 
   // AREA2 : socketChatArea
@@ -228,7 +228,7 @@ export class SocketGateway
     })
 
     //  7. Lock 을 풀어준다.
-    this.lockService.releaseLock(`chat:${cOId}`, readyNumber)
+    this.lockService.releaseLock(readyNumber)
   }
 
   // AREA1 : Private function Area
