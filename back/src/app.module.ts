@@ -7,11 +7,13 @@ import {AuthModule} from './modules/auth/auth.module'
 import {SocketModule} from './modules/socket/socket.module'
 import {UseDBModule} from './modules/useDB/useDB.module'
 import {SidebarModule} from './modules/sidebar/sidebar.module'
+import {LockModule} from './modules/lock/lock.module'
 
 @Module({
   imports: [
     MongooseModule.forRoot(mongodbUrl), //
     AuthModule,
+    LockModule,
     SidebarModule,
     SocketModule,
     UseDBModule
