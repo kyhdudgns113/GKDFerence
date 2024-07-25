@@ -13,6 +13,7 @@ import {
 import * as bcrypt from 'bcrypt'
 import {UseDBService} from '../useDB/useDB.service'
 import {CreateUserDto} from '../useDB/userDB/dto'
+import {GkdJwtService} from '../gkdJwt/gkdJwt.service'
 
 /**
  * // NOTE: 여기는 예외적으로 jwtService 를 service 내에서 사용한다.
@@ -23,7 +24,7 @@ import {CreateUserDto} from '../useDB/userDB/dto'
 export class AuthService {
   constructor(
     private useDBService: UseDBService,
-    private jwtService: JwtService
+    private gkdJwtService: GkdJwtService
   ) {}
 
   async signup(authBody: AuthBodyType) {
@@ -65,14 +66,14 @@ export class AuthService {
       uOId: newUser._id.toString(),
       email: newUser.email
     }
-    const jwt = await this.jwtService.signAsync(jwtPayload, gkdJwtSignOption)
+    const jwtFromServer = await this.gkdJwtService.signAsync(jwtPayload, gkdJwtSignOption)
 
     ret.ok = true
     ret.body = {
       id: newUser.id,
       uOId: newUser._id.toString(),
       email: newUser.email,
-      jwt: jwt
+      jwt: jwtFromServer
     }
 
     return ret
@@ -100,12 +101,15 @@ export class AuthService {
         uOId: user._id.toString(),
         email: user.email
       }
-      const jwt = await this.jwtService.signAsync(jwtPayload, gkdJwtSignOption)
+      const jwtFromServer = await this.gkdJwtService.signAsync(
+        jwtPayload,
+        gkdJwtSignOption
+      )
       ret.ok = true
       ret.body.id = user.id
       ret.body.email = user.email
       ret.body.uOId = user._id.toString()
-      ret.body.jwt = jwt
+      ret.body.jwt = jwtFromServer
     } else {
       ret.errors['idOrEmail'] = "User isn't exist"
     }
@@ -123,7 +127,7 @@ export class AuthService {
       return sendObject
     }
     try {
-      this.jwtService.verify(jwt)
+      await this.gkdJwtService.verifyAsync(jwt)
       const sendObject: AuthObjectType = {
         ok: true,
         body: {jwt: jwt},
@@ -140,8 +144,8 @@ export class AuthService {
     }
   }
 
-  async refreshToken(jwt: string) {
-    if (!jwt) {
+  async refreshTokenPhase1(jwtFromClient: string) {
+    if (!jwtFromClient) {
       const sendObject: AuthObjectType = {
         ok: false,
         body: {},
@@ -150,30 +154,38 @@ export class AuthService {
       return sendObject
     }
 
-    try {
-      const isJwt = this.jwtService.verify(jwt)
-      /** For forcing type, jwtPayload should be declared as const variable */
-      const jwtPayload: JwtPayload = {
-        id: isJwt.id,
-        uOId: isJwt.uOId,
-        email: isJwt.email
-      }
-      const newJwt = this.jwtService.sign(jwtPayload)
-      const sendObject: AuthObjectType = {
-        ok: Boolean(newJwt),
-        body: {jwt: newJwt},
-        errors: newJwt ? {} : {jwt: 'jwt regenerate error'}
-      }
-      return sendObject
-    } catch (err) {
+    const encodedJwt = await this.gkdJwtService.refreshPhase1(jwtFromClient)
+    const sendObject: AuthObjectType = {
+      ok: Boolean(encodedJwt),
+      body: {
+        jwt: encodedJwt
+      },
+      errors: encodedJwt ? {} : {jwt: 'jwt regenerate error'}
+    }
+
+    return sendObject
+  }
+
+  async refreshTokenPhase2(jwtFromClient: string) {
+    if (!jwtFromClient) {
       const sendObject: AuthObjectType = {
         ok: false,
         body: {},
-        errors: {jwt: 'JWT Invalid'}
+        errors: {jwt: 'No header is sended'}
       }
       return sendObject
     }
-  }
 
-  // BLANK LINE COMMENT:
+    const encodedJwt = await this.gkdJwtService.refreshPhase2(jwtFromClient)
+    const sendObject: AuthObjectType = {
+      ok: Boolean(encodedJwt),
+      body: {
+        jwt: encodedJwt
+      },
+      errors: encodedJwt ? {} : {jwt: 'jwt regenerate2 error'}
+    }
+
+    return sendObject
+  }
+  // BLANK LINE COMMENT
 }

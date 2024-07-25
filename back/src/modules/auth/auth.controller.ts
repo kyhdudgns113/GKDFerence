@@ -45,9 +45,14 @@ export class AuthController {
     const jwt = getJwtFromHeader(headers) ?? ''
     return await this.authService.checkToken(jwt)
   }
-  @Get('/refreshToken')
-  async refreshToken(@Headers() headers) {
-    const jwt = getJwtFromHeader(headers) ?? ''
-    return await this.authService.refreshToken(jwt)
+  @Get('/refreshTokenPhase1')
+  async refreshTokenPhase1(@Headers() headers) {
+    const jwtFromClient = getJwtFromHeader(headers) ?? ''
+    return await this.authService.refreshTokenPhase1(jwtFromClient)
+  }
+  @Get('/refreshTokenPhase2')
+  async refreshTokenPhase2(@Headers() headers) {
+    const jwtFromClient = getJwtFromHeader(headers) ?? ''
+    return await this.authService.refreshTokenPhase2(jwtFromClient)
   }
 }

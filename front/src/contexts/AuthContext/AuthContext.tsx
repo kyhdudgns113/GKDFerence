@@ -92,7 +92,9 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     async (successCallBack?: Callback, failCallBack?: Callback) => {
       U.readStringP('jwt').then(jwt => {
         if (jwt) {
-          get('/auth/checkToken', jwt)
+          const {header, jwtBody} = U.decodeJwtFromServer(jwt)
+          const jwtFromClient = U.encodeJwtFromClient(header, jwtBody)
+          get('/auth/checkToken', jwtFromClient)
             .then(res => res.json())
             .then((result: AuthObjectType) => {
               const {ok} = result
@@ -114,17 +116,38 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     },
     [navigate]
   )
+
   const refreshToken = useCallback(
     async (callback?: Callback) => {
       U.readStringP('jwt').then(jwt => {
         if (jwt) {
-          get('/auth/refreshToken', jwt)
+          const {header, jwtBody} = U.decodeJwtFromServer(jwt)
+          const jwtFromClient = U.encodeJwtFromClient(header, jwtBody)
+          get('/auth/refreshTokenPhase1', jwtFromClient)
             .then(res => res.json())
             .then((result: AuthObjectType) => {
               const {ok, body, errors} = result
-              if (ok) {
-                U.writeStringP('jwt', body?.jwt ?? '')
-                callback && callback()
+              const jwtFromServer = body.jwt
+              const {header, jwtBody} = U.decodeJwtFromServer(jwtFromServer)
+              if (ok && header && jwtBody) {
+                U.writeStringP('jwt', jwtFromServer || '').then(jwtBody => {
+                  const jwtFromClient = U.encodeJwtFromClient(header, jwtBody)
+                  get('/auth/refreshTokenPhase2', jwtFromClient)
+                    .then(res => res.json())
+                    .then(res => {
+                      const {ok, body, errors} = result
+                      if (ok) {
+                        const jwtFromServer = body.jwt
+                        U.writeStringP('jwt', jwtFromServer || '') //
+                          .then(res => {
+                            callback && callback()
+                          })
+                      } else {
+                        const errKey = Object.keys(errors)[0]
+                        setAlertMsg(errors[errKey])
+                      }
+                    })
+                })
               } else {
                 const keys = Object.keys(errors)
                 setAlertMsg(errors[keys[0]])
