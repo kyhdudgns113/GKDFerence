@@ -2,21 +2,12 @@ import {Module} from '@nestjs/common'
 import {SidebarController} from './sidebar.controller'
 import {SidebarService} from './sidebar.service'
 import {UseDBModule} from '../useDB/useDB.module'
-import {JwtModule} from '@nestjs/jwt'
-import {gkdJwtSecret, gkdJwtSignOption} from 'src/common'
 import {ChatRoomsModule} from './chatRooms/chatRooms.module'
 import {LockModule} from '../lock/lock.module'
+import {GkdJwtModule} from '../gkdJwt/gkdJwt.module'
 
 @Module({
-  imports: [
-    ChatRoomsModule,
-    LockModule,
-    UseDBModule,
-    JwtModule.register({
-      secret: gkdJwtSecret,
-      signOptions: gkdJwtSignOption
-    })
-  ],
+  imports: [ChatRoomsModule, GkdJwtModule, LockModule, UseDBModule],
   controllers: [SidebarController],
   providers: [SidebarService]
 })

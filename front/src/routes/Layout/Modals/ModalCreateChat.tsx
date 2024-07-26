@@ -9,11 +9,11 @@ import * as T from '../../../components/Base/Texts'
 import {get, post} from '../../../server'
 import {SidebarBodyType} from '../../../common'
 
-export default function ModalTest() {
+export default function ModalCreateChat() {
   const [idOrEmail, setIdOrMail] = useState<string>('')
   const [errMsg, setErrMsg] = useState<string>('')
 
-  const {isTestOpen, onTestClose} = useLayoutModalContext()
+  const {isCreateChatOpen, onCreateChatClose} = useLayoutModalContext()
   const {id, uOId, email, checkToken, getJwt} = useAuth()
 
   const onChangeIdAndErrMsg = useCallback(
@@ -26,11 +26,11 @@ export default function ModalTest() {
 
   const onClickClose = useCallback(
     (e: MouseEvent) => {
-      onTestClose()
+      onCreateChatClose()
       setIdOrMail('')
       setErrMsg('')
     },
-    [onTestClose, setErrMsg, setIdOrMail]
+    [onCreateChatClose, setErrMsg, setIdOrMail]
   )
 
   const onClickTest = useCallback(
@@ -92,7 +92,7 @@ export default function ModalTest() {
 
   // BLANK LINE COMMENT
   return (
-    <Modal className="flex-col" isOpen={isTestOpen}>
+    <Modal className="flex-col" isOpen={isCreateChatOpen}>
       <div className="flex justify-center">
         <T.Title className="font-bold">New Chat</T.Title>
       </div>

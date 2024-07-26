@@ -14,10 +14,10 @@ export class GkdJwtService {
     return header + jwt
   }
 
-  async verifyAsync(jwtFromServer: string) {
+  async verifyAsync(jwtFromClient: string) {
     try {
-      const {jwt} = this.decodeJwtFromClient(jwtFromServer)
-      await this.jwtService.verifyAsync(jwt)
+      const {jwt} = this.decodeJwtFromClient(jwtFromClient)
+      return (await this.jwtService.verifyAsync(jwt)) as JwtPayload
     } catch (error) {
       throw ''
     }
@@ -29,21 +29,24 @@ export class GkdJwtService {
    */
   async refreshPhase1(jwtFromClient: string) {
     const {header, jwt, footer} = this.decodeJwtFromClient(jwtFromClient)
-
     if (!this.validateHeaderFooter(header, footer)) {
       return ''
     }
-
     try {
       const payload = (await this.jwtService.verifyAsync(jwt)) as JwtPayload
-      const newJwt = await this.jwtService.signAsync(payload, gkdJwtSignOption)
-      const uOId = payload.uOId
+      const newPayload: JwtPayload = {
+        id: payload.id,
+        uOId: payload.uOId,
+        email: payload.email
+      }
+
+      const newJwt = await this.jwtService.signAsync(newPayload, gkdJwtSignOption)
+      const uOId = newPayload.uOId
 
       const newHeader = this.generateRandomString()
       const encodedJwt = this.encodeJwtFromServer(newJwt, newHeader)
 
       this.uOIdToHeader[uOId] = newHeader
-
       return encodedJwt
     } catch (err) {
       return ''
@@ -74,7 +77,7 @@ export class GkdJwtService {
   }
 
   // AREA1 : Private function Area
-  generateRandomString() {
+  private generateRandomString() {
     const chrs: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     let res: string = ''
 
@@ -85,11 +88,11 @@ export class GkdJwtService {
     return res
   }
 
-  encodeJwtFromServer(jwt: string, secret: string) {
+  private encodeJwtFromServer(jwt: string, secret: string) {
     return secret + jwt
   }
 
-  decodeJwtFromClient(jwtFromClient: string) {
+  private decodeJwtFromClient(jwtFromClient: string) {
     if (jwtFromClient.length < 2 * this.secretLength) {
       return {
         header: '',
@@ -107,11 +110,11 @@ export class GkdJwtService {
     return {header, jwt, footer}
   }
 
-  validateHeaderFooter(header: string, footer: string) {
+  private validateHeaderFooter(header: string, footer: string) {
     return header === footer
   }
 
-  validateHeaderFooter2(header: string, footer: string, uOId: string) {
+  private validateHeaderFooter2(header: string, footer: string, uOId: string) {
     return header === footer && this.uOIdToHeader[uOId] === header
   }
 }

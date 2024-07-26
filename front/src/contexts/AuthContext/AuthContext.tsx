@@ -42,7 +42,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
   const getJwt = useCallback(async () => {
     return await U.readStringP('jwt')
       .then(ret => {
-        return ret || ''
+        const {header, jwtBody} = U.decodeJwtFromServer(ret || '')
+        return U.encodeJwtFromClient(header, jwtBody)
       })
       .catch(() => {
         return ''
@@ -116,7 +117,6 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
     },
     [navigate]
   )
-
   const refreshToken = useCallback(
     async (callback?: Callback) => {
       U.readStringP('jwt').then(jwt => {

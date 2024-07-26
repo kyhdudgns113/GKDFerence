@@ -160,7 +160,7 @@ export class AuthService {
       body: {
         jwt: encodedJwt
       },
-      errors: encodedJwt ? {} : {jwt: 'jwt regenerate error'}
+      errors: encodedJwt ? {} : {jwt: 'jwt regenerate error in phase 1'}
     }
 
     return sendObject
@@ -182,7 +182,7 @@ export class AuthService {
       body: {
         jwt: encodedJwt
       },
-      errors: encodedJwt ? {} : {jwt: 'jwt regenerate2 error'}
+      errors: encodedJwt ? {} : {jwt: 'jwt regenerate2 error in phase 2'}
     }
 
     return sendObject

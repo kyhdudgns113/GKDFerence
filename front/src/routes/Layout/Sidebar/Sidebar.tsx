@@ -5,16 +5,15 @@ import {SocketTestCountType} from '../../../common'
 
 import * as CT from '../../../contexts'
 import * as C from './components'
-import * as U from '../../../utils'
 import {get} from '../../../server'
 
 export default function Sidebar() {
   const {testCnt, setTestCnt, setChatRooms} = CT.useLayoutContext()
   const {socketP, socketEmit} = CT.useSocketContext()
 
-  const {id, uOId, checkToken, refreshToken} = CT.useAuth()
+  const {id, uOId, getJwt, refreshToken} = CT.useAuth()
 
-  const {onTestOpen} = CT.useLayoutModalContext()
+  const {onCreateChatOpen} = CT.useLayoutModalContext()
 
   const onClickSockInc = useCallback(
     (testCnt: number | undefined) => {
@@ -34,9 +33,9 @@ export default function Sidebar() {
    */
   useEffect(() => {
     if (id && uOId) {
-      U.readStringP('jwt').then(jwt => {
-        if (jwt) {
-          get(`/sidebar/getChatRooms/${uOId}`, jwt)
+      getJwt().then(jwtFromClient => {
+        if (jwtFromClient) {
+          get(`/sidebar/getChatRooms/${uOId}`, jwtFromClient)
             .then(res => res.json())
             .then(res => {
               const {ok, body} = res
@@ -46,10 +45,11 @@ export default function Sidebar() {
               }
             })
         } else {
+          //
         }
       })
     }
-  }, [id, uOId, setChatRooms])
+  }, [id, uOId, getJwt, setChatRooms])
 
   return (
     <div className={C.classNameEntireSidebar} style={{minWidth: '250px'}}>
@@ -61,9 +61,9 @@ export default function Sidebar() {
       <div className="GKD_TestBtn_Area flex flex-col items-center justify-center mt-2">
         <TestButton onClick={e => setTestCnt(prev => prev + 1)}>Inc</TestButton>
         <TestButton onClick={e => onClickSockInc(testCnt)}>Sock Inc</TestButton>
-        <TestButton onClick={e => checkToken()}>Token C</TestButton>
+        {/* <TestButton onClick={e => checkToken()}>Token C</TestButton> */}
         <TestButton onClick={e => refreshToken()}>Token R</TestButton>
-        <TestButton onClick={e => onTestOpen()}>Test Modal</TestButton>
+        <TestButton onClick={e => onCreateChatOpen()}>Create Chat</TestButton>
         <TestButton
           onClick={e => {
             socketEmit(socketP, 'test lock', 'yes')

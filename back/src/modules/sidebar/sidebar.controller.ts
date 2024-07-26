@@ -14,6 +14,7 @@ import {getJwtFromHeader} from 'src/util'
 import {gkdJwtSignOption, JwtPayload, SidebarBodyType} from 'src/common'
 import {JwtService} from '@nestjs/jwt'
 import {LockService} from '../lock/lock.service'
+import {GkdJwtService} from '../gkdJwt/gkdJwt.service'
 
 // NOTE: JWT 검증은 controller 에서 해야한다.
 // NOTE: JWT 검증은 controller 에서 해야한다.
@@ -22,9 +23,9 @@ import {LockService} from '../lock/lock.service'
 export class SidebarController {
   private logger: Logger = new Logger('SidebarController')
   constructor(
+    private readonly gkdJwtService: GkdJwtService,
     private readonly lockService: LockService,
-    private readonly sidebarService: SidebarService,
-    private readonly jwtService: JwtService
+    private readonly sidebarService: SidebarService
   ) {}
 
   // AREA2 : Post
@@ -35,7 +36,7 @@ export class SidebarController {
   ) {
     const jwt = body.jwt || ''
     try {
-      await this.jwtService.verifyAsync(jwt)
+      await this.gkdJwtService.verifyAsync(jwt)
     } catch (error) {
       return {
         ok: false,
@@ -55,7 +56,7 @@ export class SidebarController {
   async findUser(@Headers() headers: any, @Param('idOrEmail') idOrEmail: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
     try {
-      await this.jwtService.verifyAsync(jwt)
+      await this.gkdJwtService.verifyAsync(jwt)
     } catch (error) {
       return {
         ok: false,
@@ -77,12 +78,12 @@ export class SidebarController {
     const jwt = getJwtFromHeader(headers) ?? ''
     let returnedJwt: JwtPayload
     try {
-      returnedJwt = await this.jwtService.verifyAsync(jwt, gkdJwtSignOption)
+      returnedJwt = await this.gkdJwtService.verifyAsync(jwt)
     } catch (error) {
       return {
         ok: false,
         body: {},
-        errors: {jwt: 'Jwt invalid'}
+        errors: {jwt: 'Jwt invalid in getChatBlock'}
       }
     }
 
@@ -97,12 +98,12 @@ export class SidebarController {
   async getChatRooms(@Headers() headers: any, @Param('uOId') uOId: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
     try {
-      await this.jwtService.verifyAsync(jwt)
+      await this.gkdJwtService.verifyAsync(jwt)
     } catch (error) {
       return {
         ok: false,
         body: {},
-        errors: {jwt: 'Jwt invalid'}
+        errors: {jwt: 'Jwt invalid in getChatRooms'}
       }
     }
 

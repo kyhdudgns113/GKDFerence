@@ -1,8 +1,7 @@
 import {useEffect} from 'react'
 import {ChatBlocksType, Setter} from '../../../common'
 import {get} from '../../../server'
-
-import * as U from '../../../utils'
+import {useAuth} from '../../AuthContext/AuthContext'
 
 export const useGetChatBlocksFromDB = (
   cOId: string,
@@ -10,10 +9,11 @@ export const useGetChatBlocksFromDB = (
   setChatBlocks: Setter<ChatBlocksType>,
   setIsDBLoad: Setter<boolean>
 ) => {
+  const {getJwt} = useAuth()
   useEffect(() => {
-    U.readStringP('jwt').then(jwt => {
-      if (jwt && cOId && !isDBLoad) {
-        get(`/sidebar/chatRoom/getChatBlocks/${cOId}/0`, jwt)
+    getJwt().then(jwtFromClient => {
+      if (jwtFromClient && cOId && !isDBLoad) {
+        get(`/sidebar/chatRoom/getChatBlocks/${cOId}/0`, jwtFromClient)
           .then(res => res.json())
           .then(res => {
             const {ok, body, errors} = res
@@ -28,5 +28,5 @@ export const useGetChatBlocksFromDB = (
           })
       }
     })
-  }, [isDBLoad, cOId, setChatBlocks, setIsDBLoad])
+  }, [isDBLoad, cOId, getJwt, setChatBlocks, setIsDBLoad])
 }

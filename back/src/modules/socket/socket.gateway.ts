@@ -20,6 +20,7 @@ import {
 import {JwtService} from '@nestjs/jwt'
 import {UseDBService} from '../useDB/useDB.service'
 import {LockService} from '../lock/lock.service'
+import {GkdJwtService} from '../gkdJwt/gkdJwt.service'
 
 /**
  * // NOTE: 클라이언트가 소켓을 전송하기 전에 refreshToken 을 호출한다.
@@ -40,28 +41,28 @@ export class SocketGateway
     }
   } = {}
   private uOidInfo: {
-    [uOid: string]: {
+    [uOId: string]: {
       numConnectedP: number
       connectedP: {[sockPid: string]: boolean}
     }
   } = {}
   private sockPidInfo: {
     [sockPid: string]: {
-      uOid: string
+      uOId: string
       sockChatId: string
       cOId: string
     } | null
   } = {}
   private sockCidInfo: {
     [sockCid: string]: {
-      uOid: string
+      uOId: string
       sockPid: string
       cOId: string
     }
   } = {}
 
   constructor(
-    private jwtService: JwtService,
+    private gkdJwtService: GkdJwtService,
     private lockService: LockService,
     private useDBService: UseDBService
   ) {}
@@ -159,6 +160,7 @@ export class SocketGateway
   }
   @SubscribeMessage('chat')
   async chat(client: Socket, payload: SocketChatContentType) {
+    let debugNumber = 0
     if (
       !payload.jwt ||
       !payload.cOId ||
@@ -170,7 +172,7 @@ export class SocketGateway
       return
     }
 
-    const isJwt = await this.jwtService.verifyAsync(payload.jwt, gkdJwtSignOption)
+    const isJwt = await this.gkdJwtService.verifyAsync(payload.jwt)
     if (!isJwt) {
       return
     }
@@ -193,7 +195,6 @@ export class SocketGateway
       this.lockService.releaseLock(readyNumber)
       return
     }
-
     //  2. 연결된 client 확인하는곳
     const connectedClientIds = Array.from(this.server.sockets.adapter.rooms.get(cOId))
 
@@ -219,7 +220,7 @@ export class SocketGateway
   ) {
     const result = {...usersObject}
     connectedClientIds.forEach(clientId => {
-      const uOId = this.sockCidInfo[clientId].uOid
+      const uOId = this.sockCidInfo[clientId].uOId
       delete result[uOId]
     })
     return result
@@ -244,7 +245,7 @@ export class SocketGateway
     this.uOidInfo[uOid].connectedP[sid] = true
 
     this.sockPidInfo[sid] = {
-      uOid: uOid,
+      uOId: uOid,
       cOId: '',
       sockChatId: ''
     }
@@ -258,22 +259,29 @@ export class SocketGateway
 
     // JWT 인증
     const jwt = payload.jwt
-    const isJwt = (await this.jwtService.verifyAsync(jwt)) as JwtPayload
+    const isJwt = await this.gkdJwtService.verifyAsync(jwt)
     if (!isJwt || isJwt.uOId !== payload.uOId) {
       // this.logger.log('JWT Veryfing error')
       return false
     }
+
     // 채팅방 OId 에 따른 room 구현
     // this.logger.log(`${client.id} join to ${payload.cOId}`)
     client.join(payload.cOId)
 
     // 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
     this.sockCidInfo[client.id] = {
-      uOid: payload.uOId,
+      uOId: payload.uOId,
       sockPid: client.id,
       cOId: payload.cOId
     }
-
+    if (!this.sockPidInfo[payload.socketPId]) {
+      this.sockPidInfo[payload.socketPId] = {
+        uOId: payload.uOId,
+        sockChatId: client.id,
+        cOId: payload.cOId
+      }
+    }
     this.sockPidInfo[payload.socketPId].sockChatId = client.id
     this.sockPidInfo[payload.socketPId].cOId = payload.cOId
     return true

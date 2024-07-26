@@ -3,15 +3,15 @@ import {createContext, useCallback, useContext, useState} from 'react'
 import Layout from '../../routes/Layout'
 
 type ContextType = {
-  isTestOpen: boolean
-  onTestOpen: () => void
-  onTestClose: () => void
+  isCreateChatOpen: boolean
+  onCreateChatOpen: () => void
+  onCreateChatClose: () => void
 }
 
 export const LayoutModalContext = createContext<ContextType>({
-  isTestOpen: false,
-  onTestOpen: () => {},
-  onTestClose: () => {}
+  isCreateChatOpen: false,
+  onCreateChatOpen: () => {},
+  onCreateChatClose: () => {}
 })
 
 type LayoutModalProviderProps = {}
@@ -19,20 +19,20 @@ type LayoutModalProviderProps = {}
 export const LayoutModalProvider: FC<PropsWithChildren<LayoutModalProviderProps>> = ({
   children
 }) => {
-  const [isTestOpen, setIsTestOpen] = useState<boolean>(false)
+  const [isCreateChatOpen, setCreateChatOpen] = useState<boolean>(false)
 
-  const onTestOpen = useCallback(() => {
-    setIsTestOpen(true)
-  }, [setIsTestOpen])
+  const onCreateChatOpen = useCallback(() => {
+    setCreateChatOpen(true)
+  }, [setCreateChatOpen])
 
-  const onTestClose = useCallback(() => {
-    setIsTestOpen(false)
-  }, [setIsTestOpen])
+  const onCreateChatClose = useCallback(() => {
+    setCreateChatOpen(false)
+  }, [setCreateChatOpen])
 
   const value = {
-    isTestOpen,
-    onTestOpen,
-    onTestClose
+    isCreateChatOpen,
+    onCreateChatOpen,
+    onCreateChatClose
   }
   return <LayoutModalContext.Provider value={value} children={<Layout />} />
 }
