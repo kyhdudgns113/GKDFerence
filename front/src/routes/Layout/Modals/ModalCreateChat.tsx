@@ -66,15 +66,15 @@ export default function ModalCreateChat() {
     async (e: MouseEvent) => {
       checkToken()
 
-      const jwt = await getJwt()
+      const jwtFromClient = await getJwt()
 
-      const sidebarBody: SidebarBodyType = {
-        jwt: jwt,
+      const payload: SidebarBodyType = {
+        jwt: jwtFromClient,
         id: id,
         uOId: uOId,
         email: email
       }
-      post(`/sidebar/createSingleChatRoom/${idOrEmail}`, sidebarBody)
+      post(`/sidebar/createSingleChatRoom/${idOrEmail}`, payload)
         .then(res => res.json())
         .then(res => {
           const {ok, errors} = res

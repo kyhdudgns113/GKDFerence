@@ -36,6 +36,10 @@ export interface JwtPayload {
   uOId: string
   email: string
 }
+export type RowDocumentGType = {
+  dOId: string
+  title: string
+}
 export type RowSingleChatRoomType = {
   cOId: string
   tUOId: string

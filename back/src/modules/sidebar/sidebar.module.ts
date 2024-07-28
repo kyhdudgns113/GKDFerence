@@ -5,9 +5,10 @@ import {UseDBModule} from '../useDB/useDB.module'
 import {ChatRoomsModule} from './chatRooms/chatRooms.module'
 import {LockModule} from '../lock/lock.module'
 import {GkdJwtModule} from '../gkdJwt/gkdJwt.module'
+import {DocumentGsModule} from './documentGs/documentGs.module'
 
 @Module({
-  imports: [ChatRoomsModule, GkdJwtModule, LockModule, UseDBModule],
+  imports: [ChatRoomsModule, DocumentGsModule, GkdJwtModule, LockModule, UseDBModule],
   controllers: [SidebarController],
   providers: [SidebarService]
 })

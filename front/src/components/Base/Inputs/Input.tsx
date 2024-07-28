@@ -18,12 +18,12 @@ export const Input: FC<PropsWithChildren<InputProps>> = ({
   ...props
 }) => {
   const className = [
-    'w-full',
     'ml-2 p-2',
     'text-gkd-sakura-text',
     'placeholder-gkd-sakura-placeholder',
     'focus:outline-gkd-sakura-border',
-    'border-gkd-sakura-border/50 border-2 rounded-lg'
+    'border-gkd-sakura-border/50 border-2 rounded-lg',
+    _className
   ].join(' ')
 
   return (

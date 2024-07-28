@@ -18,6 +18,7 @@ export default function RoutesSetup() {
         }>
         <Route index element={<MainPage />} />
         <Route path="/main/sc/:cOId" element={<CT.SingleChatProvider />} />
+        <Route path="/main/dc/:dOId" element={<CT.DocumentGProvider />} />
         <Route path="/main/*" element={<NullPage />} />
       </Route>
       <Route path="/signup" element={<CT.SignUpProvider />} />

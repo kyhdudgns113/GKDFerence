@@ -1,10 +1,10 @@
 import {Module} from '@nestjs/common'
 import {UseDBModule} from 'src/modules/useDB/useDB.module'
-import {ChatRoomService} from './chatRoom.service'
+import {DocumentGService} from './documentG.service'
 
 @Module({
   imports: [UseDBModule],
-  providers: [ChatRoomService],
-  exports: [ChatRoomService]
+  providers: [DocumentGService],
+  exports: [DocumentGService]
 })
 export class ChatRoomModule {}

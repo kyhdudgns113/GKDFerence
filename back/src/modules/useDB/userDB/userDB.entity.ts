@@ -25,6 +25,12 @@ export class User extends Document {
   @Prop({type: Object, default: {}})
   unReadChats: {[cOId: string]: number}
 
+  /**
+   * documentGs[dOId] = true
+   */
+  @Prop({type: Object, default: {}})
+  documentGs: {[dOId: string]: boolean}
+
   @Prop({type: Date, default: Date.now})
   createdDt: Date
 }

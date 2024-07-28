@@ -48,6 +48,30 @@ export class SidebarController {
     return ret
   }
 
+  @Post('/createDocument')
+  async createDocument(@Body() body: SidebarBodyType) {
+    const jwtFromClient = body.jwt || ''
+    try {
+      const jwtPayload = await this.gkdJwtService.verifyAsync(jwtFromClient)
+      if (jwtPayload.uOId !== body.uOId) {
+        return {
+          ok: false,
+          body: {},
+          errors: {jwt: 'jwt username invalid in createDocument'}
+        }
+      }
+    } catch (err) {
+      return {
+        ok: false,
+        body: {},
+        errors: {jwt: 'jwt invalid in createDocument'}
+      }
+    }
+
+    const ret = await this.sidebarService.createDocument(body)
+    return ret
+  }
+
   // AREA2 : Get
   /**
    * It is used in create chatroom modal
@@ -107,8 +131,25 @@ export class SidebarController {
       }
     }
 
-    const ret = await this.sidebarService.getUserChatRooms(uOId)
+    const ret = await this.sidebarService.getChatRooms(uOId)
     return ret
   }
-  // BLANK LINE COMMENT:
+
+  @Get('/getSidebars/:uOId')
+  async getSidebars(@Headers() headers: any, @Param('uOId') uOId: string) {
+    const jwt = getJwtFromHeader(headers) ?? ''
+    try {
+      await this.gkdJwtService.verifyAsync(jwt)
+    } catch (error) {
+      return {
+        ok: false,
+        body: {},
+        errors: {jwt: 'Jwt invalid in getSidebars'}
+      }
+    }
+
+    const ret = await this.sidebarService.getSidebars(uOId)
+    return ret
+  }
+  // BLANK LINE COMMENT
 }

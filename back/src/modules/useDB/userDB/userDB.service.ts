@@ -8,6 +8,16 @@ import {User} from './userDB.entity'
 export class UserDBService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+  async addDocumentG(uOId: string, dOId: string) {
+    const _id = new Types.ObjectId(uOId)
+    const ret = this.userModel.updateOne(
+      {_id: _id},
+      {$set: {[`documentGs.${dOId}`]: true}}
+    )
+
+    return ret
+  }
+
   create(createUserDto: CreateUserDto) {
     const createdUser = new this.userModel(createUserDto)
     createdUser.createdDt = new Date()

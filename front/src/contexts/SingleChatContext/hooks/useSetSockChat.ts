@@ -17,7 +17,7 @@ export const useSetSockChat = (
   const {pageOId, setChatRooms} = useLayoutContext()
 
   useEffect(() => {
-    if (!sockChat && socketPId && pageOId && socketPId) {
+    if (!sockChat && socketPId && pageOId) {
       const newSocket = io(serverUrl)
       setSockChat(newSocket)
 

@@ -1,5 +1,6 @@
 export const classNameRowTitle = [
   'flex flex-row',
+  'select-none',
   'items-center justify-between',
   'cursor-pointer'
 ].join(' ')

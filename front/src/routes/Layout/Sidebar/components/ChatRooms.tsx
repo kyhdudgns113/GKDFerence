@@ -1,11 +1,12 @@
 import {FC, MouseEvent, useCallback} from 'react'
+import {useNavigate} from 'react-router-dom'
+
 import {DivCommonProps, Icon} from '../../../../components/Base'
 import {useLayoutContext} from '../../../../contexts'
 import {Text} from '../../Header/components'
 import {classNameRowTitle} from './className'
 
 import * as T from '../../../../components/Base/Texts'
-import {useNavigate} from 'react-router-dom'
 import {RowSingleChatRoomType} from '../../../../common'
 
 export type ChatRoomsProps = DivCommonProps & {
@@ -28,12 +29,7 @@ export const ChatRooms: FC<ChatRoomsProps> = () => {
 
   return (
     <div className="flex flex-col">
-      <div
-        className={classNameRowTitle}
-        onClick={e => {
-          setShowChatRooms(prev => !prev)
-        }}
-        style={{userSelect: 'none'}}>
+      <div className={classNameRowTitle} onClick={e => setShowChatRooms(prev => !prev)}>
         <Text>&nbsp;&nbsp;Chats</Text>
         <Icon className="text-3xl" name={showChatRooms ? 'arrow_drop_down' : 'arrow_right'}></Icon>
       </div>
@@ -42,7 +38,7 @@ export const ChatRooms: FC<ChatRoomsProps> = () => {
           {chatRooms?.map(row => {
             return (
               <div
-                className="pl-8 pt-1 pb-1 flex flex-row cursor-pointer hover:bg-gkd-sakura-bg-70 items-center"
+                className="pl-8 pt-1 pb-1 select-none flex flex-row cursor-pointer hover:bg-gkd-sakura-bg-70 items-center"
                 key={`chatRow:${row.cOId}`}
                 onClick={onClickChatRoom(row)}>
                 <Icon name="chat" className="flex items-center text-xl" />

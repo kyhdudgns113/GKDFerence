@@ -1,30 +1,43 @@
 import {useCallback, useEffect} from 'react'
 
 import {TestButton} from '../../../components'
-import {SocketTestCountType} from '../../../common'
+import {get, post} from '../../../server'
 
 import * as CT from '../../../contexts'
 import * as C from './components'
-import {get} from '../../../server'
+import {SidebarBodyType} from '../../../common'
+import {useNavigate} from 'react-router-dom'
 
 export default function Sidebar() {
-  const {testCnt, setTestCnt, setChatRooms} = CT.useLayoutContext()
-  const {socketP, socketEmit} = CT.useSocketContext()
-
-  const {id, uOId, getJwt, refreshToken} = CT.useAuth()
-
+  const {setChatRooms, setDocumentGs} = CT.useLayoutContext()
+  const {id, uOId, email, getJwt, refreshToken} = CT.useAuth()
   const {onCreateChatOpen} = CT.useLayoutModalContext()
 
-  const onClickSockInc = useCallback(
-    (testCnt: number | undefined) => {
-      const sendObj: SocketTestCountType = {
-        id: id || '',
-        cnt: testCnt || 0
+  const navigate = useNavigate()
+
+  // FUTURE: 생성하겠냐고 물어본 뒤에 만들어야 한다.
+  // FUTURE: 광클 방지기능 넣어야 한다는 의미.
+  const onClickCreateDocument = useCallback(async () => {
+    if (uOId) {
+      const jwtFromClient = await getJwt()
+      const payload: SidebarBodyType = {
+        jwt: jwtFromClient,
+        id: id,
+        uOId: uOId,
+        email: email
       }
-      socketEmit(socketP, 'test count', sendObj)
-    },
-    [id, socketP, socketEmit]
-  )
+      post(`/sidebar/createDocument`, payload)
+        .then(res => res.json())
+        .then(res => {
+          const {ok} = res // eslint-disable-line
+          if (ok) {
+            navigate('/')
+          } else {
+            //
+          }
+        })
+    }
+  }, [email, id, uOId, getJwt, navigate])
 
   /**
    * 채팅방 리스트 가져오기
@@ -35,21 +48,42 @@ export default function Sidebar() {
     if (id && uOId) {
       getJwt().then(jwtFromClient => {
         if (jwtFromClient) {
-          get(`/sidebar/getChatRooms/${uOId}`, jwtFromClient)
+          get(`/sidebar/getSidebars/${uOId}`, jwtFromClient)
             .then(res => res.json())
             .then(res => {
               const {ok, body} = res
               if (ok) {
                 setChatRooms(body.chatRooms)
+                setDocumentGs(body.documentGs)
               } else {
+                //
               }
             })
+          // get(`/sidebar/getChatRooms/${uOId}`, jwtFromClient)
+          //   .then(res => res.json())
+          //   .then(res => {
+          //     const {ok, body} = res
+          //     if (ok) {
+          //       setChatRooms(body.chatRooms)
+          //     } else {
+          //     }
+          //   })
+          // get(`/sidebar/getDocumentGs/${uOId}`, jwtFromClient)
+          //   .then(res => res.json())
+          //   .then(res => {
+          //     const {ok, body} = res
+          //     if (ok) {
+          //       //
+          //     } else {
+          //       //
+          //     }
+          //   })
         } else {
           //
         }
       })
     }
-  }, [id, uOId, getJwt, setChatRooms])
+  }, [id, uOId, getJwt, setChatRooms, setDocumentGs])
 
   return (
     <div className={C.classNameEntireSidebar} style={{minWidth: '250px'}}>
@@ -59,17 +93,13 @@ export default function Sidebar() {
         <C.Documents />
       </div>
       <div className="GKD_TestBtn_Area flex flex-col items-center justify-center mt-2">
-        <TestButton onClick={e => setTestCnt(prev => prev + 1)}>Inc</TestButton>
-        <TestButton onClick={e => onClickSockInc(testCnt)}>Sock Inc</TestButton>
+        {/* <TestButton onClick={e => setTestCnt(prev => prev + 1)}>Inc</TestButton> */}
+        {/* <TestButton onClick={e => onClickSockInc(testCnt)}>Sock Inc</TestButton> */}
         {/* <TestButton onClick={e => checkToken()}>Token C</TestButton> */}
         <TestButton onClick={e => refreshToken()}>Token R</TestButton>
-        <TestButton onClick={e => onCreateChatOpen()}>Create Chat</TestButton>
-        <TestButton
-          onClick={e => {
-            socketEmit(socketP, 'test lock', 'yes')
-          }}>
-          Test Modal
-        </TestButton>
+        <TestButton onClick={e => onCreateChatOpen()}>New Chat</TestButton>
+        <TestButton onClick={e => onClickCreateDocument()}>New Document</TestButton>
+        {/* <TestButton onClick={e => socketEmit(socketP, 'test lock', 'yes')}>Test Lock</TestButton> */}
       </div>
     </div>
   )

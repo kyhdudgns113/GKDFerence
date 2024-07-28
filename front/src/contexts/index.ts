@@ -1,4 +1,5 @@
 export * from './AuthContext/AuthContext'
+export * from './DocumentGContext/DocumentGContext'
 export * from './LayoutContext/LayoutContext'
 export * from './LayoutModalContext/LayoutModalContext'
 export * from './RootPageContext/RootPageContext'

@@ -24,7 +24,6 @@ export const LayoutModalProvider: FC<PropsWithChildren<LayoutModalProviderProps>
   const onCreateChatOpen = useCallback(() => {
     setCreateChatOpen(true)
   }, [setCreateChatOpen])
-
   const onCreateChatClose = useCallback(() => {
     setCreateChatOpen(false)
   }, [setCreateChatOpen])

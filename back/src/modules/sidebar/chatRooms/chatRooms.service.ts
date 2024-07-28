@@ -69,21 +69,9 @@ export class ChatRoomsService {
     }
   }
 
-  async getUserChatRooms(uOId: string) {
+  async getChatRooms(uOId: string) {
     const chatRooms = await this.useDBService.findChatRooms(uOId)
-    if (chatRooms === null) {
-      return {
-        ok: false,
-        body: {},
-        errors: {uOId: "User isn't exist"}
-      }
-    } else {
-      return {
-        ok: true,
-        body: {chatRooms: chatRooms},
-        errors: {}
-      }
-    }
+    return chatRooms
   }
 
   // BLANK LINE COMMENT

@@ -2,8 +2,9 @@ import {Injectable} from '@nestjs/common'
 
 import {CreateUserDto} from 'src/modules/useDB/userDB/dto'
 import {ChatRoomDBService} from './chatRoomDB/chatRoomDB.service'
-import {ChatBlockType, RowSingleChatRoomType} from 'src/common'
+import {ChatBlockType, RowDocumentGType, RowSingleChatRoomType} from 'src/common'
 import {UserDBService} from './userDB/userDB.service'
+import {DocumentGDBService} from './documentGDB/documentGDB.service'
 
 /**
  * // NOTE: DON'T RETURN {ok, body, errors} type
@@ -11,9 +12,14 @@ import {UserDBService} from './userDB/userDB.service'
 @Injectable()
 export class UseDBService {
   constructor(
-    private userDBService: UserDBService,
-    private chatRoomDBService: ChatRoomDBService
+    private chatRoomDBService: ChatRoomDBService,
+    private documentGDBService: DocumentGDBService,
+    private userDBService: UserDBService
   ) {}
+
+  async addDocumentG(uOId: string, dOId: string) {
+    return await this.userDBService.addDocumentG(uOId, dOId)
+  }
 
   async ChatRoomHasUser(cOId: string, uOId: string) {
     return await this.chatRoomDBService.chatRoomHasUser(cOId, uOId)
@@ -35,6 +41,21 @@ export class UseDBService {
     return chatRoom
   }
 
+  async createDocumentG(uOId: string) {
+    const documentG = await this.documentGDBService.createDocumentG([uOId])
+    if (documentG) {
+      const dOId = documentG._id.toString()
+      const ret = await this.userDBService.addDocumentG(uOId, dOId)
+      if (ret) {
+        return dOId
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
+  }
+
   async findChatRooms(uOId: string) {
     const user = await this.userDBService.findOneByObjectId(uOId)
     if (!user) {
@@ -53,6 +74,26 @@ export class UseDBService {
         tUOId: tUOId,
         tUId: tUser.id,
         unreadChat: user.unReadChats[cOId]
+      })
+    }
+
+    return ret
+  }
+
+  async findDocumentGs(uOId: string) {
+    const user = await this.userDBService.findOneByObjectId(uOId)
+    if (!user) {
+      return null
+    }
+
+    const dOIds = Object.keys(user.documentGs)
+    const ret: RowDocumentGType[] = []
+
+    for (let dOId of dOIds) {
+      const documentG = await this.documentGDBService.findOneByObjectId(dOId)
+      ret.push({
+        dOId: dOId,
+        title: documentG.title
       })
     }
 

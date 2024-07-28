@@ -11,16 +11,13 @@ import {useToggle} from '../../hooks'
 import {useSocketContext} from '../SocketContext/SocketContext'
 import {LayoutModalProvider} from '../LayoutModalContext/LayoutModalContext'
 import {
+  RowDocumentGType,
   RowSingleChatRoomType,
   Setter,
-  SocketSetUnreadChatType,
-  SocketTestCountType
+  SocketSetUnreadChatType
 } from '../../common'
 
 type ContextType = {
-  testCnt?: number
-  setTestCnt: Setter<number>
-
   showConf?: boolean
   setShowConf: Setter<boolean>
   showChatRooms?: boolean
@@ -30,17 +27,21 @@ type ContextType = {
 
   chatRooms?: RowSingleChatRoomType[]
   setChatRooms: Setter<RowSingleChatRoomType[]>
+  documentGs?: RowDocumentGType[]
+  setDocumentGs: Setter<RowDocumentGType[]>
 
   pageOId?: string
   setPageOId: Setter<string>
 }
 
 export const LayoutContext = createContext<ContextType>({
-  setTestCnt: () => {},
   setShowConf: () => {},
   setShowChatRooms: () => {},
   setShowDoc: () => {},
+
   setChatRooms: () => {},
+  setDocumentGs: () => {},
+
   setPageOId: () => {}
 })
 
@@ -51,20 +52,16 @@ type LayoutProviderProps = {}
  * @returns Provider with "Layout" elements
  */
 export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({children}) => {
-  const [testCnt, setTestCnt] = useState<number>(0)
   const [showConf, setShowConf] = useToggle()
   const [showChatRooms, setShowChatRooms] = useToggle()
   const [showDoc, setShowDoc] = useToggle()
 
   const [chatRooms, setChatRooms] = useState<RowSingleChatRoomType[]>([])
+  const [documentGs, setDocumentGs] = useState<RowDocumentGType[]>([])
 
   const {addSocketPOn, socketPInit, socketPReset} = useSocketContext()
 
   const [pageOId, setPageOId] = useState<string>('')
-
-  const callbackTestCount = useCallback((payload: SocketTestCountType) => {
-    setTestCnt(payload.cnt)
-  }, [])
 
   const callbackSetUnreadChat = useCallback((payload: SocketSetUnreadChatType) => {
     setChatRooms(chatRooms =>
@@ -80,18 +77,14 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
   // NOTE: 소켓 초기화 하는곳
   useEffect(() => {
     socketPInit()
-    addSocketPOn('test count', callbackTestCount)
     addSocketPOn('set unread chat', callbackSetUnreadChat)
 
     return () => {
       socketPReset()
     }
-  }, [addSocketPOn, socketPInit, socketPReset, callbackTestCount, callbackSetUnreadChat])
+  }, [addSocketPOn, socketPInit, socketPReset, callbackSetUnreadChat])
 
   const value = {
-    testCnt,
-    setTestCnt,
-
     showConf,
     setShowConf,
     showChatRooms,
@@ -101,6 +94,8 @@ export const LayoutProvider: FC<PropsWithChildren<LayoutProviderProps>> = ({chil
 
     chatRooms,
     setChatRooms,
+    documentGs,
+    setDocumentGs,
 
     pageOId,
     setPageOId

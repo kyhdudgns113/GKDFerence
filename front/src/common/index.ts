@@ -36,11 +36,20 @@ export type ChatBlockType = {
   content: string
 }
 export type ChatBlocksType = ChatBlockType[]
+
+export type DocContentType = string | null
+export type DocContentsType = DocContentType[]
+export type DocTitleType = string
+
 export type ErrorsType = KeyValueType
 export interface JwtPayload {
   id: string
   uOId: string
   email: string
+}
+export type RowDocumentGType = {
+  dOId: string
+  title: string
 }
 export type RowSingleChatRoomType = {
   cOId: string
@@ -89,7 +98,14 @@ export type SocketSetUnreadChatType = {
   cOId: string
   unreadChat: number
 }
-
+// SocketDoc Type
+export type SocketDocConnectedType = {
+  jwt: string
+  uOId: string
+  dOId: string
+  socketPId: string
+}
+// asdfasdfasdf
 export type UserBodyType = {
   jwt?: string
   id?: string

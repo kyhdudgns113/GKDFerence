@@ -43,6 +43,7 @@ export const RowInput: FC<PropsWithChildren<RowInputProps>> = ({
     <div className={className_div}>
       <T.Text2XL className={className_text}>{children}</T.Text2XL>
       <Input
+        className="w-full"
         type={inputType}
         value={val}
         onChange={onChange}
