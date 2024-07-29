@@ -13,8 +13,16 @@ export class DocumentGsService {
     return ret
   }
 
+  /**
+   * documentG 의 title 과 contents 를 가져온다.
+   */
+  async getDocumentG(dOId: string) {
+    const ret = await this.useDBService.getDocumentG(dOId)
+    return ret
+  }
+
   async getDocumentGs(uOId: string) {
-    const documentGs = this.useDBService.findDocumentGs(uOId)
+    const documentGs = await this.useDBService.findDocumentGs(uOId)
     return documentGs
   }
   // BLANK LINE COMMENT

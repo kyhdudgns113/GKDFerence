@@ -20,7 +20,6 @@ export const Documents: FC<DocumentsProps> = () => {
   const onClickDocumentG = useCallback(
     (row: RowDocumentGType) => (e: MouseEvent) => {
       e.stopPropagation()
-      console.log(`Navigate to /main/dc/${row.dOId}`)
       navigate(`/main/dc/${row.dOId}`, {
         state: {dOId: row.dOId, title: row.title}
       })

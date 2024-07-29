@@ -30,6 +30,9 @@ export type ChatBlockType = {
   content: string
 }
 export type ChatBlocksType = ChatBlockType[]
+export type DocContentType = string | null
+export type DocContentsType = DocContentType[]
+export type DocTitleType = string
 export type ErrorsType = KeyValueType
 export interface JwtPayload {
   id: string
@@ -87,7 +90,29 @@ export type SocketSetUnreadChatType = {
   cOId: string
   unreadChat: number
 }
-
+// SocketDoc Type
+export type SocketDocConnectedType = {
+  jwt: string
+  uOId: string
+  dOId: string
+  socketPId: string
+}
+export type SocketDocChangeType = {
+  jwt?: string
+  dOId: string
+  whichChanged: 'title' | 'contents'
+  deleteInfo: {
+    isDelete: boolean
+    startRow: number
+    endRow: number
+  } | null
+  insertInfo: {
+    isAdd: boolean
+    insertRow: number
+    contents: DocContentsType | DocTitleType
+  } | null
+}
+// asdfasdfasdf
 export type UserBodyType = {
   jwt?: string
   id?: string

@@ -113,6 +113,34 @@ export class SidebarService {
     }
   }
 
+  async getDocumentG(uOId: string, dOId: string) {
+    const valid = await this.useDBService.DocumentGHasUser(dOId, uOId)
+    if (!valid) {
+      return {
+        ok: false,
+        body: {},
+        errors: {id: '해당 id 는 이 문서에 권한이 없습니다. '}
+      }
+    }
+
+    const ret = await this.documentGsService.getDocumentG(dOId)
+    if (!ret) {
+      return {
+        ok: false,
+        body: {},
+        errors: {
+          title: '제목을 가져오는데 실패했습니다.',
+          contents: '내용을 가져오는데 실패했습니다.'
+        }
+      }
+    }
+    return {
+      ok: true,
+      body: {title: ret.title, contents: ret.contents},
+      errors: {}
+    }
+  }
+
   async getSidebars(uOId: string) {
     const chatRooms = await this.chatRoomsService.getChatRooms(uOId)
     if (chatRooms === null) {

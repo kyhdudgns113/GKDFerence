@@ -135,6 +135,28 @@ export class SidebarController {
     return ret
   }
 
+  @Get(`/documentG/getDocumentG/:dOId`)
+  async getDocumentG(@Headers() headers: any, @Param('dOId') dOId: string) {
+    const jwt = getJwtFromHeader(headers) ?? ''
+    let returnedJwt: JwtPayload
+    try {
+      returnedJwt = await this.gkdJwtService.verifyAsync(jwt)
+    } catch (error) {
+      return {
+        ok: false,
+        body: {},
+        errors: {jwt: 'Jwt invalid in getDocumentG'}
+      }
+    }
+
+    const readyLock = await this.lockService.readyLock(`documentG:${dOId}`)
+    const uOId = returnedJwt.uOId
+    const ret = await this.sidebarService.getDocumentG(uOId, dOId)
+    this.logger.log(`ret is ${ret}`)
+    this.lockService.releaseLock(readyLock)
+    return ret
+  }
+
   @Get('/getSidebars/:uOId')
   async getSidebars(@Headers() headers: any, @Param('uOId') uOId: string) {
     const jwt = getJwtFromHeader(headers) ?? ''

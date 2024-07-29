@@ -25,6 +25,10 @@ export class UseDBService {
     return await this.chatRoomDBService.chatRoomHasUser(cOId, uOId)
   }
 
+  async DocumentGHasUser(dOId: string, uOId: string) {
+    return await this.documentGDBService.documentGHasUser(dOId, uOId)
+  }
+
   async createUser(createUserDto: CreateUserDto) {
     const newUser = await this.userDBService.create(createUserDto)
     return newUser
@@ -135,6 +139,10 @@ export class UseDBService {
 
   async getChatRoomUsers(cOId: string) {
     return await this.chatRoomDBService.getChatRoomUsers(cOId)
+  }
+
+  async getDocumentG(dOId: string) {
+    return await this.documentGDBService.getDocumentG(dOId)
   }
 
   async setUnreadChat(uOId: string, cOId: string, newCnt: number) {

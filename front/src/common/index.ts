@@ -36,7 +36,6 @@ export type ChatBlockType = {
   content: string
 }
 export type ChatBlocksType = ChatBlockType[]
-
 export type DocContentType = string | null
 export type DocContentsType = DocContentType[]
 export type DocTitleType = string
@@ -104,6 +103,21 @@ export type SocketDocConnectedType = {
   uOId: string
   dOId: string
   socketPId: string
+}
+export type SocketDocChangeType = {
+  jwt?: string
+  dOId: string
+  whichChanged: 'title' | 'contents'
+  deleteInfo: {
+    isDelete: boolean
+    startRow: number
+    endRow: number
+  } | null
+  insertInfo: {
+    isAdd: boolean
+    insertRow: number
+    contents: DocContentsType | DocTitleType
+  } | null
 }
 // asdfasdfasdf
 export type UserBodyType = {

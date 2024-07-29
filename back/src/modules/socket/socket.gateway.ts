@@ -13,6 +13,8 @@ import {
   JwtPayload,
   SocketChatConnectedType,
   SocketChatContentType,
+  SocketDocChangeType,
+  SocketDocConnectedType,
   SocketSetUnreadChatType,
   SocketTestCountType,
   SocketUserConnectedType
@@ -36,7 +38,7 @@ export class SocketGateway
 
   private sockInfo: {
     [sockId: string]: {
-      type: 'P' | 'Chat'
+      type: 'P' | 'Chat' | 'Doc'
       uOId: string
     }
   } = {}
@@ -49,8 +51,8 @@ export class SocketGateway
   private sockPidInfo: {
     [sockPid: string]: {
       uOId: string
-      sockChatId: string
-      cOId: string
+      sockChatOrDocId: string
+      cOrdId: string
     } | null
   } = {}
   private sockCidInfo: {
@@ -58,6 +60,13 @@ export class SocketGateway
       uOId: string
       sockPid: string
       cOId: string
+    }
+  } = {}
+  private sockDidInfo: {
+    [sockDid: string]: {
+      uOId: string
+      sockPid: string
+      dOId: string
     }
   } = {}
 
@@ -91,7 +100,6 @@ export class SocketGateway
         case 'P':
           {
             const uOid = this.sockInfo[sid].uOId
-            const sockCId = this.sockPidInfo[sid].sockChatId
             delete this.sockPidInfo[sid]
 
             this.uOidInfo[uOid].numConnectedP -= 1
@@ -99,7 +107,7 @@ export class SocketGateway
             if (this.uOidInfo[uOid].numConnectedP === 0) {
               delete this.uOidInfo[uOid]
             }
-            delete this.sockCidInfo[sockCId]
+            // NOTE: sockC 와 sockD 도 연결이 끊어지기 때문에 이 함수가 또 호출된다.
           }
           break
         case 'Chat':
@@ -107,11 +115,23 @@ export class SocketGateway
             const cOId = this.sockCidInfo[sid].cOId
             const pid = this.sockCidInfo[sid].sockPid
 
-            this.sockPidInfo[pid].sockChatId = ''
-            this.sockPidInfo[pid].cOId = ''
+            this.sockPidInfo[pid].sockChatOrDocId = ''
+            this.sockPidInfo[pid].cOrdId = ''
 
             delete this.sockCidInfo[sid]
             client.leave(cOId)
+          }
+          break
+        case 'Doc':
+          {
+            const dOId = this.sockDidInfo[sid].dOId
+            const pid = this.sockDidInfo[sid].sockPid
+
+            this.sockPidInfo[pid].sockChatOrDocId = ''
+            this.sockPidInfo[pid].cOrdId = ''
+
+            delete this.sockDidInfo[sid]
+            client.leave(dOId)
           }
           break
       }
@@ -123,7 +143,6 @@ export class SocketGateway
   // AREA1 : socketP Area
   @SubscribeMessage('user connected')
   userConnected(client: Socket, payload: SocketUserConnectedType): void {
-    // this.logger.log('USER CONNECTED : ')
     this.initSocketP(client, payload)
     payload.socketPId = client.id
     client.emit('user connected', payload)
@@ -212,7 +231,20 @@ export class SocketGateway
     this.lockService.releaseLock(readyNumber)
   }
 
-  // AREA1 : Private function Area
+  // AREA1 : socketDocumentGArea
+  @SubscribeMessage('documentG connected')
+  async documentGConnected(client: Socket, payload: SocketDocConnectedType) {
+    const ret = await this.initSocketD(client, payload)
+    if (ret) {
+      client.emit('document connected', payload)
+    }
+  }
+  @SubscribeMessage('documentG changed')
+  async documentGChanged(client: Socket, payload: SocketDocChangeType) {
+    // TODO: 수정 알고리즘 구체적으로 짜자.
+  }
+
+  // AREA2 : Private function Area
 
   private getUnconnectedUsers(
     usersObject: {[uOId: string]: boolean},
@@ -246,8 +278,8 @@ export class SocketGateway
 
     this.sockPidInfo[sid] = {
       uOId: uOid,
-      cOId: '',
-      sockChatId: ''
+      cOrdId: '',
+      sockChatOrDocId: ''
     }
   }
 
@@ -265,6 +297,11 @@ export class SocketGateway
       return false
     }
 
+    this.sockInfo[client.id] = {
+      type: 'Chat',
+      uOId: payload.uOId
+    }
+
     // 채팅방 OId 에 따른 room 구현
     // this.logger.log(`${client.id} join to ${payload.cOId}`)
     client.join(payload.cOId)
@@ -278,12 +315,55 @@ export class SocketGateway
     if (!this.sockPidInfo[payload.socketPId]) {
       this.sockPidInfo[payload.socketPId] = {
         uOId: payload.uOId,
-        sockChatId: client.id,
-        cOId: payload.cOId
+        sockChatOrDocId: client.id,
+        cOrdId: payload.cOId
       }
     }
-    this.sockPidInfo[payload.socketPId].sockChatId = client.id
-    this.sockPidInfo[payload.socketPId].cOId = payload.cOId
+    this.sockPidInfo[payload.socketPId].sockChatOrDocId = client.id
+    this.sockPidInfo[payload.socketPId].cOrdId = payload.cOId
+    return true
+  }
+
+  private async initSocketD(client: Socket, payload: SocketDocConnectedType) {
+    if (!payload.jwt || !payload.dOId || !payload.uOId || !payload.socketPId) {
+      return false
+    }
+
+    // JWT 인증
+    const jwt = payload.jwt
+    const isJwt = await this.gkdJwtService.verifyAsync(jwt)
+    if (!isJwt || isJwt.uOId !== payload.uOId) {
+      // this.logger.log('JWT Veryfing error')
+      return false
+    }
+
+    this.sockInfo[client.id] = {
+      type: 'Doc',
+      uOId: payload.uOId
+    }
+
+    // 채팅방 OId 에 따른 room 구현
+    // this.logger.log(`${client.id} join to ${payload.cOId}`)
+    client.join(payload.dOId)
+
+    // 클래스 내부에 채팅소켓 들어온것에 대한 정보 기입
+    this.sockDidInfo[client.id] = {
+      uOId: payload.uOId,
+      sockPid: client.id,
+      dOId: payload.dOId
+    }
+
+    if (!this.sockPidInfo[payload.socketPId]) {
+      this.sockPidInfo[payload.socketPId] = {
+        uOId: payload.uOId,
+        sockChatOrDocId: client.id,
+        cOrdId: payload.dOId
+      }
+    }
+
+    this.sockPidInfo[payload.socketPId].sockChatOrDocId = client.id
+    this.sockPidInfo[payload.socketPId].cOrdId = payload.dOId
+
     return true
   }
 

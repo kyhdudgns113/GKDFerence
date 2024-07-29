@@ -22,7 +22,7 @@ export class DocumentG extends Document {
   uOIds: {[uOId: string]: boolean}
 
   @Prop({type: [DocumentGContentSchema], default: []})
-  chatBlocks: DocumentGContent[]
+  contents: DocumentGContent[]
 
   @Prop({type: Date, default: Date.now})
   createdDt: Date
