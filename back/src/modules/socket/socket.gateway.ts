@@ -9,8 +9,6 @@ import {
 import {Server, Socket} from 'socket.io'
 import {Logger} from '@nestjs/common'
 import {
-  gkdJwtSignOption,
-  JwtPayload,
   SocketChatConnectedType,
   SocketChatContentType,
   SocketDocChangeType,
@@ -19,7 +17,6 @@ import {
   SocketTestCountType,
   SocketUserConnectedType
 } from 'src/common'
-import {JwtService} from '@nestjs/jwt'
 import {UseDBService} from '../useDB/useDB.service'
 import {LockService} from '../lock/lock.service'
 import {GkdJwtService} from '../gkdJwt/gkdJwt.service'
@@ -238,10 +235,6 @@ export class SocketGateway
     if (ret) {
       client.emit('document connected', payload)
     }
-  }
-  @SubscribeMessage('documentG changed')
-  async documentGChanged(client: Socket, payload: SocketDocChangeType) {
-    // TODO: 수정 알고리즘 구체적으로 짜자.
   }
 
   // AREA2 : Private function Area
