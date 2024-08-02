@@ -1,6 +1,6 @@
 import {Injectable, Logger} from '@nestjs/common'
 
-export type CheckReadyLockType = 'miss' | 'right now' | 'ready'
+export type CheckReadyLockType = 'miss' | 'right now' | 'ready' | 'never'
 
 // FUTURE: ready = now + 1 일 경우, 너무 오래 기다리면 문제가 생겼다는걸 알려보자
 @Injectable()
@@ -12,12 +12,20 @@ export class LockService {
 
   constructor() {}
 
+  /**
+   *
+   * @param readyLock
+   * @returns 'miss' : 다양한 이유로 순번이 지나갔다.
+   *          'right now' : 지금 해당 순번이다.
+   *          'ready' : 아직 순번이 오지 않았다.
+   *          'never' : 해당 key 는 생성되지도 않았다. 이런 경우가 있을까 싶다.
+   */
   checkReadyLockWithNowNumber(readyLock: string): CheckReadyLockType {
     const {readyNumber, key} = this.decodeReadyLockToNumberAndKey(readyLock)
 
     // NOTE: 해당 key 가 없다는건 readyNumber 가 생성되지도 않았다는 뜻이다.
     if (!this.lockInfo[key]) {
-      return null
+      return 'never'
     }
 
     if (this.lockInfo[key].nowNumber > readyNumber) {

@@ -99,18 +99,20 @@ export type SocketDocConnectedType = {
 }
 export type SocketDocChangeType = {
   jwt?: string
+  readyLock?: string
+  uOId: string
   dOId: string
   whichChanged: 'title' | 'contents'
-  deleteInfo: {
-    isDelete: boolean
-    startRow: number
-    endRow: number
-  } | null
-  insertInfo: {
-    isAdd: boolean
-    insertRow: number
-    contents: DocContentsType | DocTitleType
-  } | null
+  startRow: number | null
+  endRow: number | null
+  title: DocTitleType
+  contents: DocContentsType
+}
+export type SocketDocRequestLockType = {
+  jwt?: string
+  uOId: string
+  dOId: string
+  readyLock?: string
 }
 // asdfasdfasdf
 export type UserBodyType = {

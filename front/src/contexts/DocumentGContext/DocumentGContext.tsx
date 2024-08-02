@@ -7,6 +7,7 @@ import {
   Setter,
   SocketDocChangeType,
   SocketDocConnectedType,
+  SocketDocRequestLockType,
   SocketType
 } from '../../common'
 import {useLocation} from 'react-router-dom'
@@ -16,6 +17,7 @@ import {io} from 'socket.io-client'
 import {serverUrl} from '../../client_secret'
 import {useLayoutContext} from '../LayoutContext/LayoutContext'
 import {get} from '../../server'
+import {onSetChangeQWhenReceiveInfo} from './hooks'
 
 type ContextType = {
   dOId?: string
@@ -49,7 +51,7 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
   const [contents, setContents] = useState<DocContentsType>([])
   const [changeQ, setChangeQ] = useState<SocketDocChangeType[]>([])
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
-  const [isQWaiting, setIsQWaiting] = useState<boolean>(false)
+  const [isQWaitingLock, setIsQWaitingLock] = useState<boolean>(false)
 
   const {uOId, getJwt} = useAuth()
   const {pageOId, setPageOId} = useLayoutContext()
@@ -57,6 +59,8 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
 
   const location = useLocation()
 
+  // 수정사항 : 제목
+  // changeQueue 에 넣는다.
   const onBlurTitle = useCallback(
     async (e: FocusEvent<HTMLInputElement, Element>) => {
       const newTitle: DocTitleType = e.currentTarget.value
@@ -64,22 +68,16 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
       const dOId = location.state.dOId
       const payload: SocketDocChangeType = {
         jwt: jwt,
+        uOId: uOId || '',
         dOId: dOId,
         whichChanged: 'title',
-        deleteInfo: {
-          isDelete: true,
-          startRow: 0,
-          endRow: 0
-        },
-        insertInfo: {
-          isAdd: true,
-          insertRow: 0,
-          contents: newTitle
-        }
+        startRow: 0,
+        endRow: 0,
+        title: newTitle
       }
       setChangeQ(prev => [...prev, payload])
     },
-    [location, getJwt, setChangeQ]
+    [location, uOId, getJwt, setChangeQ]
   )
 
   const onChangeTitle = useCallback(
@@ -125,10 +123,51 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
       const newSocket = io(serverUrl)
       setSockDoc(newSocket)
 
-      newSocket.on('documentG connected', (payload: SocketDocConnectedType) => {
+      newSocket.on('documentG connected', (_payload: SocketDocConnectedType) => {
         // 일단 뭐 안한다.
       })
 
+      // NOTE: 서버로부터 본인의 순서가 되어 "수정 정보" 를 보내라는 신호가 오면
+      // NOTE: 서버로 "수정 정보"를 보낸다.
+      newSocket.on('documentG request lock', (_payload: SocketDocRequestLockType) => {
+        setChangeQ(prev => {
+          let payload = prev.pop()
+          if (payload) {
+            payload.readyLock = _payload.readyLock || ''
+            newSocket.emit('documentG send change info', payload)
+          }
+          return prev
+        })
+      })
+
+      // NOTE: 서버로부터 수정 정보가 들어오는 부분.
+      newSocket.on('documentG send change info', (_payload: SocketDocChangeType) => {
+        // 1. 만약 이 수정정보가 내 대기순번이 지났다는거라면 업데이트 하지 않고 대기상태만 해제한다.
+        if (_payload.uOId === uOId && _payload.startRow === null && _payload.endRow === null) {
+          setIsQWaitingLock(false)
+          return
+        }
+        // 2. changeQ 에 있는 내용들과 문서내용을 바꾼다.
+        onSetChangeQWhenReceiveInfo(setChangeQ, _payload)
+
+        if (_payload.startRow && _payload.endRow) {
+          if (_payload.startRow <= _payload.endRow) {
+            if (_payload.whichChanged === 'contents') {
+              setContents(prev => {
+                const deleteLen = _payload.endRow! - _payload.startRow! + 1
+                const contents = _payload.contents ?? []
+                prev.splice(_payload.startRow!, deleteLen, ...contents)
+                return prev
+              })
+            } else {
+              setTitle(_payload.contents ? _payload.contents[0] || '' : '')
+            }
+          }
+        }
+      })
+      // END: 서버로부터 수정 정보가 들어오는 부분.
+
+      // 소켓 연결됬다고 서버에 알리는 부분
       getJwt().then(jwtFromClient => {
         if (!uOId || !jwtFromClient) {
           alert('다음이 NULL 입니다. ' + !uOId && 'uOId ' + !jwtFromClient && 'jwt ')
@@ -144,15 +183,20 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
     }
   }, [sockDoc, socketPId, pageOId, uOId, getJwt])
 
-  // send Q to server with sockDoc
+  // changeQ 에 수정정보가 있으면 서버에 "수정 요청 신호" 를 보낸다.
   useEffect(() => {
-    if (sockDoc && changeQ && changeQ.length > 0) {
-      // const newChangeQ = [...changeQ]
-      // const payload = newChangeQ.pop()
-      // sockDoc.emit('change document', payload)
-      // setChangeQ(newChangeQ)
-    }
-  }, [changeQ, sockDoc])
+    getJwt().then(jwtFromClient => {
+      if (jwtFromClient && sockDoc && changeQ && changeQ.length > 0 && !isQWaitingLock && uOId) {
+        const payload: SocketDocRequestLockType = {
+          jwt: jwtFromClient,
+          uOId: uOId,
+          dOId: dOId
+        }
+        sockDoc.emit('documentG request lock', payload)
+        setIsQWaitingLock(true)
+      }
+    })
+  }, [changeQ, dOId, isQWaitingLock, sockDoc, uOId, getJwt])
 
   // Quit socket
   useEffect(() => {

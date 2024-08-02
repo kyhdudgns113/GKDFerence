@@ -4,7 +4,7 @@ import {Document} from 'mongoose'
 // FUTURE: 이미지도 저장 가능하도록 조정해야 한다.
 // FUTURE: 그래서 DocContent Schema 를 따로 만들었다.
 @Schema()
-export class DocumentGContent {
+export class DocumentGContent extends Document {
   @Prop()
   content: string
 }

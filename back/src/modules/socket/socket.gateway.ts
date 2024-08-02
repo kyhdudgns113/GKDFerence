@@ -13,6 +13,7 @@ import {
   SocketChatContentType,
   SocketDocChangeType,
   SocketDocConnectedType,
+  SocketDocRequestLockType,
   SocketSetUnreadChatType,
   SocketTestCountType,
   SocketUserConnectedType
@@ -112,8 +113,10 @@ export class SocketGateway
             const cOId = this.sockCidInfo[sid].cOId
             const pid = this.sockCidInfo[sid].sockPid
 
-            this.sockPidInfo[pid].sockChatOrDocId = ''
-            this.sockPidInfo[pid].cOrdId = ''
+            if (this.sockPidInfo[pid]) {
+              this.sockPidInfo[pid].sockChatOrDocId = ''
+              this.sockPidInfo[pid].cOrdId = ''
+            }
 
             delete this.sockCidInfo[sid]
             client.leave(cOId)
@@ -124,8 +127,10 @@ export class SocketGateway
             const dOId = this.sockDidInfo[sid].dOId
             const pid = this.sockDidInfo[sid].sockPid
 
-            this.sockPidInfo[pid].sockChatOrDocId = ''
-            this.sockPidInfo[pid].cOrdId = ''
+            if (this.sockPidInfo[pid]) {
+              this.sockPidInfo[pid].sockChatOrDocId = ''
+              this.sockPidInfo[pid].cOrdId = ''
+            }
 
             delete this.sockDidInfo[sid]
             client.leave(dOId)
@@ -176,7 +181,6 @@ export class SocketGateway
   }
   @SubscribeMessage('chat')
   async chat(client: Socket, payload: SocketChatContentType) {
-    let debugNumber = 0
     if (
       !payload.jwt ||
       !payload.cOId ||
@@ -235,6 +239,49 @@ export class SocketGateway
     if (ret) {
       client.emit('document connected', payload)
     }
+  }
+  @SubscribeMessage('documentG request lock')
+  async documentGRequestLock(client: Socket, payload: SocketDocRequestLockType) {
+    const dOId = payload.dOId
+    const readyLock = await this.lockService.readyLock(`documentG:${dOId}`)
+    payload.readyLock = readyLock
+    client.emit('documentG request lock', payload)
+  }
+  @SubscribeMessage('documentG send change info')
+  async documentGSendChangeInfo(client: Socket, payload: SocketDocChangeType) {
+    const jwtFromClient = payload.jwt
+    try {
+      const jwtPayload = await this.gkdJwtService.verifyAsync(jwtFromClient)
+    } catch (err) {
+      // TODO: JWT 만료시 해야 할 일
+      // TODO: return ok: false 는 아니다. 여기 소켓이다.
+    }
+
+    const readyLock = payload.readyLock || ''
+    const dOId = payload.dOId
+    const lockState = this.lockService.checkReadyLockWithNowNumber(readyLock)
+
+    if (lockState === 'miss') {
+      payload.startRow = null
+      payload.endRow = null
+      client.emit('documentG send change info', payload)
+      return
+    } else if (lockState === 'never' || lockState === 'ready') {
+      // NOTE: 뭔가를 해야할까?
+      return
+    }
+    // 이건 더이상 쓰지 않는다.
+    payload.readyLock = ''
+
+    // 1. DB 를 수정한다.
+    // TODO: 유저 무결성 검증
+    await this.useDBService.applyDocumentGChangeInfo(payload)
+
+    // 2. 연결된 소켓들에게 "수정 정보" 를 전송한다.
+    this.server.to(dOId).emit('documentG send change info', payload)
+
+    // 3. Release Lock 을 해준다.
+    this.lockService.releaseLock(readyLock)
   }
 
   // AREA2 : Private function Area

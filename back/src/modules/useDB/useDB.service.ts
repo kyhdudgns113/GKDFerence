@@ -2,7 +2,12 @@ import {Injectable} from '@nestjs/common'
 
 import {CreateUserDto} from 'src/modules/useDB/userDB/dto'
 import {ChatRoomDBService} from './chatRoomDB/chatRoomDB.service'
-import {ChatBlockType, RowDocumentGType, RowSingleChatRoomType} from 'src/common'
+import {
+  ChatBlockType,
+  RowDocumentGType,
+  RowSingleChatRoomType,
+  SocketDocChangeType
+} from 'src/common'
 import {UserDBService} from './userDB/userDB.service'
 import {DocumentGDBService} from './documentGDB/documentGDB.service'
 
@@ -19,6 +24,11 @@ export class UseDBService {
 
   async addDocumentG(uOId: string, dOId: string) {
     return await this.userDBService.addDocumentG(uOId, dOId)
+  }
+
+  async applyDocumentGChangeInfo(payload: SocketDocChangeType) {
+    const ret = await this.documentGDBService.applyDocumentGChangeInfo(payload)
+    return ret
   }
 
   async ChatRoomHasUser(cOId: string, uOId: string) {

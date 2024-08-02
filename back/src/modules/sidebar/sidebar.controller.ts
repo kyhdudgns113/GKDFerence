@@ -152,7 +152,6 @@ export class SidebarController {
     const readyLock = await this.lockService.readyLock(`documentG:${dOId}`)
     const uOId = returnedJwt.uOId
     const ret = await this.sidebarService.getDocumentG(uOId, dOId)
-    this.logger.log(`ret is ${ret}`)
     this.lockService.releaseLock(readyLock)
     return ret
   }
