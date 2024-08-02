@@ -87,6 +87,62 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
     [setTitle]
   )
 
+  const sockDocOn_documentGConnected = useCallback((newSocket: SocketType) => {
+    newSocket!.on('documentG connected', (_payload: SocketDocConnectedType) => {
+      // 일단 뭐 안한다.
+    })
+  }, [])
+
+  // 서버로부터 본인의 순서가 되어 "수정 정보" 를 보내라는 신호가 오면
+  // 서버로 "수정 정보"를 보낸다.
+  const sockDocOn_documentGRequestLock = useCallback(
+    (newSocket: SocketType, setChangeQ: Setter<SocketDocChangeType[]>) => {
+      newSocket!.on('documentG request lock', (_payload: SocketDocRequestLockType) => {
+        setChangeQ(prev => {
+          let payload = prev.pop()
+          if (payload) {
+            payload.readyLock = _payload.readyLock || ''
+            newSocket!.emit('documentG send change info', payload)
+          }
+          return prev
+        })
+      })
+    },
+    []
+  )
+
+  // 서버로부터 수정 정보가 들어오는 부분.
+  const sockDocOn_documentGSendChangeInfo = useCallback(
+    (newSocket: SocketType) => {
+      newSocket!.on('documentG send change info', (_payload: SocketDocChangeType) => {
+        // 1. 만약 이 수정정보가 내 대기순번이 지났다는거라면 업데이트 하지 않고 대기상태만 해제한다.
+        if (_payload.uOId === uOId && _payload.startRow === null && _payload.endRow === null) {
+          setIsQWaitingLock(false)
+          return
+        }
+        // 2. changeQ 에 있는 내용들과 문서내용을 바꾼다.
+        onSetChangeQWhenReceiveInfo(setChangeQ, _payload)
+
+        // 3. changeQ 를 빠져나온 _payload(수정 정보) 를 처리한다.
+        if (_payload.startRow && _payload.endRow) {
+          if (_payload.startRow <= _payload.endRow) {
+            if (_payload.whichChanged === 'contents') {
+              setContents(prev => {
+                const deleteLen = _payload.endRow! - _payload.startRow! + 1
+                const contents = _payload.contents ?? []
+                prev.splice(_payload.startRow!, deleteLen, ...contents)
+                return prev
+              })
+            } else {
+              setTitle(_payload.contents ? _payload.contents[0] || '' : '')
+            }
+          }
+        }
+      })
+    },
+    [uOId]
+  )
+
   // Setter area
   useEffect(() => {
     if (location) {
@@ -123,49 +179,9 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
       const newSocket = io(serverUrl)
       setSockDoc(newSocket)
 
-      newSocket.on('documentG connected', (_payload: SocketDocConnectedType) => {
-        // 일단 뭐 안한다.
-      })
-
-      // NOTE: 서버로부터 본인의 순서가 되어 "수정 정보" 를 보내라는 신호가 오면
-      // NOTE: 서버로 "수정 정보"를 보낸다.
-      newSocket.on('documentG request lock', (_payload: SocketDocRequestLockType) => {
-        setChangeQ(prev => {
-          let payload = prev.pop()
-          if (payload) {
-            payload.readyLock = _payload.readyLock || ''
-            newSocket.emit('documentG send change info', payload)
-          }
-          return prev
-        })
-      })
-
-      // NOTE: 서버로부터 수정 정보가 들어오는 부분.
-      newSocket.on('documentG send change info', (_payload: SocketDocChangeType) => {
-        // 1. 만약 이 수정정보가 내 대기순번이 지났다는거라면 업데이트 하지 않고 대기상태만 해제한다.
-        if (_payload.uOId === uOId && _payload.startRow === null && _payload.endRow === null) {
-          setIsQWaitingLock(false)
-          return
-        }
-        // 2. changeQ 에 있는 내용들과 문서내용을 바꾼다.
-        onSetChangeQWhenReceiveInfo(setChangeQ, _payload)
-
-        if (_payload.startRow && _payload.endRow) {
-          if (_payload.startRow <= _payload.endRow) {
-            if (_payload.whichChanged === 'contents') {
-              setContents(prev => {
-                const deleteLen = _payload.endRow! - _payload.startRow! + 1
-                const contents = _payload.contents ?? []
-                prev.splice(_payload.startRow!, deleteLen, ...contents)
-                return prev
-              })
-            } else {
-              setTitle(_payload.contents ? _payload.contents[0] || '' : '')
-            }
-          }
-        }
-      })
-      // END: 서버로부터 수정 정보가 들어오는 부분.
+      sockDocOn_documentGConnected(newSocket)
+      sockDocOn_documentGRequestLock(newSocket, setChangeQ)
+      sockDocOn_documentGSendChangeInfo(newSocket)
 
       // 소켓 연결됬다고 서버에 알리는 부분
       getJwt().then(jwtFromClient => {
@@ -181,7 +197,16 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
         newSocket.emit('documentG connected', payload)
       })
     }
-  }, [sockDoc, socketPId, pageOId, uOId, getJwt])
+  }, [
+    sockDoc,
+    socketPId,
+    pageOId,
+    uOId,
+    getJwt,
+    sockDocOn_documentGConnected,
+    sockDocOn_documentGRequestLock,
+    sockDocOn_documentGSendChangeInfo
+  ])
 
   // changeQ 에 수정정보가 있으면 서버에 "수정 요청 신호" 를 보낸다.
   useEffect(() => {
