@@ -29,17 +29,28 @@ type ContextType = {
   contents?: DocContentsType
   setContents: Setter<DocContentsType>
 
+  isContentsChanged?: boolean
+  setIsContentsChanged: Setter<boolean>
+
   onBlurTitle: (e: FocusEvent<HTMLInputElement, Element>) => void
   onChangeTitle: (e: ChangeEvent<HTMLInputElement>) => void
+  addInfoToChangeQ: (
+    whichChanged: 'title' | 'contents',
+    startRow: number,
+    endRow: number,
+    contents: DocContentsType | undefined
+  ) => void
 }
 
 export const DocumentGContext = createContext<ContextType>({
   setDOId: () => {},
   setTitle: () => {},
   setContents: () => {},
+  setIsContentsChanged: () => {},
 
   onBlurTitle: () => {},
-  onChangeTitle: () => {}
+  onChangeTitle: () => {},
+  addInfoToChangeQ: () => {}
 })
 
 type DocumentGProviderProps = {}
@@ -52,6 +63,7 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
   const [changeQ, setChangeQ] = useState<SocketDocChangeType[]>([])
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
   const [isQWaitingLock, setIsQWaitingLock] = useState<boolean>(false)
+  const [isContentsChanged, setIsContentsChanged] = useState<boolean>(false)
 
   const {uOId, getJwt} = useAuth()
   const {pageOId, setPageOId} = useLayoutContext()
@@ -64,10 +76,8 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
   const onBlurTitle = useCallback(
     async (e: FocusEvent<HTMLInputElement, Element>) => {
       const newTitle: DocTitleType = e.currentTarget.value
-      const jwt = await getJwt()
       const dOId = location.state.dOId
       const payload: SocketDocChangeType = {
-        jwt: jwt,
         uOId: uOId || '',
         dOId: dOId,
         whichChanged: 'title',
@@ -77,7 +87,7 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
       }
       setChangeQ(prev => [...prev, payload])
     },
-    [location, uOId, getJwt, setChangeQ]
+    [location, uOId, setChangeQ]
   )
 
   const onChangeTitle = useCallback(
@@ -87,6 +97,30 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
     [setTitle]
   )
 
+  const addInfoToChangeQ = useCallback(
+    (
+      whichChanged: 'title' | 'contents',
+      startRow: number,
+      endRow: number,
+      contents: DocContentsType | undefined
+    ) => {
+      if (uOId && dOId) {
+        const changeQElement: SocketDocChangeType = {
+          uOId: uOId,
+          dOId: dOId,
+          whichChanged: whichChanged,
+          startRow: startRow,
+          endRow: endRow,
+          contents: contents
+        }
+
+        setChangeQ(prev => [...prev, changeQElement])
+      }
+    },
+    [dOId, uOId]
+  )
+
+  // AREA1: Set socket area
   const sockDocOn_documentGConnected = useCallback((newSocket: SocketType) => {
     newSocket!.on('documentG connected', (_payload: SocketDocConnectedType) => {
       // 일단 뭐 안한다.
@@ -98,17 +132,20 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
   const sockDocOn_documentGRequestLock = useCallback(
     (newSocket: SocketType, setChangeQ: Setter<SocketDocChangeType[]>) => {
       newSocket!.on('documentG request lock', (_payload: SocketDocRequestLockType) => {
-        setChangeQ(prev => {
-          let payload = prev.pop()
-          if (payload) {
-            payload.readyLock = _payload.readyLock || ''
-            newSocket!.emit('documentG send change info', payload)
-          }
-          return prev
+        getJwt().then(jwtFromClient => {
+          setChangeQ(prev => {
+            let payload = prev.pop()
+            if (payload) {
+              payload.jwt = jwtFromClient
+              payload.readyLock = _payload.readyLock || ''
+              newSocket!.emit('documentG send change info', payload)
+            }
+            return prev
+          })
         })
       })
     },
-    []
+    [getJwt]
   )
 
   // 서버로부터 수정 정보가 들어오는 부분.
@@ -171,6 +208,10 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
           })
       }
     })
+
+    return () => {
+      setIsDBLoad(false)
+    }
   }, [dOId, isDBLoad, getJwt])
 
   // Set sockDoc
@@ -238,9 +279,11 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
     dOId, setDOId,
     title, setTitle,
     contents, setContents,
+    isContentsChanged, setIsContentsChanged,
 
     onBlurTitle,
-    onChangeTitle
+    onChangeTitle,
+    addInfoToChangeQ
   }
   return <DocumentGContext.Provider value={value} children={<DocumentGPage />} />
 }

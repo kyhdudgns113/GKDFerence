@@ -93,7 +93,7 @@ export class LockService {
     }
   }
 
-  // AREA1 : PRIVATE FUNCTION AREA
+  // AREA1: PRIVATE FUNCTION AREA
 
   private decodeReadyLockToNumberAndKey(readyLock: string) {
     const [readyNumberString, key] = readyLock.split('___')

@@ -76,7 +76,7 @@ export class GkdJwtService {
     }
   }
 
-  // AREA1 : Private function Area
+  // AREA1: Private function Area
   private generateRandomString() {
     const chrs: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     let res: string = ''

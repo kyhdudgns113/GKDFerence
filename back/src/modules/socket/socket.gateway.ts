@@ -142,7 +142,7 @@ export class SocketGateway
     delete this.sockInfo[client.id]
   }
 
-  // AREA1 : socketP Area
+  // AREA1: socketP Area
   @SubscribeMessage('user connected')
   userConnected(client: Socket, payload: SocketUserConnectedType): void {
     this.initSocketP(client, payload)
@@ -164,7 +164,7 @@ export class SocketGateway
     this.lockService.releaseLock(readyNumber)
   }
 
-  // AREA2 : socketChatArea
+  // AREA2: socketChatArea
   @SubscribeMessage('chat connected')
   async chatConnected(client: Socket, payload: SocketChatConnectedType) {
     const ret = await this.initSocketC(client, payload)
@@ -232,7 +232,7 @@ export class SocketGateway
     this.lockService.releaseLock(readyNumber)
   }
 
-  // AREA1 : socketDocumentGArea
+  // AREA1: socketDocumentGArea
   @SubscribeMessage('documentG connected')
   async documentGConnected(client: Socket, payload: SocketDocConnectedType) {
     const ret = await this.initSocketD(client, payload)
@@ -254,7 +254,7 @@ export class SocketGateway
       const jwtPayload = await this.gkdJwtService.verifyAsync(jwtFromClient)
     } catch (err) {
       // TODO: JWT 만료시 해야 할 일
-      // TODO: return ok: false 는 아니다. 여기 소켓이다.
+      // return {ok: false...} 는 아니다. 여기 소켓이다.
     }
 
     const readyLock = payload.readyLock || ''
@@ -284,7 +284,7 @@ export class SocketGateway
     this.lockService.releaseLock(readyLock)
   }
 
-  // AREA2 : Private function Area
+  // AREA2: Private function Area
 
   private getUnconnectedUsers(
     usersObject: {[uOId: string]: boolean},

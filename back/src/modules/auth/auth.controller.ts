@@ -23,7 +23,7 @@ export class AuthController {
   private logger: Logger = new Logger('AuthController')
   constructor(private readonly authService: AuthService) {}
 
-  // AREA2 : Post
+  // AREA2: Post
   @Post('/signup')
   async signUp(@Body() authBody: AuthBodyType) {
     this.logger.log(`signup(${authBody.id}): requested`)
@@ -39,7 +39,7 @@ export class AuthController {
     return ret
   }
 
-  // AREA2 : Get
+  // AREA2: Get
   @Get('/checkToken')
   async checkToken(@Headers() headers) {
     const jwt = getJwtFromHeader(headers) ?? ''

@@ -16,13 +16,13 @@ export class CopyMeController {
   private logger: Logger = new Logger('CopyMeController')
   constructor(private readonly copyService: CopyMeService) {}
 
-  // AREA2 : Post
+  // AREA2: Post
   @Post()
   async post(@Body() arg: any) {
     return 'post'
   }
 
-  // AREA2 : Get
+  // AREA2: Get
   @Get()
   async get(@Headers() arg: any) {
     return 'get'

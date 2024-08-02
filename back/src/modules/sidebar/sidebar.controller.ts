@@ -28,7 +28,7 @@ export class SidebarController {
     private readonly sidebarService: SidebarService
   ) {}
 
-  // AREA2 : Post
+  // AREA2: Post
   @Post('/createSingleChatRoom/:idOrEmail')
   async createChatRoom(
     @Body() body: SidebarBodyType,
@@ -72,7 +72,7 @@ export class SidebarController {
     return ret
   }
 
-  // AREA2 : Get
+  // AREA2: Get
   /**
    * It is used in create chatroom modal
    */

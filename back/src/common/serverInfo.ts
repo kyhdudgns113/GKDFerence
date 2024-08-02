@@ -7,5 +7,5 @@ export const mongodbUrl = mongodbLocalUrl
 export const gkdSaltOrRounds = 10
 export const gkdJwtSecret = 'gkdudgns114jwt'
 export const gkdJwtSignOption: JwtModuleOptions['signOptions'] = {
-  expiresIn: '15m'
+  expiresIn: '15h'
 }

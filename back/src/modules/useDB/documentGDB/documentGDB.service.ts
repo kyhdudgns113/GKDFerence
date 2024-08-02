@@ -100,7 +100,10 @@ export class DocumentGDBService {
     if (!documentG) {
       return null
     }
-    return {title: documentG.title, contents: documentG.contents}
+    const contents = documentG.contents.map((content, index) => {
+      return content.content
+    })
+    return {title: documentG.title, contents: contents}
   }
 
   // BLANK LINE COMMENT
