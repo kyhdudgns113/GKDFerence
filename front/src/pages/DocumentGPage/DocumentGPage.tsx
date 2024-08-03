@@ -18,6 +18,18 @@ export default function DocumentGPage() {
   /* eslint-enable */
 
   // AREA1: Div Page Area
+  const onDragEnterPage = useCallback((e: MouseEvent) => {
+    // 이거 해줘야 onDropPage 가 실행된다.
+    e.preventDefault()
+  }, [])
+  const onDragOverPage = useCallback((e: MouseEvent) => {
+    // 이거 해줘야 onDropPage 가 실행된다.
+    e.preventDefault()
+  }, [])
+  const onDropPage = useCallback((e: MouseEvent) => {
+    setIsMouseDown(false)
+    setMouseUpRow(null)
+  }, [])
   const onMouseDownPage = useCallback((e: MouseEvent) => {
     setIsMouseDown(true)
     setIsMouseOutDuringDown(false)
@@ -42,6 +54,14 @@ export default function DocumentGPage() {
     (index: number) => (e: MouseEvent) => {
       // MouseDown -> MouseOut -> MouseEnter -> MouseUp 이어도 실행된다.
       // console.log('Click')
+    },
+    []
+  )
+  const onDropInput = useCallback(
+    (index: number) => (e: MouseEvent) => {
+      e.preventDefault()
+      setIsMouseDown(false)
+      setMouseUpRow(index)
     },
     []
   )
@@ -107,7 +127,10 @@ export default function DocumentGPage() {
 
   return (
     <div
-      className="flex flex-col items-center h-full"
+      className="flex flex-col items-center h-full bg-blue-300"
+      onDragEnter={onDragEnterPage}
+      onDragOver={onDragOverPage}
+      onDrop={onDropPage}
       onMouseDown={onMouseDownPage}
       onMouseOver={onMouseOverPage}
       onMouseUp={onMouseUpPage}>
@@ -124,12 +147,14 @@ export default function DocumentGPage() {
             return (
               <div
                 className="w-full selection:bg-gkd-sakura-bg"
+                key={`contentsDiv:${index}`}
                 ref={el => (divRefs.current[index] = el)}>
                 <input
                   className="w-full border-2 focus:bg-gkd-sakura-bg"
                   key={`contents:${index}`}
                   onChange={e => {}}
                   onClick={onClickInput(index)}
+                  onDrop={onDropInput(index)}
                   onMouseDown={onMouseDownInput(index)}
                   onMouseOut={onMouseOutInput(index)}
                   onMouseOver={onMouseOverInput(index)}
