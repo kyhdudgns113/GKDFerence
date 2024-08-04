@@ -153,7 +153,7 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
     (newSocket: SocketType) => {
       newSocket!.on('documentG send change info', (_payload: SocketDocChangeType) => {
         // 1. 만약 이 수정정보가 내 대기순번이 지났다는거라면 업데이트 하지 않고 대기상태만 해제한다.
-        if (_payload.uOId === uOId && _payload.startRow === null && _payload.endRow === null) {
+        if (_payload.uOId === uOId || (_payload.startRow === null && _payload.endRow === null)) {
           setIsQWaitingLock(false)
           return
         }
@@ -191,26 +191,24 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
 
   // Get data from DB
   useEffect(() => {
-    getJwt().then(jwtFromClient => {
-      if (jwtFromClient && dOId && !isDBLoad) {
-        get(`/sidebar/documentG/getDocumentG/${dOId}`, jwtFromClient)
-          .then(res => res.json())
-          .then(res => {
-            const {ok, body, errors} = res
-            if (ok) {
-              setTitle(body.title)
-              setContents(body.contents)
-              setIsDBLoad(true)
-            } else {
-              const keys = Object.keys(errors)
-              alert(errors[keys[0]])
-            }
-          })
-      }
-    })
-
-    return () => {
-      setIsDBLoad(false)
+    if (dOId && !isDBLoad) {
+      getJwt().then(jwtFromClient => {
+        if (jwtFromClient) {
+          get(`/sidebar/documentG/getDocumentG/${dOId}`, jwtFromClient)
+            .then(res => res.json())
+            .then(res => {
+              const {ok, body, errors} = res
+              if (ok) {
+                setTitle(body.title)
+                setContents(body.contents)
+                setIsDBLoad(true)
+              } else {
+                const keys = Object.keys(errors)
+                alert(errors[keys[0]])
+              }
+            })
+        }
+      })
     }
   }, [dOId, isDBLoad, getJwt])
 
@@ -270,9 +268,10 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
       if (sockDoc) {
         sockDoc.disconnect()
         setSockDoc(null)
+        setIsDBLoad(false)
       }
     }
-  }, [sockDoc, setSockDoc])
+  }, [dOId, sockDoc, setSockDoc])
 
   // prettier-ignore
   const value = {
