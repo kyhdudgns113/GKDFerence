@@ -24,8 +24,12 @@ export default function DocumentGPage() {
   const [isMouseOutDuringDown, setIsMouseOutDuringDown] = useState<boolean>(false)
   const [rangeStartRow, setRangeStartRow] = useState<number | null>(null)
   const [rangeEndRow, setRangeEndRow] = useState<number | null>(null)
+  // starRow, endRow : 수정사항이 없으면 null 이 되도록 한다.
   const [startRow, setStartRow] = useState<number | null>(null)
   const [endRow, setEndRow] = useState<number | null>(null)
+
+  const [focusRowAfterRender, setFocusRowAfterRender] = useState<number | null>(null)
+  const [cursorAfterRender, setCursorAfterRender] = useState<number>(0)
 
   // inputRefs : 이걸 써야 blur 가 된다.
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -37,6 +41,62 @@ export default function DocumentGPage() {
       inputRefs.current[1]?.focus()
     },
     [inputRefs]
+  )
+
+  // AREA2: onKeyDownInput_something area
+  const onKeyDownInput_ArrowUp = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const selectionStart = e.currentTarget.selectionStart
+      const selectionEnd = e.currentTarget.selectionEnd
+      const selectionDirection = e.currentTarget.selectionDirection
+      const cursorCol = (selectionDirection === 'forward' ? selectionEnd : selectionStart) || 0
+      if (index > 0) {
+        e.preventDefault()
+        setCursorAfterRender(cursorCol)
+        setFocusRowAfterRender(index - 1)
+      }
+    },
+    []
+  )
+  const onKeyDownInput_ArrowDown = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const selectionStart = e.currentTarget.selectionStart
+      const selectionEnd = e.currentTarget.selectionEnd
+      const selectionDirection = e.currentTarget.selectionDirection
+      const cursorCol = (selectionDirection === 'forward' ? selectionEnd : selectionStart) || 0
+      if (index < ((contents && contents.length) || 0)) {
+        e.preventDefault()
+        setCursorAfterRender(cursorCol)
+        setFocusRowAfterRender(index + 1)
+      }
+    },
+    [contents]
+  )
+  const onKeyDownInput_ArrowLeft = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const selectionEnd = e.currentTarget.selectionEnd
+      if (selectionEnd === 0 && index > 0) {
+        const upperContents = (contents && contents[index - 1]) || ''
+        const upperLen = upperContents.length
+        e.preventDefault()
+        setFocusRowAfterRender(index - 1)
+        setCursorAfterRender(upperLen)
+      }
+    },
+    [contents]
+  )
+  const onKeyDownInput_ArrowRight = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const contentsLen = (contents && contents.length) || 0
+      const nowContent = (contents && contents[index]) || ''
+      const selectionStart = e.currentTarget.selectionStart || 0
+      if (selectionStart >= nowContent.length && index < contentsLen) {
+        e.preventDefault()
+        setFocusRowAfterRender(index + 1)
+        setCursorAfterRender(0)
+      }
+    },
+    [contents]
   )
 
   // AREA1: Div Page Area
@@ -81,8 +141,9 @@ export default function DocumentGPage() {
   const onBlurInput = useCallback(
     (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
       if (startRow && endRow) {
-        console.log(`Add info to Queue in Page`)
         addInfoToChangeQ('contents', startRow, endRow, [e.currentTarget.value])
+        setStartRow(null)
+        setEndRow(null)
       }
     },
     [startRow, endRow, addInfoToChangeQ]
@@ -101,6 +162,7 @@ export default function DocumentGPage() {
           return [e.target.value]
         }
       })
+      setFocusRowAfterRender(index)
     },
     [rangeStartRow, rangeEndRow, setContents]
   )
@@ -111,6 +173,7 @@ export default function DocumentGPage() {
       // setMouseDownRow(index)
       // setMouseOverRow(index)
       // setMouseUpRow(index)
+      // NOTE: 클릭 안하고 focus 가 들어오는 경우도 있다보니 가급적 여기서 뭐 하지 말자
     },
     []
   )
@@ -130,7 +193,27 @@ export default function DocumentGPage() {
     []
   )
   const onKeyDownInput = useCallback(
-    (index: number) => (e: KeyboardEvent) => {
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      switch (e.key) {
+        case 'ArrowUp': {
+          onKeyDownInput_ArrowUp(index)(e)
+          return
+        }
+        case 'ArrowDown': {
+          onKeyDownInput_ArrowDown(index)(e)
+          return
+        }
+        case 'ArrowLeft': {
+          onKeyDownInput_ArrowLeft(index)(e)
+          return
+        }
+        case 'ArrowRight': {
+          onKeyDownInput_ArrowRight(index)(e)
+          return
+        }
+      }
+
+      // selection 활성화때
       if (isMouseOutDuringDown) {
         // 입력키가 들어왔을 때
         if (!e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && e.key.length === 1) {
@@ -143,13 +226,25 @@ export default function DocumentGPage() {
             newPrev.splice(rangeStartRow ?? index, deleteLen, e.key)
             return newPrev
           })
+
+          // 얘네는 내용이 바뀔때만 호출되어야 한다.
+          // 방향키등을 눌렀을때는 변함 없어야 한다.
+          setStartRow(rangeStartRow)
+          setEndRow(rangeEndRow)
         }
         setIsMouseOutDuringDown(false)
-        setStartRow(rangeStartRow)
-        setEndRow(rangeEndRow)
       }
     },
-    [isMouseOutDuringDown, rangeStartRow, rangeEndRow, setContents]
+    [
+      isMouseOutDuringDown,
+      rangeStartRow,
+      rangeEndRow,
+      setContents,
+      onKeyDownInput_ArrowUp,
+      onKeyDownInput_ArrowDown,
+      onKeyDownInput_ArrowLeft,
+      onKeyDownInput_ArrowRight
+    ]
   )
   const onMouseDownInput = useCallback(
     (index: number) => (e: MouseEvent) => {
@@ -231,9 +326,23 @@ export default function DocumentGPage() {
     }
   }, [divRefs, inputRefs, isMouseDown, isMouseOutDuringDown, mouseDownRow, mouseOverRow])
 
+  // Set focus after render
+  useEffect(() => {
+    if (focusRowAfterRender !== null) {
+      const inputRef = inputRefs.current[focusRowAfterRender]
+      if (inputRef) {
+        inputRef.focus()
+        inputRef.selectionStart = cursorAfterRender
+        inputRef.selectionEnd = cursorAfterRender
+      }
+      setCursorAfterRender(0)
+      setFocusRowAfterRender(null)
+    }
+  }, [cursorAfterRender, focusRowAfterRender, inputRefs])
+
   const DocumentGContent = (index: number) => (
     <input
-      className="INPUT_CONTENT outline-none w-full border-2 focus:bg-gkd-sakura-bg "
+      className="INPUT_CONTENT outline-none w-full focus:bg-gkd-sakura-bg "
       key={`contents:${index}`}
       onBlur={onBlurInput(index)}
       onChange={onChangeInput(index)}
@@ -260,27 +369,24 @@ export default function DocumentGPage() {
       onMouseOver={onMouseOverPage}
       onMouseUp={onMouseUpPage}>
       <Title>DocumentG Page</Title>
-      <Title>Range : {`${rangeStartRow}, ${rangeEndRow}`}</Title>
-      <Title>STED : {`${startRow}, ${endRow}`}</Title>
       <input
         className="INPUT_TITLE border-2 text-gkd-sakura-text m-2 p-2 text-3xl w-1/3"
         onChange={onChangeTitle}
         onBlur={onBlurTitle}
         value={title}
       />
-      <div className="flex flex-col w-1/2">
+      <div className="flex flex-col w-1/2 border-gkd-sakura-text border-2">
         {contents &&
           contents.map((content, index) => {
             return (
               <div
-                className="DIV_CONTENT w-full selection:bg-blue-300"
+                className="DIV_CONTENT w-full selection:bg-gkd-sakura-bg"
                 key={`contentsDiv:${index}`}
                 ref={el => (divRefs.current[index] = el)}>
                 {DocumentGContent(index)}
               </div>
             )
           })}
-        {/* // FUTURE: 여기서 입력을 하면 focus 가 사라진다. */}
         {DocumentGContent((contents && contents.length) || 0)}
       </div>
       <Button onClick={onClickTest}>yes</Button>
