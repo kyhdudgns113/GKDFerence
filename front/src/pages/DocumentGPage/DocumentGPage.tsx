@@ -32,6 +32,7 @@ export default function DocumentGPage() {
   const [rangeEndRow, setRangeEndRow] = useState<number | null>(null)
   const [selectionRowStart, setSelectionRowStart] = useState<number | null>(null)
   const [selectionRowEnd, setSelectionRowEnd] = useState<number | null>(null)
+  const [shiftMouseDownRow, setShiftMouseDownRow] = useState<number | null>(null)
 
   // contents 가 변했을때 바꾼다.
   const [startRow, setStartRow] = useState<number | null>(null)
@@ -62,6 +63,7 @@ export default function DocumentGPage() {
   const onMouseDownPage = useCallback((e: MouseEvent) => {
     setIsMousePressed(true)
     setMouseDownRow(null)
+    setShiftMouseDownRow(null)
   }, [])
   const onMouseOverPage = useCallback((e: MouseEvent) => {
     setMouseOverRow(null)
@@ -83,6 +85,7 @@ export default function DocumentGPage() {
             newPrev.push(e.target.value)
             return newPrev
           })
+          setContentLastRow(null)
         }
         addInfoToChangeQ('contents', startRow, endRow, [e.target.value])
       }
@@ -143,6 +146,8 @@ export default function DocumentGPage() {
           setIsChanged(true)
           setStartRow(rangeStartRow)
           setEndRow(rangeEndRow)
+          setSelectionRowStart(null)
+          setSelectionRowEnd(null)
           setContents(prev => {
             const newPrev = [...prev]
             const deleteLen = (rangeEndRow || index) - (rangeStartRow || index) + 1
@@ -159,6 +164,11 @@ export default function DocumentGPage() {
       e.stopPropagation()
       setIsMousePressed(true)
       setMouseDownRow(index)
+      if (e.shiftKey) {
+        setShiftMouseDownRow(index)
+      } else {
+        setShiftMouseDownRow(null)
+      }
     },
     []
   )
@@ -211,17 +221,19 @@ export default function DocumentGPage() {
   // Set selectionRowEnd
   useEffect(() => {
     const selectionDrag = isMouseOutAndPressed && isMousePressed
-    const setCondition = selectionDrag || false
 
     const justMouseDown = isMousePressed && !isMouseOutAndPressed
     const setNullCondition = justMouseDown || false
-    if (setCondition) {
+    if (selectionDrag) {
       setSelectionRowEnd(mouseOverRow)
+    } //
+    else if (shiftMouseDownRow !== null) {
+      setSelectionRowEnd(shiftMouseDownRow)
     } //
     else if (setNullCondition) {
       setSelectionRowEnd(null)
     }
-  }, [isMouseOutAndPressed, isMousePressed, mouseOverRow])
+  }, [isMouseOutAndPressed, isMousePressed, mouseOverRow, shiftMouseDownRow])
 
   // Set selection
   useEffect(() => {
