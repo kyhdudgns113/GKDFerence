@@ -20,7 +20,12 @@ export default function DocumentGPage() {
 
   const [contentsLen, setContentsLen] = useState<number>(0)
   const [contentLastRow, setContentLastRow] = useState<DocContentType>('')
+  const [cursorAfterRender, setCursorAfterRender] = useState<number | null>(null)
+  // focusRow : onFocus 실행됬을때만 설정된다.
+  // focusRowAfterRender : 이거 설정되고 렌더링되면 focus 가 바뀌도록 했다.
+  // 둘이 엄연히 다르다.
   const [focusRow, setFocusRow] = useState<number | null>(null)
+  const [focusRowAfterRender, setFocusRowAfterRender] = useState<number | null>(null)
   const [isChanged, setIsChanged] = useState<boolean>(false)
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false)
   const [isMouseOutAndPressed, setIsMouseOutAndPressed] = useState<boolean>(false)
@@ -28,11 +33,15 @@ export default function DocumentGPage() {
   const [mouseDownRow, setMouseDownRow] = useState<number | null>(null)
   const [mouseUpRow, setMouseUpRow] = useState<number | null>(null)
   const [mouseOverRow, setMouseOverRow] = useState<number | null>(null)
+  // rangeStartRow : min(selectionRowStart, End)
+  // 선택한 범위의 윗 부분 index 이다.
   const [rangeStartRow, setRangeStartRow] = useState<number | null>(null)
   const [rangeEndRow, setRangeEndRow] = useState<number | null>(null)
+  // selectionRowStart : 선택을 시작한 부분의 row
   const [selectionRowStart, setSelectionRowStart] = useState<number | null>(null)
   const [selectionRowEnd, setSelectionRowEnd] = useState<number | null>(null)
   const [shiftMouseDownRow, setShiftMouseDownRow] = useState<number | null>(null)
+  const [shiftKeyboardSelectEndRow, setShiftKeyboardSelectEndRow] = useState<number | null>(null)
 
   // contents 가 변했을때 바꾼다.
   const [startRow, setStartRow] = useState<number | null>(null)
@@ -73,6 +82,181 @@ export default function DocumentGPage() {
     setMouseUpRow(null)
   }, [])
 
+  // AREA2: onKeyDownInput Area
+  const onKeyDownInput_ArrowUp = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.shiftKey) {
+        if (isSelectionActivated && selectionRowEnd !== null && selectionRowEnd > 0) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(selectionRowEnd - 1)
+        } // BLANK LINE COMMENT:
+        else if (!isSelectionActivated && index > 0) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(index - 1)
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      }
+      // shift 안 눌렸을 때
+      else {
+        const newCursor =
+          e.currentTarget.selectionDirection === 'forward'
+            ? e.currentTarget.selectionEnd
+            : e.currentTarget.selectionStart
+        if (isSelectionActivated) {
+          e.preventDefault()
+          setFocusRowAfterRender(rangeStartRow)
+          setCursorAfterRender(0)
+          setSelectionRowEnd(null)
+        } // BLANK LINE COMMENT:
+        else if (index > 0) {
+          e.preventDefault()
+          setFocusRowAfterRender(index - 1)
+          setCursorAfterRender(newCursor)
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      }
+    },
+    [isSelectionActivated, rangeStartRow, selectionRowEnd]
+  )
+  const onKeyDownInput_ArrowDown = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.shiftKey) {
+        if (isSelectionActivated && selectionRowEnd !== null && selectionRowEnd < contentsLen) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(selectionRowEnd + 1)
+        } // BLANK LINE COMMENT:
+        else if (!isSelectionActivated && index < contentsLen) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(index + 1)
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      } // BLANK LINE COMMENT:
+      // shift 안 눌렸을 때
+      else {
+        const newCursor =
+          e.currentTarget.selectionDirection === 'forward'
+            ? e.currentTarget.selectionEnd
+            : e.currentTarget.selectionStart
+        if (isSelectionActivated) {
+          const rangeEndRowContent = contents && contents[rangeEndRow || index]
+          e.preventDefault()
+          setFocusRowAfterRender(rangeEndRow)
+          setCursorAfterRender(rangeEndRowContent ? rangeEndRowContent.length : 0)
+          setSelectionRowEnd(null)
+        } // BLANK LINE COMMENT:
+        else if (index < contentsLen) {
+          e.preventDefault()
+          setFocusRowAfterRender(index + 1)
+          setCursorAfterRender(newCursor)
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      }
+    },
+    [contents, contentsLen, isSelectionActivated, rangeEndRow, selectionRowEnd]
+  )
+  const onKeyDownInput_ArrowLeft = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const selStart = e.currentTarget.selectionStart
+      const selEnd = e.currentTarget.selectionEnd
+      if (e.shiftKey) {
+        if (isSelectionActivated && selectionRowEnd !== null && selectionRowEnd > 0) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(selectionRowEnd - 1)
+        } // BLANK LINE COMMENT:
+        else if (!isSelectionActivated && index > 0 && selStart === 0) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(index - 1)
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      } // BLANK LINE COMMENT:
+      // shift 안 누른 상태일 때
+      else {
+        if (isSelectionActivated) {
+          e.preventDefault()
+          setFocusRowAfterRender(rangeStartRow)
+          setCursorAfterRender(0)
+          setSelectionRowEnd(null)
+        } // BLANK LINE COMMENT:
+        // 커서가 맨 왼쪽에 있을 때
+        else if (index > 0 && selStart === 0 && selEnd === 0) {
+          e.preventDefault()
+          setFocusRowAfterRender(index - 1)
+
+          if (contents) {
+            const upperContent = contents[index - 1]
+            setCursorAfterRender(upperContent === null ? 0 : upperContent.length)
+          } // BLANK LINE COMMENT:
+          else {
+            setCursorAfterRender(0)
+          }
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      }
+    },
+    [contents, isSelectionActivated, rangeStartRow, selectionRowEnd]
+  )
+  const onKeyDownInput_ArrowRight = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const selStart = e.currentTarget.selectionStart
+      const selEnd = e.currentTarget.selectionEnd
+      const nowContent = contents && contents[index]
+      const nowContentLen = (nowContent && nowContent.length) || 0
+
+      if (e.shiftKey) {
+        if (isSelectionActivated && selectionRowEnd !== null && selectionRowEnd < contentsLen) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(selectionRowEnd + 1)
+        } // BLANK LINE COMMENT:
+        else if (!isSelectionActivated && index < contentsLen && selEnd === nowContentLen) {
+          e.preventDefault()
+          setShiftKeyboardSelectEndRow(index + 1)
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      } // BLANK LINE COMMENT:
+      // shift 안 누른 상태일 때
+      else {
+        if (isSelectionActivated) {
+          const rangeEndRowContent = contents && contents[rangeEndRow || index]
+          e.preventDefault()
+          setFocusRowAfterRender(rangeEndRow)
+          setCursorAfterRender(rangeEndRowContent ? rangeEndRowContent.length : 0)
+          setSelectionRowEnd(null)
+        } // BLANK LINE COMMENT:
+        // 커서가 맨 오른쪽에 있을 때
+        else if (index < contentsLen && selStart === nowContentLen && selEnd === nowContentLen) {
+          e.preventDefault()
+          setFocusRowAfterRender(index + 1)
+
+          if (contents) {
+            const lowerContent = contents[index + 1]
+            setCursorAfterRender(lowerContent === null ? 0 : lowerContent.length)
+          } // BLANK LINE COMMENT:
+          else {
+            setCursorAfterRender(0)
+          }
+        } // BLANK LINE COMMENT:
+        else {
+          // DO NOTHING:
+        }
+      }
+    },
+    [contents, contentsLen, isSelectionActivated, rangeEndRow, selectionRowEnd]
+  )
+
   // AREA3: input Element Area
   const onBlurInput = useCallback(
     (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +287,8 @@ export default function DocumentGPage() {
           newPrev[index] = e.target.value
           return newPrev
         })
-      } else {
+      } //
+      else {
         // 여기서 setContents 하면 커서 위치 오류가 난다.
         setContentLastRow(e.target.value)
       }
@@ -135,9 +320,17 @@ export default function DocumentGPage() {
       // NOTE: selection 이랑 상관 없이 돌아가는 경우에는 return 해준다.
       switch (e.key) {
         case 'ArrowUp':
-          break
+          onKeyDownInput_ArrowUp(index)(e)
+          return
         case 'ArrowDown':
-          break
+          onKeyDownInput_ArrowDown(index)(e)
+          return
+        case 'ArrowLeft':
+          onKeyDownInput_ArrowLeft(index)(e)
+          return
+        case 'ArrowRight':
+          onKeyDownInput_ArrowRight(index)(e)
+          return
       }
 
       if (isSelectionActivated) {
@@ -157,7 +350,16 @@ export default function DocumentGPage() {
         }
       }
     },
-    [isSelectionActivated, rangeStartRow, rangeEndRow, setContents]
+    [
+      isSelectionActivated,
+      rangeStartRow,
+      rangeEndRow,
+      onKeyDownInput_ArrowUp,
+      onKeyDownInput_ArrowDown,
+      onKeyDownInput_ArrowLeft,
+      onKeyDownInput_ArrowRight,
+      setContents
+    ]
   )
   const onMouseDownInput = useCallback(
     (index: number) => (e: MouseEvent) => {
@@ -165,12 +367,16 @@ export default function DocumentGPage() {
       setIsMousePressed(true)
       setMouseDownRow(index)
       if (e.shiftKey) {
-        setShiftMouseDownRow(index)
-      } else {
+        e.preventDefault()
+        if (mouseDownRow !== index) {
+          setShiftMouseDownRow(index)
+        }
+      } //
+      else {
         setShiftMouseDownRow(null)
       }
     },
-    []
+    [mouseDownRow]
   )
   const onMouseOutInput = useCallback(
     (index: number) => (e: MouseEvent) => {
@@ -196,6 +402,19 @@ export default function DocumentGPage() {
     []
   )
 
+  // Change focus after render
+  useEffect(() => {
+    if (focusRowAfterRender !== null && inputRefs) {
+      const inputRef = inputRefs.current[focusRowAfterRender]
+      if (inputRef) {
+        inputRef.focus()
+        inputRef.selectionStart = cursorAfterRender
+        inputRef.selectionEnd = cursorAfterRender
+      }
+      setFocusRowAfterRender(null)
+    }
+  }, [cursorAfterRender, focusRowAfterRender, inputRefs])
+
   // Set contentsLen
   useEffect(() => {
     setContentsLen(contents ? contents.length : 0)
@@ -216,9 +435,10 @@ export default function DocumentGPage() {
   // Set selectionRowStart
   useEffect(() => {
     setSelectionRowStart(focusRow)
+    setSelectionRowEnd(null)
   }, [focusRow])
 
-  // Set selectionRowEnd
+  // Set selectionRowEnd 1 : mouse without shift
   useEffect(() => {
     const selectionDrag = isMouseOutAndPressed && isMousePressed
 
@@ -226,14 +446,31 @@ export default function DocumentGPage() {
     const setNullCondition = justMouseDown || false
     if (selectionDrag) {
       setSelectionRowEnd(mouseOverRow)
-    } //
-    else if (shiftMouseDownRow !== null) {
-      setSelectionRowEnd(shiftMouseDownRow)
-    } //
-    else if (setNullCondition) {
+    } else if (setNullCondition) {
       setSelectionRowEnd(null)
     }
-  }, [isMouseOutAndPressed, isMousePressed, mouseOverRow, shiftMouseDownRow])
+  }, [
+    isMouseOutAndPressed,
+    isMousePressed,
+    mouseOverRow,
+    shiftKeyboardSelectEndRow,
+    shiftMouseDownRow
+  ])
+
+  // Set selectionRowEnd 2 : shift + mouse
+  useEffect(() => {
+    if (shiftMouseDownRow !== null) {
+      setSelectionRowEnd(shiftMouseDownRow)
+    }
+  }, [shiftMouseDownRow])
+
+  // Set selectionRowEnd 3 : shift + keyboard
+  useEffect(() => {
+    if (shiftKeyboardSelectEndRow !== null) {
+      setSelectionRowEnd(shiftKeyboardSelectEndRow)
+      setShiftKeyboardSelectEndRow(null)
+    }
+  }, [shiftKeyboardSelectEndRow])
 
   // Set selection
   useEffect(() => {
@@ -261,7 +498,8 @@ export default function DocumentGPage() {
         selection.removeAllRanges()
         selection.addRange(range)
       }
-    } else {
+    } //
+    else {
       setIsSelectionActivated(false)
     }
   }, [divRefs, selectionRowStart, selectionRowEnd])
@@ -305,7 +543,9 @@ export default function DocumentGPage() {
       <Title>DocumentG Page</Title>
       <Title>MousePressed : {isMousePressed ? 'true' : 'false'}</Title>
       <Title>OutPressed : {isMouseOutAndPressed ? 'true' : 'false'}</Title>
-      <Title>selection : {`${selectionRowStart}, ${selectionRowEnd}`}</Title>
+      <Title>selection? : {isSelectionActivated ? 'True' : 'False'}</Title>
+      <Title>selectionRow : {`${selectionRowStart}, ${selectionRowEnd}`}</Title>
+      <Title>shiftKeyRow? : {shiftKeyboardSelectEndRow}</Title>
       <input
         className="INPUT_TITLE border-2 text-gkd-sakura-text m-2 p-2 text-3xl w-1/3"
         onChange={onChangeTitle}
@@ -317,7 +557,7 @@ export default function DocumentGPage() {
           contents.map((content, index) => {
             return (
               <div
-                className="DIV_CONTENT w-full selection:bg-gkd-sakura-bg"
+                className="DIV_CONTENT w-full selection:bg-gkd-sakura-text"
                 key={`contentsDiv:${index}`}
                 ref={el => (divRefs.current[index] = el)}>
                 {DocumentGContent(index)}
