@@ -14,8 +14,17 @@ import {DocContentType} from '../../common'
 
 export default function DocumentGPage() {
   /* eslint-disable */
-  const {dOId, title, contents, addInfoToChangeQ, onBlurTitle, onChangeTitle, setContents} =
-    useDocumentGContext()
+  const {
+    dOId,
+    title,
+    contents,
+    changedContents,
+    addInfoToChangeQ,
+    onBlurTitle,
+    onChangeTitle,
+    setContents,
+    setChangedContents
+  } = useDocumentGContext()
   const {uOId} = useAuth()
 
   const [contentsLen, setContentsLen] = useState<number>(0)
@@ -256,12 +265,65 @@ export default function DocumentGPage() {
     },
     [contents, contentsLen, isSelectionActivated, rangeEndRow, selectionRowEnd]
   )
+  const onKeyDownInput_Enter = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      if (isSelectionActivated) {
+        setContents(prev => {
+          const newPrev = [...prev]
+          const deleteLen = (rangeEndRow || index) - (rangeStartRow || index)
+          newPrev.splice(rangeStartRow || index, deleteLen, null, null)
+          return newPrev
+        })
+        setChangedContents([null, null])
+        setFocusRowAfterRender((rangeStartRow || index) + 1)
+        setCursorAfterRender(0)
+        setStartRow(rangeStartRow)
+        setEndRow(rangeEndRow)
+        setSelectionRowStart(null)
+        setSelectionRowEnd(null)
+        setIsChanged(true)
+      } // BLANK LINE COMMENT:
+      else {
+        const selStart = e.currentTarget.selectionStart
+        const selEnd = e.currentTarget.selectionEnd
+
+        if (selStart !== null && selEnd !== null) {
+          const contentIndex = e.currentTarget.value.slice(0, selStart)
+          const contentIndexNext = e.currentTarget.value.slice(selEnd)
+          setContents(prev => {
+            const newPrev = [...prev]
+            newPrev.splice(index, 1, contentIndex, contentIndexNext)
+            return newPrev
+          })
+          setChangedContents([contentIndex, contentIndexNext])
+          setFocusRowAfterRender(index + 1)
+          setCursorAfterRender(0)
+          setStartRow(index)
+          setEndRow(index)
+          setSelectionRowStart(null)
+          setSelectionRowEnd(null)
+          setIsChanged(true)
+        }
+      }
+    },
+    [isSelectionActivated, rangeStartRow, rangeEndRow, setContents, setChangedContents]
+  )
+  const onKeyDownInput_Backspace = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      if (isSelectionActivated) {
+        //
+      } // BLANK LINE COMMENT:
+      else {
+        //
+      }
+    },
+    [isSelectionActivated]
+  )
 
   // AREA3: input Element Area
   const onBlurInput = useCallback(
     (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
       setFocusRow(null)
-      setIsChanged(false)
       if (isChanged && startRow !== null && endRow !== null) {
         if (index === contentsLen) {
           setContents(prev => {
@@ -271,10 +333,21 @@ export default function DocumentGPage() {
           })
           setContentLastRow(null)
         }
-        addInfoToChangeQ('contents', startRow, endRow, [e.target.value])
+        addInfoToChangeQ('contents', startRow, endRow, changedContents)
+        setChangedContents([])
       }
+      setIsChanged(false)
     },
-    [contentsLen, isChanged, startRow, endRow, addInfoToChangeQ, setContents]
+    [
+      contentsLen,
+      changedContents,
+      isChanged,
+      startRow,
+      endRow,
+      addInfoToChangeQ,
+      setContents,
+      setChangedContents
+    ]
   )
   const onChangeInput = useCallback(
     (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -287,13 +360,14 @@ export default function DocumentGPage() {
           newPrev[index] = e.target.value
           return newPrev
         })
-      } //
+      } // BLANK LINE COMMENT:
       else {
         // 여기서 setContents 하면 커서 위치 오류가 난다.
         setContentLastRow(e.target.value)
       }
+      setChangedContents([e.target.value])
     },
-    [contentsLen, rangeStartRow, rangeEndRow, setContents]
+    [contentsLen, rangeStartRow, rangeEndRow, setContents, setChangedContents]
   )
   const onClickInput = useCallback(
     (index: number) => (e: MouseEvent) => {
@@ -331,6 +405,12 @@ export default function DocumentGPage() {
         case 'ArrowRight':
           onKeyDownInput_ArrowRight(index)(e)
           return
+        case 'Enter':
+          onKeyDownInput_Enter(index)(e)
+          return
+        case 'Backspace':
+          onKeyDownInput_Backspace(index)(e)
+          return
       }
 
       if (isSelectionActivated) {
@@ -348,6 +428,7 @@ export default function DocumentGPage() {
             newPrev.splice(rangeStartRow || index, deleteLen, e.key)
             return newPrev
           })
+          setChangedContents([e.key])
           setFocusRowAfterRender(rangeStartRow)
           setCursorAfterRender(e.key.length)
         }
@@ -361,7 +442,10 @@ export default function DocumentGPage() {
       onKeyDownInput_ArrowDown,
       onKeyDownInput_ArrowLeft,
       onKeyDownInput_ArrowRight,
-      setContents
+      onKeyDownInput_Enter,
+      onKeyDownInput_Backspace,
+      setContents,
+      setChangedContents
     ]
   )
   const onMouseDownInput = useCallback(
@@ -546,11 +630,6 @@ export default function DocumentGPage() {
       onMouseOver={onMouseOverPage}
       onMouseUp={onMouseUpPage}>
       <Title>DocumentG Page</Title>
-      <Title>MousePressed : {isMousePressed ? 'true' : 'false'}</Title>
-      <Title>OutPressed : {isMouseOutAndPressed ? 'true' : 'false'}</Title>
-      <Title>selection? : {isSelectionActivated ? 'True' : 'False'}</Title>
-      <Title>selectionRow : {`${selectionRowStart}, ${selectionRowEnd}`}</Title>
-      <Title>rangeRow : {`${rangeStartRow}, ${rangeEndRow}`}</Title>
       <input
         className="INPUT_TITLE border-2 text-gkd-sakura-text m-2 p-2 text-3xl w-1/3"
         onChange={onChangeTitle}

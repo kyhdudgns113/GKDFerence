@@ -29,6 +29,9 @@ type ContextType = {
   contents?: DocContentsType
   setContents: Setter<DocContentsType>
 
+  changedContents?: DocContentsType
+  setChangedContents: Setter<DocContentsType>
+
   isContentsChanged?: boolean
   setIsContentsChanged: Setter<boolean>
 
@@ -46,6 +49,7 @@ export const DocumentGContext = createContext<ContextType>({
   setDOId: () => {},
   setTitle: () => {},
   setContents: () => {},
+  setChangedContents: () => {},
   setIsContentsChanged: () => {},
 
   onBlurTitle: () => {},
@@ -60,6 +64,7 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
   const [dOId, setDOId] = useState<string>('')
   const [title, setTitle] = useState<DocTitleType>('')
   const [contents, setContents] = useState<DocContentsType>([])
+  const [changedContents, setChangedContents] = useState<DocContentsType>([])
   const [changeQ, setChangeQ] = useState<SocketDocChangeType[]>([])
   const [isDBLoad, setIsDBLoad] = useState<boolean>(false)
   const [isQWaitingLock, setIsQWaitingLock] = useState<boolean>(false)
@@ -278,6 +283,7 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
     dOId, setDOId,
     title, setTitle,
     contents, setContents,
+    changedContents, setChangedContents,
     isContentsChanged, setIsContentsChanged,
 
     onBlurTitle,
