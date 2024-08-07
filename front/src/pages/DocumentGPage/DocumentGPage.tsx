@@ -334,7 +334,8 @@ export default function DocumentGPage() {
       }
 
       if (isSelectionActivated) {
-        if (!e.altKey && !e.ctrlKey && !e.shiftKey && e.key.length === 1) {
+        // NOTE: shift 키는 눌려도 된다.
+        if (!e.altKey && !e.ctrlKey && e.key.length === 1) {
           e.preventDefault()
           setIsChanged(true)
           setStartRow(rangeStartRow)
@@ -347,6 +348,8 @@ export default function DocumentGPage() {
             newPrev.splice(rangeStartRow || index, deleteLen, e.key)
             return newPrev
           })
+          setFocusRowAfterRender(rangeStartRow)
+          setCursorAfterRender(e.key.length)
         }
       }
     },
@@ -474,8 +477,8 @@ export default function DocumentGPage() {
 
   // Set selection
   useEffect(() => {
+    const selection = window.getSelection()
     if (selectionRowStart !== null && selectionRowEnd !== null && divRefs) {
-      const selection = window.getSelection()
       if (selection) {
         const range = document.createRange()
 
@@ -501,6 +504,8 @@ export default function DocumentGPage() {
     } //
     else {
       setIsSelectionActivated(false)
+      // 이거 하면 focus 도 해제된다.
+      // selection?.removeAllRanges()
     }
   }, [divRefs, selectionRowStart, selectionRowEnd])
 
@@ -545,7 +550,7 @@ export default function DocumentGPage() {
       <Title>OutPressed : {isMouseOutAndPressed ? 'true' : 'false'}</Title>
       <Title>selection? : {isSelectionActivated ? 'True' : 'False'}</Title>
       <Title>selectionRow : {`${selectionRowStart}, ${selectionRowEnd}`}</Title>
-      <Title>shiftKeyRow? : {shiftKeyboardSelectEndRow}</Title>
+      <Title>rangeRow : {`${rangeStartRow}, ${rangeEndRow}`}</Title>
       <input
         className="INPUT_TITLE border-2 text-gkd-sakura-text m-2 p-2 text-3xl w-1/3"
         onChange={onChangeTitle}
