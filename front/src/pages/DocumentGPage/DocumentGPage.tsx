@@ -10,7 +10,7 @@ import {
 } from 'react'
 import {Button, Title} from '../../components'
 import {useAuth, useDocumentGContext} from '../../contexts'
-import {DocContentType} from '../../common'
+import {DocContentsType, DocContentType} from '../../common'
 
 export default function DocumentGPage() {
   /* eslint-disable */
@@ -55,6 +55,9 @@ export default function DocumentGPage() {
   // contents 가 변했을때 바꾼다.
   const [startRow, setStartRow] = useState<number | null>(null)
   const [endRow, setEndRow] = useState<number | null>(null)
+
+  const [testStart, setTestStart] = useState<number | null>(null)
+  const [testEnd, setTestEnd] = useState<number | null>(null)
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const divRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -267,15 +270,24 @@ export default function DocumentGPage() {
   )
   const onKeyDownInput_Enter = useCallback(
     (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
-      if (isSelectionActivated) {
+      if (isSelectionActivated && rangeStartRow !== null && rangeEndRow !== null) {
+        e.preventDefault()
+
+        const newStartRow = rangeStartRow
+        const newEndRow = rangeEndRow
+        const deleteLen = newEndRow - newStartRow + 1
+        const newContents: DocContentsType = []
+        if (newStartRow !== contentsLen && newEndRow !== contentsLen) {
+          newContents.push(null)
+        }
+
         setContents(prev => {
           const newPrev = [...prev]
-          const deleteLen = (rangeEndRow || index) - (rangeStartRow || index)
-          newPrev.splice(rangeStartRow || index, deleteLen, null, null)
+          newPrev.splice(rangeStartRow, deleteLen, ...newContents)
           return newPrev
         })
-        setChangedContents([null, null])
-        setFocusRowAfterRender((rangeStartRow || index) + 1)
+        setChangedContents(newContents)
+        setFocusRowAfterRender(rangeStartRow)
         setCursorAfterRender(0)
         setStartRow(rangeStartRow)
         setEndRow(rangeEndRow)
@@ -283,41 +295,194 @@ export default function DocumentGPage() {
         setSelectionRowEnd(null)
         setIsChanged(true)
       } // BLANK LINE COMMENT:
+      // Selection is not activated in onKeyDown_Enter
       else {
+        e.preventDefault()
         const selStart = e.currentTarget.selectionStart
         const selEnd = e.currentTarget.selectionEnd
 
         if (selStart !== null && selEnd !== null) {
-          const contentIndex = e.currentTarget.value.slice(0, selStart)
-          const contentIndexNext = e.currentTarget.value.slice(selEnd)
+          const newStartRow = index
+          const newEndRow = index
+          const deleteLen = newEndRow - newStartRow + 1
+          const newContents: DocContentsType = []
+
+          if (selStart !== e.currentTarget.value.length) {
+            const contentIdx = e.currentTarget.value.slice(0, selStart)
+            const contentIdxNext = e.currentTarget.value.slice(selEnd)
+            newContents.push(contentIdx)
+            newContents.push(contentIdxNext)
+            setContentLastRow(null)
+          } // BLANK LINE COMMENT:
+          else if (newStartRow === contentsLen) {
+            newContents.push(null)
+          }
           setContents(prev => {
             const newPrev = [...prev]
-            newPrev.splice(index, 1, contentIndex, contentIndexNext)
+            newPrev.splice(newStartRow, deleteLen, ...newContents)
             return newPrev
           })
-          setChangedContents([contentIndex, contentIndexNext])
-          setFocusRowAfterRender(index + 1)
+          setChangedContents(newContents)
+          setFocusRowAfterRender(newStartRow + 1)
           setCursorAfterRender(0)
-          setStartRow(index)
-          setEndRow(index)
+          setStartRow(newStartRow)
+          setEndRow(newEndRow)
           setSelectionRowStart(null)
           setSelectionRowEnd(null)
           setIsChanged(true)
         }
       }
     },
-    [isSelectionActivated, rangeStartRow, rangeEndRow, setContents, setChangedContents]
+    [contentsLen, isSelectionActivated, rangeStartRow, rangeEndRow, setContents, setChangedContents]
   )
   const onKeyDownInput_Backspace = useCallback(
     (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
-      if (isSelectionActivated) {
-        //
+      if (isSelectionActivated && rangeStartRow !== null && rangeEndRow !== null) {
+        e.preventDefault()
+
+        const newStartRow = rangeStartRow
+        const newEndRow = rangeEndRow
+        const deleteLen = newEndRow - newStartRow + 1
+        const newContents: DocContentsType = []
+
+        if (newStartRow !== contentsLen) {
+          newContents.push(null)
+        }
+
+        setContents(prev => {
+          const newPrev = [...prev]
+          newPrev.splice(newStartRow, deleteLen, ...newContents)
+          return newPrev
+        })
+        setChangedContents(newContents)
+        setFocusRowAfterRender(newStartRow)
+        setCursorAfterRender(0)
+        setStartRow(newStartRow)
+        setEndRow(newEndRow)
+        setSelectionRowStart(null)
+        setSelectionRowEnd(null)
+        setIsChanged(true)
       } // BLANK LINE COMMENT:
+      // Selection is not activated
       else {
-        //
+        const selStart = e.currentTarget.selectionStart
+        const selEnd = e.currentTarget.selectionEnd
+
+        if (selStart === 0 && selEnd === 0 && index > 0 && contents) {
+          e.preventDefault()
+
+          const newStartRow = index - 1
+          const newEndRow = index
+          const deleteLen = newEndRow - newStartRow + 1
+          const newContents: DocContentsType = []
+
+          const contentIndexPrev = contents[index - 1]
+          const contentIndex = e.currentTarget.value
+          const newContent = (contentIndexPrev || '') + (contentIndex || '')
+          newContents.push(newContent)
+
+          const newCursor = (contentIndexPrev && contentIndexPrev.length) || 0
+          setContents(prev => {
+            const newPrev = [...prev]
+            newPrev.splice(newStartRow, deleteLen, ...newContents)
+            return newPrev
+          })
+          setContentLastRow(null)
+          setChangedContents(newContents)
+          setFocusRowAfterRender(newStartRow)
+          setCursorAfterRender(newCursor)
+          setStartRow(newStartRow)
+          setEndRow(newEndRow)
+          setSelectionRowStart(null)
+          setSelectionRowEnd(null)
+          setIsChanged(true)
+        }
       }
     },
-    [isSelectionActivated]
+    [
+      contents,
+      contentsLen,
+      isSelectionActivated,
+      rangeStartRow,
+      rangeEndRow,
+      setContents,
+      setChangedContents
+    ]
+  )
+  const onKeyDownInput_Delete = useCallback(
+    (index: number) => (e: KeyboardEvent<HTMLInputElement>) => {
+      const selStart = e.currentTarget.selectionStart
+      const selEnd = e.currentTarget.selectionEnd
+      const valLen = e.currentTarget.value.length
+
+      if (isSelectionActivated && rangeStartRow !== null && rangeEndRow !== null) {
+        e.preventDefault()
+
+        const newStartRow = rangeStartRow
+        const newEndRow = rangeEndRow
+        const deleteLen = newEndRow - newStartRow + 1
+        const newContents: DocContentsType = []
+
+        if (newStartRow !== contentsLen) {
+          newContents.push(null)
+        }
+
+        setContents(prev => {
+          const newPrev = [...prev]
+          newPrev.splice(newStartRow, deleteLen, ...newContents)
+          return newPrev
+        })
+        setChangedContents(newContents)
+        setFocusRowAfterRender(newStartRow)
+        setCursorAfterRender(0)
+        setStartRow(newStartRow)
+        setEndRow(newEndRow)
+        setSelectionRowStart(null)
+        setSelectionRowEnd(null)
+        setIsChanged(true)
+      } // BLANK LINE COMMENT:
+      // Selection is not activated
+      else {
+        if (selStart === valLen && selEnd && valLen && index < contentsLen - 1) {
+          e.preventDefault()
+
+          if (contents) {
+            const contentNow = contents[index]
+            const contentNext = contents[index + 1]
+            const newContentNow = (contentNow || '') + (contentNext || '')
+            const newContents = [newContentNow]
+            const newStartRow = index
+            const newEndRow = index + 1
+            const deleteLen = newEndRow - newStartRow + 1
+            const newCursor = valLen
+
+            setContents(prev => {
+              const newPrev = [...prev]
+              newPrev.splice(newStartRow, deleteLen, ...newContents)
+              return newPrev
+            })
+            setContentLastRow(null)
+            setChangedContents(newContents)
+            setFocusRowAfterRender(newStartRow)
+            setCursorAfterRender(newCursor)
+            setStartRow(newStartRow)
+            setEndRow(newEndRow)
+            setSelectionRowStart(null)
+            setSelectionRowEnd(null)
+            setIsChanged(true)
+          }
+        }
+      }
+    },
+    [
+      contents,
+      contentsLen,
+      isSelectionActivated,
+      rangeStartRow,
+      rangeEndRow,
+      setContents,
+      setChangedContents
+    ]
   )
 
   // AREA3: input Element Area
@@ -325,7 +490,8 @@ export default function DocumentGPage() {
     (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
       setFocusRow(null)
       if (isChanged && startRow !== null && endRow !== null) {
-        if (index === contentsLen) {
+        // Lastrow 에 값이 없으면 반영하지 않는다.
+        if (index === contentsLen && e.currentTarget.value.length > 0) {
           setContents(prev => {
             const newPrev = [...prev]
             newPrev.push(e.target.value)
@@ -411,6 +577,9 @@ export default function DocumentGPage() {
         case 'Backspace':
           onKeyDownInput_Backspace(index)(e)
           return
+        case 'Delete':
+          onKeyDownInput_Delete(index)(e)
+          return
       }
 
       if (isSelectionActivated) {
@@ -434,16 +603,20 @@ export default function DocumentGPage() {
         }
       }
     },
+    // prettier-ignore
     [
       isSelectionActivated,
       rangeStartRow,
       rangeEndRow,
+
       onKeyDownInput_ArrowUp,
       onKeyDownInput_ArrowDown,
       onKeyDownInput_ArrowLeft,
       onKeyDownInput_ArrowRight,
       onKeyDownInput_Enter,
       onKeyDownInput_Backspace,
+      onKeyDownInput_Delete,
+
       setContents,
       setChangedContents
     ]
@@ -491,16 +664,20 @@ export default function DocumentGPage() {
 
   // Change focus after render
   useEffect(() => {
-    if (focusRowAfterRender !== null && inputRefs) {
+    // focusRowAfterRender > contentsLen 인 경우는
+    // 마지막줄을 수정했는데 이것이 아직 반영이 안 된 경우이다.
+    // 반영이 안 된 상태에서는 focus 가 제대로 이동을 안 한다.
+    // 따라서 focusRowAfterReder <= contentsLen 조건을 추가헀다.
+    if (inputRefs && focusRowAfterRender !== null && focusRowAfterRender <= contentsLen) {
       const inputRef = inputRefs.current[focusRowAfterRender]
       if (inputRef) {
         inputRef.focus()
         inputRef.selectionStart = cursorAfterRender
         inputRef.selectionEnd = cursorAfterRender
+        setFocusRowAfterRender(null)
       }
-      setFocusRowAfterRender(null)
     }
-  }, [cursorAfterRender, focusRowAfterRender, inputRefs])
+  }, [contentsLen, cursorAfterRender, focusRowAfterRender, inputRefs])
 
   // Set contentsLen
   useEffect(() => {
