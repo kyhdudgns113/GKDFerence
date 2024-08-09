@@ -63,7 +63,8 @@ export default function SingleChatPage() {
                     <ChatBlockMy chatBlock={chatBlock} index={chatBlock.idx || 0} />
                   </div>
                 )
-              } else {
+              } // BLANK LINE COMMENT:
+              else {
                 return (
                   <div key={`chat:${chatBlock.idx}`}>
                     <ChatBlockOther chatBlock={chatBlock} index={chatBlock.idx || 0} />

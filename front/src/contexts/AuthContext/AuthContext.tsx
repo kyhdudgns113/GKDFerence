@@ -60,7 +60,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
           if (ok) {
             U.writeBodyObject(body, setId, setUOId, setEmail)
             resolve({})
-          } else {
+          } // BLANK LINE COMMENT:
+          else {
             reject(errors)
           }
         })
@@ -78,7 +79,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
           if (ok) {
             U.writeBodyObject(body, setId, setUOId, setEmail, callback)
             resolve({})
-          } else {
+          } // BLANK LINE COMMENT:
+          else {
             reject(errors)
           }
         })
@@ -101,7 +103,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
               const {ok} = result
               if (ok) {
                 successCallBack && successCallBack()
-              } else {
+              } // BLANK LINE COMMENT:
+              else {
                 U.writeBodyObject({}, setId, setUOId, setEmail, () => {
                   failCallBack ? failCallBack() : navigate('/')
                 })
@@ -110,7 +113,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
             .catch((e: Error) => {
               console.log(e.message)
             })
-        } else {
+        } // BLANK LINE COMMENT:
+        else {
           failCallBack && failCallBack()
         }
       })
@@ -142,13 +146,15 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
                           .then(res => {
                             callback && callback()
                           })
-                      } else {
+                      } // BLANK LINE COMMENT:
+                      else {
                         const errKey = Object.keys(errors)[0]
                         setAlertMsg(errors[errKey])
                       }
                     })
                 })
-              } else {
+              } // BLANK LINE COMMENT:
+              else {
                 const keys = Object.keys(errors)
                 setAlertMsg(errors[keys[0]])
 
@@ -158,7 +164,8 @@ export const AuthProvider: FC<PropsWithChildren<AuthProviderProps>> = ({children
             .catch((e: Error) => {
               console.log(e.message)
             })
-        } else {
+        } // BLANK LINE COMMENT:
+        else {
           navigate('/')
         }
       })

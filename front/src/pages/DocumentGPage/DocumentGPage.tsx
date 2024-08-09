@@ -56,9 +56,6 @@ export default function DocumentGPage() {
   const [startRow, setStartRow] = useState<number | null>(null)
   const [endRow, setEndRow] = useState<number | null>(null)
 
-  const [testStart, setTestStart] = useState<number | null>(null)
-  const [testEnd, setTestEnd] = useState<number | null>(null)
-
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const divRefs = useRef<(HTMLDivElement | null)[]>([])
   /* eslint-enable */
@@ -307,14 +304,14 @@ export default function DocumentGPage() {
           const deleteLen = newEndRow - newStartRow + 1
           const newContents: DocContentsType = []
 
-          if (selStart !== e.currentTarget.value.length) {
+          if (newStartRow < contentsLen) {
             const contentIdx = e.currentTarget.value.slice(0, selStart)
             const contentIdxNext = e.currentTarget.value.slice(selEnd)
             newContents.push(contentIdx)
             newContents.push(contentIdxNext)
             setContentLastRow(null)
           } // BLANK LINE COMMENT:
-          else if (newStartRow === contentsLen) {
+          else {
             newContents.push(null)
           }
           setContents(prev => {
@@ -443,7 +440,7 @@ export default function DocumentGPage() {
       } // BLANK LINE COMMENT:
       // Selection is not activated
       else {
-        if (selStart === valLen && selEnd && valLen && index < contentsLen - 1) {
+        if (selStart === valLen && selEnd === valLen && index < contentsLen - 1) {
           e.preventDefault()
 
           if (contents) {
@@ -696,6 +693,12 @@ export default function DocumentGPage() {
     }
   }, [isMousePressed])
 
+  // Set rangeRowStart & And
+  useEffect(() => {
+    setRangeStartRow(focusRow)
+    setRangeEndRow(focusRow)
+  }, [focusRow])
+
   // Set selectionRowStart
   useEffect(() => {
     setSelectionRowStart(focusRow)
@@ -710,7 +713,8 @@ export default function DocumentGPage() {
     const setNullCondition = justMouseDown || false
     if (selectionDrag) {
       setSelectionRowEnd(mouseOverRow)
-    } else if (setNullCondition) {
+    } // BLANK LINE COMMENT:
+    else if (setNullCondition) {
       setSelectionRowEnd(null)
     }
   }, [
@@ -770,12 +774,6 @@ export default function DocumentGPage() {
     }
   }, [divRefs, selectionRowStart, selectionRowEnd])
 
-  // Set rangeRowStart & And
-  useEffect(() => {
-    setRangeStartRow(focusRow)
-    setRangeEndRow(focusRow)
-  }, [focusRow])
-
   const classNameContent = ['outline-none w-full focus:bg-gkd-sakura-bg'].join(' ')
 
   const DocumentGContent = (index: number) => (
@@ -826,7 +824,7 @@ export default function DocumentGPage() {
             )
           })}
         <div
-          className="DIV_CONTENT w-full selection:bg-gkd-sakura-bg"
+          className="DIV_CONTENT w-full selection:bg-gkd-sakura-text"
           key={`contentsDiv:${contentsLen}`}
           ref={el => (divRefs.current[contentsLen] = el)}>
           {DocumentGContent(contentsLen)}

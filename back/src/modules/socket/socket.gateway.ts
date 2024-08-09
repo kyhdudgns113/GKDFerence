@@ -266,7 +266,8 @@ export class SocketGateway
       payload.endRow = null
       client.emit('documentG send change info', payload)
       return
-    } else if (lockState === 'never' || lockState === 'ready') {
+    } // BLANK LINE COMMENT:
+    else if (lockState === 'never' || lockState === 'ready') {
       // NOTE: 뭔가를 해야할까?
       return
     }

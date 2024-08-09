@@ -56,13 +56,17 @@ export const SignUpProvider: FC<PropsWithChildren<SignUpProviderProps>> = ({chil
         setSubmitLock(true)
         if (idErr) {
           alert(idErr)
-        } else if (emailErr) {
+        } // BLANK LINE COMMENT:
+        else if (emailErr) {
           alert(emailErr)
-        } else if (pwErr) {
+        } // BLANK LINE COMMENT:
+        else if (pwErr) {
           alert(pwErr)
-        } else if (pw2Err) {
+        } // BLANK LINE COMMENT:
+        else if (pw2Err) {
           alert(pw2Err)
-        } else {
+        } // BLANK LINE COMMENT:
+        else {
           signup(idVal, email, pwVal)
             .then(() => navigate('/'))
             .catch(errors => {

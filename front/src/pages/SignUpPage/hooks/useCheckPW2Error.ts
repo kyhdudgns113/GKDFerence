@@ -8,9 +8,11 @@ export const useCheckPW2Error = (
   useEffect(() => {
     if (!pw2Val) {
       setPw2Err('<< 비밀번호가 공란입니다. >>')
-    } else if (pwVal !== pw2Val) {
+    } // BLANK LINE COMMENT:
+    else if (pwVal !== pw2Val) {
       setPw2Err('<< 비밀번호가 틀립니다. >>')
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       setPw2Err('')
     }
   }, [pwVal, pw2Val, setPw2Err])

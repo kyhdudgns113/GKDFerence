@@ -49,7 +49,8 @@ export default function ModalCreateChat() {
           const {ok, body, errors} = result
           if (ok) {
             setErrMsg(`${body.id} is received`)
-          } else {
+          } // BLANK LINE COMMENT:
+          else {
             const keys = Object.keys(errors)
             keys.includes('jwt') && setErrMsg(errors['jwt'])
             keys.includes('idOrEmail') && setErrMsg(errors['idOrEmail'])
@@ -80,7 +81,8 @@ export default function ModalCreateChat() {
           const {ok, errors} = res
           if (ok) {
             onClickClose(e)
-          } else {
+          } // BLANK LINE COMMENT:
+          else {
             const keys = Object.keys(errors)
 
             setErrMsg(errors[keys[0]])

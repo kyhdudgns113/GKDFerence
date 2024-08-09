@@ -13,7 +13,8 @@ const getOrDel =
         ...init,
         headers: {...headers, Authorization: `Bearer ${jwt}`}
       }
-    } else init = {...init, headers}
+    } // BLANK LINE COMMENT:
+    else init = {...init, headers}
     return fetch(getServerUrl(path), init)
   }
 export const get = getOrDel('GET')

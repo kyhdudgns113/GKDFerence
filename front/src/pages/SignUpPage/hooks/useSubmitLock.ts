@@ -8,7 +8,8 @@ export const useSubmitLock = (submitLock: boolean, setSubmitLock: Setter<boolean
       const id = setInterval(() => {
         if (yes < 1) {
           yes += 1
-        } else {
+        } // BLANK LINE COMMENT:
+        else {
           setSubmitLock(false)
           clearInterval(id)
         }

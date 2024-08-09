@@ -32,7 +32,8 @@ export default function Sidebar() {
           const {ok} = res // eslint-disable-line
           if (ok) {
             navigate('/')
-          } else {
+          } // BLANK LINE COMMENT:
+          else {
             //
           }
         })
@@ -55,30 +56,13 @@ export default function Sidebar() {
               if (ok) {
                 setChatRooms(body.chatRooms)
                 setDocumentGs(body.documentGs)
-              } else {
+              } // BLANK LINE COMMENT:
+              else {
                 //
               }
             })
-          // get(`/sidebar/getChatRooms/${uOId}`, jwtFromClient)
-          //   .then(res => res.json())
-          //   .then(res => {
-          //     const {ok, body} = res
-          //     if (ok) {
-          //       setChatRooms(body.chatRooms)
-          //     } else {
-          //     }
-          //   })
-          // get(`/sidebar/getDocumentGs/${uOId}`, jwtFromClient)
-          //   .then(res => res.json())
-          //   .then(res => {
-          //     const {ok, body} = res
-          //     if (ok) {
-          //       //
-          //     } else {
-          //       //
-          //     }
-          //   })
-        } else {
+        } // BLANK LINE COMMENT:
+        else {
           //
         }
       })

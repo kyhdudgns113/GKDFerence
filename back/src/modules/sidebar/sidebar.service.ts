@@ -44,7 +44,8 @@ export class SidebarService {
         body: {},
         errors: {}
       }
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       return {
         ok: false,
         body: {},
@@ -104,7 +105,8 @@ export class SidebarService {
         body: {},
         errors: {uOId: "User isn't exist"}
       }
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       return {
         ok: true,
         body: {chatRooms: chatRooms},

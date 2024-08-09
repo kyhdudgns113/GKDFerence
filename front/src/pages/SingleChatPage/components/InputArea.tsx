@@ -28,7 +28,8 @@ export const InputArea: FC<InputAreaMyProps> = () => {
         body: chatBlock
       }
       sockChatEmit('chat', payload)
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       !jwt && console.log(`jwt is null in InputArea`)
       !cOId && console.log(`cOId is null in InputArea`)
     }
@@ -46,7 +47,8 @@ export const InputArea: FC<InputAreaMyProps> = () => {
               e.preventDefault()
               if (e.altKey) {
                 setChatInput(prev => prev + '\n')
-              } else {
+              } // BLANK LINE COMMENT:
+              else {
                 onClickSend()
               }
               break

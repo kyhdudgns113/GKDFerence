@@ -30,9 +30,11 @@ export class LockService {
 
     if (this.lockInfo[key].nowNumber > readyNumber) {
       return 'miss'
-    } else if (this.lockInfo[key].nowNumber === readyNumber) {
+    } // BLANK LINE COMMENT:
+    else if (this.lockInfo[key].nowNumber === readyNumber) {
       return 'right now'
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       return 'ready'
     }
   }
@@ -60,7 +62,8 @@ export class LockService {
 
         if (readyNumber > nowNumber) {
           // LOCKED:
-        } else if (readyNumber === nowNumber) {
+        } // BLANK LINE COMMENT:
+        else if (readyNumber === nowNumber) {
           clearInterval(intervalId)
 
           // NOTE: 연결 해제등의 이유로 lock 을 너무 오래 가지고 있을 수 있다.
@@ -69,7 +72,8 @@ export class LockService {
             this.releaseLock(retReadyLock)
           }, this.maximumHoldingLockTimeMilliSecond)
           resolve(retReadyLock)
-        } else {
+        } // BLANK LINE COMMENT:
+        else {
           clearInterval(intervalId)
           reject(retReadyLock)
         }
@@ -84,9 +88,11 @@ export class LockService {
     const {readyNumber, key} = this.decodeReadyLockToNumberAndKey(readyLock)
     if (!this.lockInfo[key]) {
       this.logger.log(`lock ${key} isn't exist`)
-    } else if (this.lockInfo[key].nowNumber === readyNumber) {
+    } // BLANK LINE COMMENT:
+    else if (this.lockInfo[key].nowNumber === readyNumber) {
       this.lockInfo[key].nowNumber += 1
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       // NOTE: 이것도 정상기능이라 간주한다.
       // NOTE: 대기순번이 지나고나서 락을 해제하는 경우이다.
       // NOTE: 아무것도 하지 않는다.

@@ -6,9 +6,11 @@ export const useCheckEmailError = (email: string, setEmailErr: (msg: string) => 
 
     if (!email) {
       setEmailErr('<< 이메일이 공란입니다. >>')
-    } else if (email && !emailRegex.test(email)) {
+    } // BLANK LINE COMMENT:
+    else if (email && !emailRegex.test(email)) {
       setEmailErr('<< 이메일 형식이 아닙니다. >>')
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       setEmailErr('')
     }
   }, [email, setEmailErr])

@@ -4,7 +4,8 @@ export const useCheckIdError = (idVal: string, setIdErr: (msg: string) => void) 
   useEffect(() => {
     if (!idVal) {
       setIdErr('<< ID 가 공란입니다. >>')
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       setIdErr('')
     }
   }, [idVal, setIdErr])

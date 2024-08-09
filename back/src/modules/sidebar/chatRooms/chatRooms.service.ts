@@ -48,7 +48,8 @@ export class ChatRoomsService {
         body: {},
         errors: {}
       }
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       return {
         ok: false,
         body: {},
@@ -63,7 +64,8 @@ export class ChatRoomsService {
     const chatBlocks = await this.useDBService.getChatBlocks(cOId)
     if (firstIdx > 0) {
       return chatBlocks.slice(firstIdx >= 10 ? firstIdx - 10 : 0, firstIdx)
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       const len = chatBlocks.length
       return chatBlocks.slice(len - 10, len)
     }

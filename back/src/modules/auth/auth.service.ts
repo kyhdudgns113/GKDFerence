@@ -110,7 +110,8 @@ export class AuthService {
       ret.body.email = user.email
       ret.body.uOId = user._id.toString()
       ret.body.jwt = jwtFromServer
-    } else {
+    } // BLANK LINE COMMENT:
+    else {
       ret.errors['idOrEmail'] = "User isn't exist"
     }
 

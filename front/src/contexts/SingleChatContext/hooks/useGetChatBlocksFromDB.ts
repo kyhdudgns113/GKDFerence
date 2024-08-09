@@ -21,7 +21,8 @@ export const useGetChatBlocksFromDB = (
               const chatBlocks = body.chatBlocks
               setChatBlocks(chatBlocks)
               setIsDBLoad(true)
-            } else {
+            } // BLANK LINE COMMENT:
+            else {
               const keys = Object.keys(errors)
               alert(errors[keys[0]])
             }
