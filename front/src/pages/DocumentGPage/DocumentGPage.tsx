@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  ClipboardEvent,
   FocusEvent,
   KeyboardEvent,
   MouseEvent,
@@ -35,6 +36,7 @@ export default function DocumentGPage() {
   // 둘이 엄연히 다르다.
   const [focusRow, setFocusRow] = useState<number | null>(null)
   const [focusRowAfterRender, setFocusRowAfterRender] = useState<number | null>(null)
+  const [focusToLastRow, setFocusToLastRow] = useState<boolean>(false)
   const [isChanged, setIsChanged] = useState<boolean>(false)
   const [isMousePressed, setIsMousePressed] = useState<boolean>(false)
   const [isMouseOutAndPressed, setIsMouseOutAndPressed] = useState<boolean>(false)
@@ -53,6 +55,8 @@ export default function DocumentGPage() {
   const [shiftKeyboardSelectEndRow, setShiftKeyboardSelectEndRow] = useState<number | null>(null)
 
   // contents 가 변했을때 바꾼다.
+  // startRow : 삭제할 컨텐츠의 시작 row
+  // endRow : 삭제할 컨텐츠의 끝 row
   const [startRow, setStartRow] = useState<number | null>(null)
   const [endRow, setEndRow] = useState<number | null>(null)
 
@@ -309,18 +313,26 @@ export default function DocumentGPage() {
             const contentIdxNext = e.currentTarget.value.slice(selEnd)
             newContents.push(contentIdx)
             newContents.push(contentIdxNext)
-            setContentLastRow(null)
           } // BLANK LINE COMMENT:
           else {
-            newContents.push(null)
+            const contentIdx = e.currentTarget.value.slice(0, selStart)
+            const contentIdxNext = e.currentTarget.value.slice(selEnd)
+            newContents.push(contentIdx)
+            if (selStart < e.currentTarget.value.length) {
+              newContents.push(contentIdxNext)
+            }
           }
           setContents(prev => {
             const newPrev = [...prev]
             newPrev.splice(newStartRow, deleteLen, ...newContents)
             return newPrev
           })
+          setContentLastRow(null)
           setChangedContents(newContents)
           setFocusRowAfterRender(newStartRow + 1)
+          if (newStartRow + 1 === contentsLen) {
+            setFocusToLastRow(true)
+          }
           setCursorAfterRender(0)
           setStartRow(newStartRow)
           setEndRow(newEndRow)
@@ -658,23 +670,95 @@ export default function DocumentGPage() {
     },
     []
   )
+  const onPasteInput = useCallback(
+    (index: number) => (e: ClipboardEvent<HTMLInputElement>) => {
+      e.preventDefault()
+      const clipboardData = e.clipboardData.getData('text')
+
+      if (isSelectionActivated && rangeStartRow !== null && rangeEndRow !== null) {
+        const newStartRow = rangeStartRow
+        const newEndRow = rangeEndRow
+        const deleteLen = newEndRow - newStartRow + 1
+
+        const newChangedContents = clipboardData.split('\n')
+
+        const newFocusRow = newStartRow + newChangedContents.length - 1
+        const newCursor = newChangedContents[0].length
+
+        setContents(prev => {
+          const newPrev = [...prev]
+          newPrev.splice(newStartRow, deleteLen, ...newChangedContents)
+          return newPrev
+        })
+        setChangedContents(newChangedContents)
+        setFocusRowAfterRender(newFocusRow)
+        setCursorAfterRender(newCursor)
+        setStartRow(newStartRow)
+        setEndRow(newEndRow)
+        setSelectionRowStart(null)
+        setSelectionRowEnd(null)
+        setIsChanged(true)
+      } // BLANK LINE COMMENT:
+      // window.selection is not activated
+      else {
+        const newStartRow = index
+        const newEndRow = index
+        const selStart = e.currentTarget.selectionStart
+        const selEnd = e.currentTarget.selectionEnd
+        const deleteLen = newEndRow - newStartRow + 1
+
+        if (selStart !== null && selEnd !== null) {
+          const newChangedContents = clipboardData.split('\n')
+          const newLen = newChangedContents.length
+          const selPrevContent = e.currentTarget.value.slice(0, selStart)
+          const selNextContent = e.currentTarget.value.slice(selEnd)
+
+          newChangedContents[0] = selPrevContent + newChangedContents[0]
+          newChangedContents[newLen - 1] = newChangedContents[newLen - 1] + selNextContent
+
+          const newFocusRow = newStartRow + newLen - 1
+
+          const newCursor = newChangedContents[newLen - 1].length - selNextContent.length
+
+          setContents(prev => {
+            const newPrev = [...prev]
+            newPrev.splice(newStartRow, deleteLen, ...newChangedContents)
+            return newPrev
+          })
+          setChangedContents(newChangedContents)
+          setFocusRowAfterRender(newFocusRow)
+          setCursorAfterRender(newCursor)
+          setStartRow(newStartRow)
+          setEndRow(newEndRow)
+          setSelectionRowStart(null)
+          setSelectionRowEnd(null)
+          setIsChanged(true)
+        }
+      }
+    },
+    [isSelectionActivated, rangeStartRow, rangeEndRow, setChangedContents, setContents]
+  )
+
+  // AREA1: useEffect Area
 
   // Change focus after render
   useEffect(() => {
-    // focusRowAfterRender > contentsLen 인 경우는
-    // 마지막줄을 수정했는데 이것이 아직 반영이 안 된 경우이다.
-    // 반영이 안 된 상태에서는 focus 가 제대로 이동을 안 한다.
-    // 따라서 focusRowAfterReder <= contentsLen 조건을 추가헀다.
+    // NOTE: focusRowAfterRender > contentsLen 인 경우는
+    // NOTE: 마지막줄을 수정했는데 이것이 아직 반영이 안 된 경우이다.
+    // NOTE: 반영이 안 된 상태에서는 focus 가 제대로 이동을 안 한다.
+    // NOTE: 따라서 focusRowAfterReder <= contentsLen 조건을 추가헀다.
     if (inputRefs && focusRowAfterRender !== null && focusRowAfterRender <= contentsLen) {
       const inputRef = inputRefs.current[focusRowAfterRender]
-      if (inputRef) {
+      const inputNextRef = inputRefs.current[focusRowAfterRender + 1]
+      if (inputRef && ((focusToLastRow && inputNextRef) || !focusToLastRow)) {
         inputRef.focus()
         inputRef.selectionStart = cursorAfterRender
         inputRef.selectionEnd = cursorAfterRender
         setFocusRowAfterRender(null)
+        setFocusToLastRow(false)
       }
     }
-  }, [contentsLen, cursorAfterRender, focusRowAfterRender, inputRefs])
+  }, [contentsLen, cursorAfterRender, focusRowAfterRender, focusToLastRow, inputRefs])
 
   // Set contentsLen
   useEffect(() => {
@@ -790,6 +874,7 @@ export default function DocumentGPage() {
       onMouseOut={onMouseOutInput(index)}
       onMouseOver={onMouseOverInput(index)}
       onMouseUp={onMouseUpInput(index)}
+      onPaste={onPasteInput(index)}
       ref={el => (inputRefs.current[index] = el)}
       value={index < contentsLen ? (contents && contents[index]) || '' : contentLastRow || ''}
     />
@@ -811,7 +896,7 @@ export default function DocumentGPage() {
         onBlur={onBlurTitle}
         value={title}
       />
-      <div className="flex flex-col w-1/2 border-gkd-sakura-text border-2">
+      <div className="flex flex-col w-1/2 p-2 border-gkd-sakura-text border-2">
         {contents &&
           contents.map((content, index) => {
             return (
