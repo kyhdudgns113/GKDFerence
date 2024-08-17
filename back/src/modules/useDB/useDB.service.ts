@@ -26,6 +26,31 @@ export class UseDBService {
     return await this.userDBService.addDocumentG(uOId, dOId)
   }
 
+  async addUserToDocumentG(dOId: string, idOrEmail: string) {
+    const user = await this.userDBService.findOneByIdOrEmail(idOrEmail)
+    if (!user) {
+      throw {idOrEmail: `User isn't exist`}
+    }
+
+    const documentG = await this.documentGDBService.findOneByObjectId(dOId)
+    if (!documentG) {
+      throw {dOId: `Document isn't exist`}
+    }
+
+    const uOId = user._id.toString()
+    const docHasUser = await this.documentGDBService.documentGHasUser(dOId, uOId)
+    if (docHasUser) {
+      throw {uOId: `User already has enjoyed`}
+    }
+
+    const ret1 = await this.userDBService.addDocumentG(uOId, dOId)
+    if (!ret1) {
+      throw {error: `Adding document error`}
+    }
+    const ret = await this.documentGDBService.addUserToDocumentG(dOId, uOId)
+    return ret
+  }
+
   async applyDocumentGChangeInfo(payload: SocketDocChangeType) {
     const ret = await this.documentGDBService.applyDocumentGChangeInfo(payload)
     return ret
@@ -155,6 +180,17 @@ export class UseDBService {
 
   async getDocumentG(dOId: string) {
     return await this.documentGDBService.getDocumentG(dOId)
+  }
+
+  async getDocumentGUsers(dOId: string) {
+    const uOIdObj = await this.documentGDBService.getDocumentGUsers(dOId)
+    const uOIds = Object.keys(uOIdObj)
+    return uOIds
+  }
+
+  async getUserIdEmail(uOId: string) {
+    const ret = await this.userDBService.getUserIdEmail(uOId)
+    return ret
   }
 
   async setUnreadChat(uOId: string, cOId: string, newCnt: number) {

@@ -166,14 +166,15 @@ export const DocumentGProvider: FC<PropsWithChildren<DocumentGProviderProps>> = 
         onSetChangeQWhenReceiveInfo(setChangeQ, _payload)
 
         // 3. changeQ 를 빠져나온 _payload(수정 정보) 를 처리한다.
-        if (_payload.startRow && _payload.endRow) {
+        if (_payload.startRow !== null && _payload.endRow !== null) {
           if (_payload.startRow <= _payload.endRow) {
             if (_payload.whichChanged === 'contents') {
               setContents(prev => {
+                const newPrev = [...prev]
                 const deleteLen = _payload.endRow! - _payload.startRow! + 1
                 const contents = _payload.contents ?? []
-                prev.splice(_payload.startRow!, deleteLen, ...contents)
-                return prev
+                newPrev.splice(_payload.startRow!, deleteLen, ...contents)
+                return newPrev
               })
             } // BLANK LINE COMMENT:
             else {

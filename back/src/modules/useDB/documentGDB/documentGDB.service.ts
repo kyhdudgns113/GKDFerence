@@ -12,6 +12,15 @@ export class DocumentGDBService {
     private documentGContentModel: Model<DocumentGContent>
   ) {}
 
+  async addUserToDocumentG(dOId: string, uOId: string) {
+    const _id = new Types.ObjectId(dOId)
+    const ret = await this.documentGModel.updateOne(
+      {_id: _id},
+      {$set: {[`uOIds.${uOId}`]: true}}
+    )
+    return ret
+  }
+
   async applyDocumentGChangeInfo(payload: SocketDocChangeType) {
     const {dOId, startRow, endRow, contents, title, whichChanged} = payload
     const _id = new Types.ObjectId(dOId)
@@ -105,6 +114,10 @@ export class DocumentGDBService {
       return content.content
     })
     return {title: documentG.title, contents: contents}
+  }
+  async getDocumentGUsers(dOId: string) {
+    const documentG = await this.findOneByObjectId(dOId)
+    return documentG.uOIds
   }
 
   // BLANK LINE COMMENT

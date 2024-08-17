@@ -14,6 +14,23 @@ export class SidebarService {
     private useDBService: UseDBService
   ) {}
 
+  async addUserToDocumentG(dOId: string, idOrEmail: string) {
+    try {
+      const ret = await this.documentGsService.addUserToDocumentG(dOId, idOrEmail)
+      return {
+        ok: true,
+        body: {},
+        errors: {}
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        body: {},
+        errors: error
+      }
+    }
+  }
+
   /**
    *
    * @param body : Information for user
@@ -140,6 +157,24 @@ export class SidebarService {
       ok: true,
       body: {title: ret.title, contents: ret.contents},
       errors: {}
+    }
+  }
+
+  async getDocumentGUsers(uOId: string, dOId: string) {
+    const ret = await this.documentGsService.getDocumentGUsers(uOId, dOId)
+    if (ret) {
+      return {
+        ok: true,
+        body: {userInfos: ret},
+        errors: {}
+      }
+    } // BLANK LINE COMMENT:
+    else {
+      return {
+        ok: false,
+        body: {},
+        errors: {uOId: '해당 문서에 권한이 없습니다.'}
+      }
     }
   }
 

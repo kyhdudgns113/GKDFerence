@@ -93,6 +93,11 @@ export class UserDBService {
     return user.singleChatRooms && user.singleChatRooms[targetUser._id.toString()]
   }
 
+  async getUserIdEmail(uOId: string) {
+    const user = await this.findOneByObjectId(uOId)
+    return {id: user.id, email: user.email}
+  }
+
   /**
    * @returns 업데이트 된 unReadChats[cOId] 값. socket.gateway.chat 에서 쓴다
    * - socketP만 연결된 uOId 가 안 읽은 cOId 개수를 socketP 를 통해 전달하는 용도

@@ -30,8 +30,17 @@ export type ChatBlockType = {
   content: string
 }
 export type ChatBlocksType = ChatBlockType[]
+export type DocAddUserBodyType = {
+  jwt?: string
+  idOrEmail: string
+}
 export type DocContentType = string | null
 export type DocContentsType = DocContentType[]
+export type DocUserInfoType = {
+  id: string
+  email: string
+  uOId: string
+}
 export type DocTitleType = string
 export type ErrorsType = KeyValueType
 export interface JwtPayload {

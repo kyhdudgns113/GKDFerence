@@ -11,7 +11,12 @@ import {
 } from '@nestjs/common'
 import {SidebarService} from './sidebar.service'
 import {getJwtFromHeader} from 'src/util'
-import {gkdJwtSignOption, JwtPayload, SidebarBodyType} from 'src/common'
+import {
+  DocAddUserBodyType,
+  gkdJwtSignOption,
+  JwtPayload,
+  SidebarBodyType
+} from 'src/common'
 import {JwtService} from '@nestjs/jwt'
 import {LockService} from '../lock/lock.service'
 import {GkdJwtService} from '../gkdJwt/gkdJwt.service'
@@ -28,7 +33,27 @@ export class SidebarController {
     private readonly sidebarService: SidebarService
   ) {}
 
-  // AREA2: Post
+  // AREA1: Post
+  @Post('/documentG/addUser/:dOId')
+  async addUserToDocumentG(
+    @Body() body: DocAddUserBodyType,
+    @Param('dOId') dOId: string
+  ) {
+    const jwt = body.jwt || ''
+    try {
+      await this.gkdJwtService.verifyAsync(jwt)
+    } catch (error) {
+      return {
+        ok: false,
+        body: {},
+        errors: {jwt: 'Jwt invalid in addUserToDocumentG'}
+      }
+    }
+
+    const ret = await this.sidebarService.addUserToDocumentG(dOId, body.idOrEmail)
+    return ret
+  }
+
   @Post('/createSingleChatRoom/:idOrEmail')
   async createChatRoom(
     @Body() body: SidebarBodyType,
@@ -38,6 +63,7 @@ export class SidebarController {
     try {
       await this.gkdJwtService.verifyAsync(jwt)
     } catch (error) {
+      // BLANK LINE COMMENT:
       return {
         ok: false,
         body: {},
@@ -72,7 +98,7 @@ export class SidebarController {
     return ret
   }
 
-  // AREA2: Get
+  // AREA1: Get
   /**
    * It is used in create chatroom modal
    */
@@ -92,7 +118,6 @@ export class SidebarController {
     const ret = await this.sidebarService.findUserIdOrEmail(idOrEmail)
     return ret
   }
-
   @Get('/chatRoom/getChatBlocks/:cOId/:firstIdx')
   async getChatBlocks(
     @Headers() headers: any,
@@ -117,7 +142,6 @@ export class SidebarController {
     this.lockService.releaseLock(readyLock)
     return ret
   }
-
   @Get('/getChatRooms/:uOId')
   async getChatRooms(@Headers() headers: any, @Param('uOId') uOId: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
@@ -134,7 +158,6 @@ export class SidebarController {
     const ret = await this.sidebarService.getChatRooms(uOId)
     return ret
   }
-
   @Get(`/documentG/getDocumentG/:dOId`)
   async getDocumentG(@Headers() headers: any, @Param('dOId') dOId: string) {
     const jwt = getJwtFromHeader(headers) ?? ''
@@ -142,6 +165,7 @@ export class SidebarController {
     try {
       returnedJwt = await this.gkdJwtService.verifyAsync(jwt)
     } catch (error) {
+      // BLANK LINE COMMENT:
       return {
         ok: false,
         body: {},
@@ -153,6 +177,28 @@ export class SidebarController {
     const uOId = returnedJwt.uOId
     const ret = await this.sidebarService.getDocumentG(uOId, dOId)
     this.lockService.releaseLock(readyLock)
+    return ret
+  }
+  @Get(`/documentG/getUsers/:dOId`)
+  async getDocumentGUsers(@Headers() headers: any, @Param('dOId') dOId: string) {
+    const jwt = getJwtFromHeader(headers) ?? ''
+    let returnedJwt: JwtPayload
+    try {
+      returnedJwt = await this.gkdJwtService.verifyAsync(jwt)
+    } catch (error) {
+      // BLANK LINE COMMENT:
+      return {
+        ok: false,
+        body: {},
+        errors: {jwt: 'Jwt invalid in getDocumentG'}
+      }
+    }
+
+    const readyLock = await this.lockService.readyLock(`documentG:${dOId}`)
+    const uOId = returnedJwt.uOId
+    const ret = await this.sidebarService.getDocumentGUsers(uOId, dOId)
+    this.lockService.releaseLock(readyLock)
+
     return ret
   }
 
@@ -172,5 +218,5 @@ export class SidebarController {
     const ret = await this.sidebarService.getSidebars(uOId)
     return ret
   }
-  // BLANK LINE COMMENT
+  // BLANK LINE COMMENT:
 }
