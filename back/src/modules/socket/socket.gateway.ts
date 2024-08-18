@@ -12,8 +12,10 @@ import {
   SocketChatConnectedType,
   SocketChatContentType,
   SocketDocChangeType,
+  SocketDocChatContentType,
   SocketDocConnectedType,
   SocketDocRequestLockType,
+  SocketDocSetUnreadChatType,
   SocketSetUnreadChatType,
   SocketTestCountType,
   SocketUserConnectedType
@@ -233,6 +235,58 @@ export class SocketGateway
   }
 
   // AREA1: socketDocumentGArea
+  @SubscribeMessage('documentG chatting')
+  async documentGChatting(client: Socket, payload: SocketDocChatContentType) {
+    if (
+      !payload.jwt ||
+      !payload.dOId ||
+      !payload.body ||
+      !payload.body.id ||
+      !payload.body.uOId ||
+      !payload.body.content
+    ) {
+      return
+    }
+
+    const isJwt = await this.gkdJwtService.verifyAsync(payload.jwt)
+    if (!isJwt) {
+      return
+    }
+
+    const dOId = payload.dOId
+    const uOId = payload.body.uOId
+
+    // 0. Lock 을 얻는다.
+    const readyLock = await this.lockService.readyLock(`documentG:${dOId}`)
+
+    // 1. 권한이 있는지 확인한다.
+    const docHasUser = await this.useDBService.DocumentGHasUser(dOId, uOId)
+    if (!docHasUser) {
+      this.lockService.releaseLock(readyLock)
+      return
+    }
+
+    // 2. DocDB 에 Chatblock 을 넣고 속해있는 user 를 가져온다.
+    const isInserted = await this.useDBService.insertChatBlockToDocG(dOId, payload.body)
+    if (!isInserted) {
+      this.lockService.releaseLock(readyLock)
+      return
+    }
+    //  3. 연결된 client 확인하는곳
+    const connectedClientIds = Array.from(this.server.sockets.adapter.rooms.get(dOId))
+
+    //  4. 연결된 유저는 채팅을 소켓으로 전송한다.
+    this.server.to(dOId).emit('documentG chatting', payload)
+
+    //  4. 채팅 소켓 연결 안 된 유저 확인
+    const docUsers = this.getUnconnectedUsersDocument(isInserted, connectedClientIds)
+
+    //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+    //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
+    this.processingUnconnectedUsersDocumentG(docUsers, dOId)
+
+    this.lockService.releaseLock(readyLock)
+  }
   @SubscribeMessage('documentG connected')
   async documentGConnected(client: Socket, payload: SocketDocConnectedType) {
     const ret = await this.initSocketD(client, payload)
@@ -286,7 +340,6 @@ export class SocketGateway
   }
 
   // AREA2: Private function Area
-
   private getUnconnectedUsers(
     usersObject: {[uOId: string]: boolean},
     connectedClientIds: string[]
@@ -298,7 +351,17 @@ export class SocketGateway
     })
     return result
   }
-
+  private getUnconnectedUsersDocument(
+    usersObject: {[uOId: string]: boolean},
+    connectedClientIds: string[]
+  ) {
+    const result = {...usersObject}
+    connectedClientIds.forEach(clientId => {
+      const uOId = this.sockDidInfo[clientId].uOId
+      delete result[uOId]
+    })
+    return result
+  }
   private initSocketP(client: Socket, payload: SocketUserConnectedType) {
     const uOid = payload.uOId
     const sid = client.id
@@ -323,7 +386,6 @@ export class SocketGateway
       sockChatOrDocId: ''
     }
   }
-
   private async initSocketC(client: Socket, payload: SocketChatConnectedType) {
     if (!payload.jwt || !payload.cOId || !payload.uOId || !payload.socketPId) {
       // this.logger.log("Payload isn't include information")
@@ -364,7 +426,6 @@ export class SocketGateway
     this.sockPidInfo[payload.socketPId].cOrdId = payload.cOId
     return true
   }
-
   private async initSocketD(client: Socket, payload: SocketDocConnectedType) {
     if (!payload.jwt || !payload.dOId || !payload.uOId || !payload.socketPId) {
       return false
@@ -407,7 +468,6 @@ export class SocketGateway
 
     return true
   }
-
   private processingUnconnectedUsers(
     chatRoomUsers: {[suOId: string]: boolean},
     cOId: string
@@ -429,6 +489,35 @@ export class SocketGateway
           const socketP = this.server.sockets.sockets.get(sockPId)
           if (socketP) {
             socketP.emit('set unread chat', payload)
+          }
+        })
+      }
+    })
+  }
+  private processingUnconnectedUsersDocumentG(
+    docUsers: {[suOId: string]: boolean},
+    dOId: string
+  ) {
+    const remainUsers = Object.keys(docUsers)
+    remainUsers.forEach(async _uOId => {
+      //  5. 연결 안 된 유저는 안 읽은 메시지를 늘린다.
+      const newUnreadChat = await this.useDBService.increaseUnreadChatDocument(
+        _uOId,
+        dOId
+      )
+
+      //  6. sockP 연결된 유저는 안 읽은 개수 전송한다.
+      if (this.uOidInfo[_uOId] && this.uOidInfo[_uOId].numConnectedP > 0) {
+        const sockPids = Object.keys(this.uOidInfo[_uOId].connectedP)
+        const payload: SocketDocSetUnreadChatType = {
+          uOId: _uOId,
+          dOId: dOId,
+          unreadChatDoc: newUnreadChat
+        }
+        sockPids.forEach(sockPId => {
+          const socketP = this.server.sockets.sockets.get(sockPId)
+          if (socketP) {
+            socketP.emit('set unread chat doc', payload)
           }
         })
       }

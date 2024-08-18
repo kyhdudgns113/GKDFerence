@@ -41,7 +41,6 @@ export class SidebarService {
     const ret = this.chatRoomsService.createSingleChatRoom(body, idOrEmail)
     return ret
   }
-
   async createDocument(body: SidebarBodyType) {
     const dOId = await this.documentGsService.createDocumentG(body)
     if (!dOId) {
@@ -155,7 +154,7 @@ export class SidebarService {
     }
     return {
       ok: true,
-      body: {title: ret.title, contents: ret.contents},
+      body: {title: ret.title, contents: ret.contents, chatBlocks: ret.chatBlocks},
       errors: {}
     }
   }

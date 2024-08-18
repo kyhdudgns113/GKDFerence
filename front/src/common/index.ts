@@ -107,6 +107,11 @@ export type SocketSetUnreadChatType = {
   unreadChat: number
 }
 // SocketDoc Type
+export type SocketDocChatContentType = {
+  jwt: string
+  dOId: string
+  body: ChatBlockType
+}
 export type SocketDocConnectedType = {
   jwt: string
   uOId: string

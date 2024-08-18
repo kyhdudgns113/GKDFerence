@@ -116,6 +116,20 @@ export class UserDBService {
     const user = await this.findOneByObjectId(uOId)
     return user.unReadChats[cOId]
   }
+  async increaseUnreadChatDocument(uOId: string, dOId: string) {
+    const _id = new Types.ObjectId(uOId)
+    await this.userModel.updateOne(
+      {_id: _id},
+      {
+        $inc: {
+          [`unReadChatsDoc.${dOId}`]: 1
+        }
+      }
+    )
+
+    const user = await this.findOneByObjectId(uOId)
+    return user.unReadChats[dOId]
+  }
 
   async setUnreadChat(uOId: string, cOId: string, newCnt: number) {
     const _id = new Types.ObjectId(uOId)

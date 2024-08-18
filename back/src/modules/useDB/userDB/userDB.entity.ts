@@ -25,6 +25,9 @@ export class User extends Document {
   @Prop({type: Object, default: {}})
   unReadChats: {[cOId: string]: number}
 
+  @Prop({type: Object, default: {}})
+  unReadChatsDoc: {[cOId: string]: number}
+
   /**
    * documentGs[dOId] = true
    */

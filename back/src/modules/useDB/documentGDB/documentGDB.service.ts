@@ -1,15 +1,17 @@
 import {Injectable} from '@nestjs/common'
 import {InjectModel} from '@nestjs/mongoose'
 import {Model, Types} from 'mongoose'
-import {DocumentG, DocumentGContent} from './documentGDB.entity'
-import {SocketDocChangeType} from 'src/common'
+import {DocumentG, DocumentGChatBlock, DocumentGContent} from './documentGDB.entity'
+import {ChatBlockType, SocketDocChangeType} from 'src/common'
 
 @Injectable()
 export class DocumentGDBService {
   constructor(
     @InjectModel(DocumentG.name) private documentGModel: Model<DocumentG>,
     @InjectModel(DocumentGContent.name)
-    private documentGContentModel: Model<DocumentGContent>
+    private documentGContentModel: Model<DocumentGContent>,
+    @InjectModel(DocumentGChatBlock.name)
+    private documentGChatModel: Model<DocumentGChatBlock>
   ) {}
 
   async addUserToDocumentG(dOId: string, uOId: string) {
@@ -89,7 +91,6 @@ export class DocumentGDBService {
 
     return ret
   }
-
   async documentGHasUser(dOId: string, uOId: string) {
     const documentG = await this.findOneByObjectId(dOId)
 
@@ -98,7 +99,6 @@ export class DocumentGDBService {
     }
     return true
   }
-
   async findOneByObjectId(dOId: string) {
     const _id = new Types.ObjectId(dOId)
     const documentG = await this.documentGModel.findOne({_id: _id})
@@ -113,12 +113,31 @@ export class DocumentGDBService {
     const contents = documentG.contents.map((content, index) => {
       return content.content
     })
-    return {title: documentG.title, contents: contents}
+    return {title: documentG.title, contents: contents, chatBlocks: documentG.chatBlocks}
   }
   async getDocumentGUsers(dOId: string) {
     const documentG = await this.findOneByObjectId(dOId)
     return documentG.uOIds
   }
 
-  // BLANK LINE COMMENT
+  async insertChatBlock(dOId: string, chatBlock: ChatBlockType) {
+    const documentG = await this.findOneByObjectId(dOId)
+    if (!documentG) {
+      return null
+    }
+
+    const newIdx = documentG.chatBlocks.length
+    const newDate = new Date()
+
+    chatBlock.idx = newIdx
+    chatBlock.date = newDate
+
+    const newChatBlock = new this.documentGChatModel(chatBlock)
+    documentG.chatBlocks.push(newChatBlock)
+    await documentG.save()
+
+    return documentG.uOIds
+  }
+
+  // BLANK LINE COMMENT:
 }

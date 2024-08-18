@@ -1,4 +1,4 @@
-import {DocumentGChatting} from './DocumentGChatting'
+import {DocumentGChatting} from './DocumentGChatting/DocumentGChatting'
 import DocumentGContents from './DocumentGContents'
 
 export default function DocumentGPage() {

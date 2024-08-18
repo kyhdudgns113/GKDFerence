@@ -88,7 +88,6 @@ export const SingleChatProvider: FC<PropsWithChildren<SingleChatProviderProps>> 
     },
     [setChatRooms]
   )
-
   const onChat = useCallback((newSocket: SocketType) => {
     if (newSocket) {
       newSocket.on('chat', (payload: SocketChatContentType) => {

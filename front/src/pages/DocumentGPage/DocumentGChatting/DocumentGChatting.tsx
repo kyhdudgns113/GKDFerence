@@ -1,20 +1,23 @@
 import {ChangeEvent, MouseEvent, useCallback, useState} from 'react'
-import {Icon} from '../../components'
-import {useAuth, useDocumentGContext} from '../../contexts'
-import {get, post} from '../../server'
-import {DocAddUserBodyType, DocUserInfoType} from '../../common'
+import {Button, Icon} from '../../../components'
+import {useAuth, useDocumentGContext} from '../../../contexts'
+import {get, post} from '../../../server'
+import {DocAddUserBodyType, DocUserInfoType} from '../../../common'
 
-import * as T from '../../components/Base/Texts'
+import * as T from '../../../components/Base/Texts'
+import {DocChatBlockMy, DocChatBlockOther} from './components'
 
 export function DocumentGChatting() {
+  const [chatInputVal, setChatInputVal] = useState<string>('')
   const [idOrEmailVal, setIdOrEmailVal] = useState<string>('')
   const [isUserListLoaded, setIsUserListLoaded] = useState<boolean>(false)
   const [showUserList, setShowUserList] = useState<boolean>(false)
   const [userErrMsg, setUserErrMsg] = useState<string>('')
   const [userList, setUserList] = useState<DocUserInfoType[]>([])
 
-  const {dOId} = useDocumentGContext()
-  const {getJwt} = useAuth()
+  const {dOId, divChatsBodyRef, chatBlocks, chat, setScrollYMax, setScrollYVal} =
+    useDocumentGContext()
+  const {uOId, getJwt} = useAuth()
 
   // AREA1: Just function area
   const addUser = useCallback(
@@ -65,6 +68,13 @@ export function DocumentGChatting() {
   const onClickErrorMessage = useCallback((e: MouseEvent<HTMLParagraphElement>) => {
     setUserErrMsg('')
   }, [])
+  const onClickSendChat = useCallback(
+    (chatInputVal: string) => (e: MouseEvent<HTMLButtonElement>) => {
+      chat(chatInputVal)
+      setChatInputVal('')
+    },
+    [chat]
+  )
   const onClickToggleUserListModal = useCallback(
     (e: MouseEvent<HTMLSpanElement>) => {
       e.stopPropagation()
@@ -110,12 +120,14 @@ export function DocumentGChatting() {
           onClick={onClickToggleUserListModal}
         />
       </div>
-      <div className="BLOCK_CHATTING h-4/5 bg-blue-400 w-full relative">
+      <div className="BLOCK_CHATTING_AND_MODAL h-4/5 w-full relative">
+        {/* USER LIST MODAL AREA */}
         <div
           className="BLOCK_USER_LIST_BACKGROUND absolute items-center justify-center inset-0 z-20 w-full h-3/5"
-          onClick={e => e.stopPropagation()}
           style={{display: showUserList ? 'flex' : 'none'}}>
-          <div className="BLOCK_USER_LIST_CENTER flex flex-col w-4/5 h-full border-4 border-gkd-sakura-text bg-white rounded-2xl p-4 ">
+          <div
+            className="BLOCK_USER_LIST_CENTER flex flex-col w-4/5 h-full border-4 border-gkd-sakura-text bg-white rounded-2xl p-4 "
+            onClick={e => e.stopPropagation()}>
             <div className="BLOCK_NEW_USER flex flex-row items-center w-full">
               <div
                 className="BLOCK_NEW_USER_TEXT relative flex flex-row items-center border-2"
@@ -156,7 +168,44 @@ export function DocumentGChatting() {
             </div>
           </div>
         </div>
-        <p>Show me the chat</p>
+        {/* CHATTING BLOCK AREA */}
+        <div className="BLOCK_CHATTING flex flex-col border-2 border-gkd-sakura-text ml-4 mr-4 bg-gkd-sakura-bg h-[700px]">
+          <div
+            className="CHAT_BLOCKS h-full overflow-y-scroll"
+            onScroll={e => {
+              setScrollYVal(divChatsBodyRef?.current?.scrollTop || 0)
+              setScrollYMax(divChatsBodyRef?.current?.scrollHeight || 0)
+            }}
+            ref={divChatsBodyRef}>
+            {chatBlocks &&
+              chatBlocks.map((chatBlock, index) => {
+                if (chatBlock.uOId === uOId) {
+                  return (
+                    <div key={`chat:${chatBlock.idx}`}>
+                      <DocChatBlockMy chatBlock={chatBlock} index={chatBlock.idx || 0} />
+                    </div>
+                  )
+                } // BLANK LINE COMMENT:
+                else {
+                  return (
+                    <div key={`chat:${chatBlock.idx}`}>
+                      <DocChatBlockOther chatBlock={chatBlock} index={chatBlock.idx || 0} />
+                    </div>
+                  )
+                }
+              })}
+          </div>
+          <div className="CHAT_INPUTS flex flex-row h-fit">
+            <textarea
+              className="border-2 resize-none p-2 outline-none border-gkd-sakura-text w-full"
+              onChange={e => setChatInputVal(e.currentTarget.value)}
+              value={chatInputVal}
+            />
+            <Button className="h-full" onClick={onClickSendChat(chatInputVal)}>
+              send
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )

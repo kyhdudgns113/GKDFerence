@@ -1,6 +1,25 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose'
 import {Document} from 'mongoose'
 
+@Schema()
+export class DocumentGChatBlock {
+  @Prop()
+  idx: number
+
+  @Prop()
+  id: string
+
+  @Prop()
+  uOId: string
+
+  @Prop()
+  date: Date
+
+  @Prop()
+  content: string
+}
+export const DocumentGChatBlockSchema = SchemaFactory.createForClass(DocumentGChatBlock)
+
 // FUTURE: 이미지도 저장 가능하도록 조정해야 한다.
 // FUTURE: 그래서 DocContent Schema 를 따로 만들었다.
 @Schema()
@@ -8,7 +27,6 @@ export class DocumentGContent extends Document {
   @Prop()
   content: string
 }
-
 export const DocumentGContentSchema = SchemaFactory.createForClass(DocumentGContent)
 
 @Schema()
@@ -23,6 +41,9 @@ export class DocumentG extends Document {
 
   @Prop({type: [DocumentGContentSchema], default: []})
   contents: DocumentGContent[]
+
+  @Prop({type: [DocumentGChatBlockSchema], default: []})
+  chatBlocks: DocumentGChatBlock[]
 
   @Prop({type: Date, default: Date.now})
   createdDt: Date

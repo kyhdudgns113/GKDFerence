@@ -173,21 +173,17 @@ export class UseDBService {
   async getChatBlocks(cOId: string) {
     return await this.chatRoomDBService.getChatBlocks(cOId)
   }
-
   async getChatRoomUsers(cOId: string) {
     return await this.chatRoomDBService.getChatRoomUsers(cOId)
   }
-
   async getDocumentG(dOId: string) {
     return await this.documentGDBService.getDocumentG(dOId)
   }
-
   async getDocumentGUsers(dOId: string) {
     const uOIdObj = await this.documentGDBService.getDocumentGUsers(dOId)
     const uOIds = Object.keys(uOIdObj)
     return uOIds
   }
-
   async getUserIdEmail(uOId: string) {
     const ret = await this.userDBService.getUserIdEmail(uOId)
     return ret
@@ -201,11 +197,18 @@ export class UseDBService {
     const ret = await this.userDBService.increaseUnreadChat(uOId, cOId)
     return ret
   }
-
+  async increaseUnreadChatDocument(uOId: string, dOId: string) {
+    const ret = await this.userDBService.increaseUnreadChatDocument(uOId, dOId)
+    return ret
+  }
   /**
    */
   async insertChatBlock(cOId: string, chatBlock: ChatBlockType) {
     const ret = await this.chatRoomDBService.insertChatBlock(cOId, chatBlock)
+    return ret
+  }
+  async insertChatBlockToDocG(dOId: string, chatBlock: ChatBlockType) {
+    const ret = await this.documentGDBService.insertChatBlock(dOId, chatBlock)
     return ret
   }
   // BLANK LINE COMMENT:
